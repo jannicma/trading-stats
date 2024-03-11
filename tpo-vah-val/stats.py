@@ -1,36 +1,68 @@
+from math import floor
 import ccxt
 from datetime import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 
+def print_tpo(tpo_dict):
+        # Extract data as lists
+    keys = list(tpo_dict.keys())
+    values = list(tpo_dict.values())
 
+    # Create bar chart with Seaborn
+    sns.barplot(x=values, y=keys, orient='h')  # Use 'h' for horizontal bars
 
-def create_tpo(df):
-    # Define price buckets
-    price_buckets = pd.cut(df[['high', 'low']].max(axis=1),
-                        bins=range(int(min(df['high'])), int(max(df['high'])), 21),
-                        right=True)
+    # Set chart labels and title
+    plt.xlabel('Value')
+    plt.ylabel('Key')
+    plt.title('Seaborn Bar Chart (Keys vs. Values)')
 
-    # Aggregate volume by bucket
-    volume_by_bucket = price_buckets.value_counts()
+    # Make bars thicker
+    sns.despine(left=True)  # Remove unnecessary left spine
 
-    # Calculate Point of Control (POC)
-    poc = volume_by_bucket.idxmax()
+    # Optional: Rotate x-axis labels for better readability
+    plt.xticks(rotation=45)  # Rotate labels by 45 degrees
 
-    center_points = [(interval.left + interval.right) / 2 for interval in volume_by_bucket.index]
-    poc_center = (poc.left + poc.right) / 2
-
-    # Plot histogram
-    plt.bar(center_points, volume_by_bucket.values)  # Pass the list of center points
-    plt.xlabel('Price Bucket ($)')
-    plt.ylabel('Volume')
-    plt.title('TPO Chart (BTC/USDT) - ' + str(datetime.today().date()))
-    plt.axvline(x=poc_center, color='red', linestyle='dashed', linewidth=2, label='POC')
-    plt.legend()
+    # Show the chart
+    plt.tight_layout()
     plt.show()
 
 
+def calculate_value_area(tpo_dict, pct=70):
 
+
+
+    # Return results
+    return 3, 1, 2
+
+
+
+def create_tpo(df, tpo_size = 21):
+    max_val = df['high'].max()
+    min_val = df['low'].min()
+
+    max_box_level = floor(max_val / tpo_size) * tpo_size
+    min_box_level = floor(min_val / tpo_size) * tpo_size
+
+    tpo_dict = {}
+    for num in range(min_box_level, max_box_level+1, tpo_size):
+        tpo_dict[num] = 0
+
+    for _ , row in df.iterrows():
+        high = row['high']
+        low = row['low']
+
+        for key in tpo_dict:
+            if low < (key + tpo_size) and high >= key:
+                tpo_dict[key]+=1
+        
+    if False:
+        print_tpo(tpo_dict)
+
+    vah, val, poc = calculate_value_area(tpo_dict, 70)
+
+    a = 0
 
 
 
