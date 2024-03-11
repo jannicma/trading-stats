@@ -5,6 +5,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+def closest_number(numbers, target):
+    def distance(num):
+        return abs(num - target)
+    
+    return min(numbers, key=distance)
+
+
 def print_tpo(tpo_dict):
         # Extract data as lists
     keys = list(tpo_dict.keys())
@@ -28,13 +35,36 @@ def print_tpo(tpo_dict):
     plt.tight_layout()
     plt.show()
 
+def calculate_poc(tpo_dict):
+    tpo_height = len(tpo_dict)
+
+    max_tpos = max(tpo_dict.values())
+    highest_tpos = {}
+    i = 0
+    for price, tpos in tpo_dict.items():
+        if tpos == max_tpos:
+            highest_tpos[i] = price
+        i+=1
+
+    poc = 0
+    if len(highest_tpos) > 1:
+        keys = highest_tpos.keys()
+        key = closest_number(keys, tpo_height/2)
+        poc = highest_tpos[key]
+    else:
+        poc = list(highest_tpos.values())[0]
+
+    return poc
+
 
 def calculate_value_area(tpo_dict, pct=70):
+    tpo_dict = dict(sorted(tpo_dict.items()))
 
-
+    #calculate POC
+    poc = calculate_poc(tpo_dict)
 
     # Return results
-    return 3, 1, 2
+    return 3, 1, poc
 
 
 
@@ -66,6 +96,8 @@ def create_tpo(df, tpo_size = 21):
 
 
 
+
+
 mexc = ccxt.mexc()
 data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=70)
 
@@ -76,12 +108,6 @@ today = datetime.today().date()
 data_today = pd_data[pd_data['timestamp'].dt.date == today]
 
 create_tpo(data_today)
-
-
-
-
-
-
 
 
 a = ''
