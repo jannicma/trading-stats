@@ -1,6 +1,6 @@
 from math import floor
 import ccxt
-from datetime import datetime
+from datetime import datetime, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -71,11 +71,11 @@ def calculate_value_area(tpos, va, poc, block_size):
             lower_level -= block_size
         else:
             if lower_level not in tpos.keys() or (upper_level in tpos.keys() and tpos[upper_level] >= tpos[lower_level]):
-                upper_level += block_size
                 tpos_done += tpos[upper_level]
+                upper_level += block_size
             else:
-                lower_level -= block_size
                 tpos_done += tpos[lower_level]
+                lower_level -= block_size
 
     return upper_level, lower_level
 
@@ -90,7 +90,7 @@ def calculate_tpo_values(tpo_dict, tpo_size, value_area=70):
     vah, val = calculate_value_area(tpo_dict, value_area, poc, tpo_size)
 
     # Return results
-    return 3, 1, poc
+    return vah, val, poc
 
 
 
@@ -115,17 +115,15 @@ def create_tpo(df, tpo_size = 21):
         
     if False:
         print_tpo(tpo_dict)
-
+    
     vah, val, poc = calculate_tpo_values(tpo_dict, tpo_size, 70)
-
-    a = 0
-
+    return poc, vah, val
 
 
 
 
 mexc = ccxt.mexc()
-data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=70)
+data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=300)
 
 pd_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
 pd_data['timestamp'] = pd.to_datetime(pd_data['timestamp'], unit='ms')
@@ -135,5 +133,10 @@ data_today = pd_data[pd_data['timestamp'].dt.date == today]
 
 create_tpo(data_today)
 
+for i in range(5):
+    day = datetime.today().date() - timedelta(days=i)
+    data_day = pd_data[pd_data['timestamp'].dt.date == day]
 
-a = ''
+    print(day)
+    print(create_tpo(data_day))
+    print('-------')
