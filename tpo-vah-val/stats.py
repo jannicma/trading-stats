@@ -57,11 +57,37 @@ def calculate_poc(tpo_dict):
     return poc
 
 
-def calculate_value_area(tpo_dict, pct=70):
+def calculate_value_area(tpos, va, poc, block_size):
+    tpo_count = sum(tpos.values())
+    tpo_va = floor(tpo_count / 100 * va)
+    tpos_done = 0
+    upper_level = poc
+    lower_level = poc
+
+    while tpos_done <= tpo_va:
+        if tpos_done == 0:
+            tpos_done += tpos[poc]
+            upper_level += block_size
+            lower_level -= block_size
+        else:
+            if lower_level not in tpos.keys() or (upper_level in tpos.keys() and tpos[upper_level] >= tpos[lower_level]):
+                upper_level += block_size
+                tpos_done += tpos[upper_level]
+            else:
+                lower_level -= block_size
+                tpos_done += tpos[lower_level]
+
+    return upper_level, lower_level
+
+
+def calculate_tpo_values(tpo_dict, tpo_size, value_area=70):
     tpo_dict = dict(sorted(tpo_dict.items()))
 
     #calculate POC
     poc = calculate_poc(tpo_dict)
+
+    #calculate VAH / VAL
+    vah, val = calculate_value_area(tpo_dict, value_area, poc, tpo_size)
 
     # Return results
     return 3, 1, poc
@@ -90,7 +116,7 @@ def create_tpo(df, tpo_size = 21):
     if False:
         print_tpo(tpo_dict)
 
-    vah, val, poc = calculate_value_area(tpo_dict, 70)
+    vah, val, poc = calculate_tpo_values(tpo_dict, tpo_size, 70)
 
     a = 0
 
