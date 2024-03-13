@@ -1,6 +1,6 @@
 from math import floor
 import ccxt
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -123,9 +123,19 @@ def create_tpo(df, tpo_size = 21):
 
 def simulate_strategy(data):
     first_timestamp = pd.to_datetime(data.head(1)['timestamp'])
-    first_day = first_timestamp + timedelta(days=1)
-    first_day 
-    a =0
+    first_day = first_timestamp.iloc[0] - timedelta(hours=first_timestamp.iloc[0].hour, minutes=first_timestamp.iloc[0].minute)
+
+    loop = True
+    daily_date = first_day
+    current_time = timedelta(hours=23, minutes=30)
+    while loop:
+        if current_time == timedelta(hours=23, minutes=30):  #84600:
+            current_time = timedelta(hours=6)
+            daily_date += timedelta(days=1)
+        daily_data = data[data['timestamp'].dt.date == daily_date ] #and data['timestamp'].dt.time <= current_time
+        current_time += timedelta(minutes=30)
+    
+    a = 0
 
 
 mexc = ccxt.mexc()
