@@ -121,6 +121,12 @@ def create_tpo(df, tpo_size = 21):
 
 
 
+def simulate_strategy(data):
+    first_timestamp = pd.to_datetime(data.head(1)['timestamp'])
+    first_day = first_timestamp + timedelta(days=1)
+    first_day 
+    a =0
+
 
 mexc = ccxt.mexc()
 data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=300)
@@ -128,15 +134,20 @@ data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=300)
 pd_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
 pd_data['timestamp'] = pd.to_datetime(pd_data['timestamp'], unit='ms')
 
-today = datetime.today().date()
-data_today = pd_data[pd_data['timestamp'].dt.date == today]
 
-create_tpo(data_today)
+simulate_strategy(pd_data)
 
-for i in range(5):
-    day = datetime.today().date() - timedelta(days=i)
-    data_day = pd_data[pd_data['timestamp'].dt.date == day]
 
-    print(day)
-    print(create_tpo(data_day))
-    print('-------')
+# today = datetime.today().date()
+# data_today = pd_data[pd_data['timestamp'].dt.date == today]
+
+
+# create_tpo(data_today)
+
+# for i in range(5):
+#     day = datetime.today().date() - timedelta(days=i)
+#     data_day = pd_data[pd_data['timestamp'].dt.date == day]
+
+#     print(day)
+#     print(create_tpo(data_day))
+#     print('-------')
