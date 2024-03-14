@@ -95,8 +95,8 @@ def calculate_tpo_values(tpo_dict, tpo_size, value_area=70):
 
 
 def create_tpo(df, tpo_size = 21):
-    max_val = df['high'].max()
-    min_val = df['low'].min()
+    max_val: int = df['high'].max()
+    min_val: int = df['low'].min()
 
     max_box_level = floor(max_val / tpo_size) * tpo_size
     min_box_level = floor(min_val / tpo_size) * tpo_size
@@ -106,7 +106,7 @@ def create_tpo(df, tpo_size = 21):
         tpo_dict[num] = 0
 
     for _ , row in df.iterrows():
-        high = row['high']
+        high: int = row['high']
         low = row['low']
 
         for key in tpo_dict:
@@ -120,20 +120,31 @@ def create_tpo(df, tpo_size = 21):
     return poc, vah, val
 
 
+def add_minutes(original_time, min = 30):
+    total_minutes: int = original_time.hour * 60 + original_time.minute
+    total_minutes += min
+    new_hours: int = total_minutes // 60
+    new_minutes: int = total_minutes % 60
+    new_time: time = time(new_hours, new_minutes)
+    return new_time
+
 
 def simulate_strategy(data):
-    first_timestamp = pd.to_datetime(data.head(1)['timestamp'])
-    first_day = first_timestamp.iloc[0] - timedelta(hours=first_timestamp.iloc[0].hour, minutes=first_timestamp.iloc[0].minute)
+    first_timestamp: pd.Timestamp = pd.to_datetime(data.head(1)['timestamp']).iloc[0]
+    first_day: pd.Timestamp = first_timestamp - timedelta(hours=first_timestamp.hour, minutes=first_timestamp.minute)
 
-    loop = True
-    daily_date = first_day
-    current_time = timedelta(hours=23, minutes=30)
+    loop: bool = True
+    daily_date: pd.Timestamp = first_day
+    current_time: time = time(hour=23, minute=30)
     while loop:
-        if current_time == timedelta(hours=23, minutes=30):  #84600:
-            current_time = timedelta(hours=6)
+        if current_time == time(hour=23, minute=30):
+            current_time = time(hour=6)
             daily_date += timedelta(days=1)
-        daily_data = data[data['timestamp'].dt.date == daily_date ] #and data['timestamp'].dt.time <= current_time
-        current_time += timedelta(minutes=30)
+
+        boolean_series: pd.Series = (data['timestamp'].dt.date == daily_date.date()) & (data['timestamp'].dt.time <= current_time)
+        daily_data: pd.DataFrame = data[boolean_series]
+
+        current_time = add_minutes(current_time)
     
     a = 0
 
