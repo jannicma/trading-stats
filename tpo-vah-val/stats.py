@@ -136,13 +136,36 @@ def simulate_strategy(data):
     loop: bool = True
     daily_date: pd.Timestamp = first_day
     current_time: time = time(hour=23, minute=30)
+    poc: int = 0
+    vah: int = 0
+    val: int = 0
+    entry: float = 0.0
+    deviation: float = 0.0
+
     while loop:
         if current_time == time(hour=23, minute=30):
             current_time = time(hour=6)
             daily_date += timedelta(days=1)
+            poc, vah, val = (0, 0, 0)
 
         boolean_series: pd.Series = (data['timestamp'].dt.date == daily_date.date()) & (data['timestamp'].dt.time <= current_time)
         daily_data: pd.DataFrame = data[boolean_series]
+        
+        if poc > 0:
+            if daily_data.iloc[-1]['high'] > vah and entry == 0:
+                #short
+                #TODO kann nicht stimmen... ifs anschauen!
+                entry = vah
+                current_deviation: float = daily_data.iloc[-1]['high'] - vah
+                if current_deviation > deviation:
+                    deviation = current_deviation
+
+
+            elif daily_data.iloc[-1]['low'] < val:
+                #long
+                a = 0
+
+        poc, vah, val = create_tpo(daily_data)
 
         current_time = add_minutes(current_time)
     
