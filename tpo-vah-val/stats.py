@@ -1,9 +1,28 @@
 from math import floor
+from typing import Union
 import ccxt
 from datetime import datetime, time, timedelta
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+
+class trade_model:
+    def __init__(self, entry, is_long, deviation, poc_hit = None, range_hit = None):
+        self.entry: float = entry
+        self.is_long: bool = is_long
+        self.deviation: float = deviation
+        self.poc_hit: Union[float, None] = poc_hit
+        self.range_hit: Union[float, None] = range_hit
+
+    def print_trade(self):
+        print('Entry: ' + str(self.entry))
+
+    def finish_trade(self):
+        self.print_trade()
+        return None
+
+
 
 def closest_number(numbers, target):
     def distance(num):
@@ -139,11 +158,8 @@ def simulate_strategy(data):
     poc: int = 0
     vah: int = 0
     val: int = 0
-    entry: float = 0.0
-    deviation: float = 0.0
-    entry_long: bool = False
-    poc_hit: int = 0
-    range_hit: int = 0
+    end_trade = False
+    trade: Union[trade_model, None] = None
 
     while loop:
         if current_time == time(hour=23, minute=30):
@@ -156,58 +172,66 @@ def simulate_strategy(data):
         
         if poc > 0:
             #in trade
-            if entry > 0:
+            if isinstance(trade, trade_model):
                 #in long
-                if entry_long:
+                if trade.is_long:
                     #update deviation
-                    if entry - daily_data.iloc[-1]['low'] > deviation:
-                        deviation = entry - daily_data.iloc[-1]['low']
+                    if trade.entry - daily_data.iloc[-1]['low'] > trade.deviation:
+                        trade.deviation = trade.entry - daily_data.iloc[-1]['low']
+                        if trade.deviation > 300:
+                            end_trade = True
 
                     #poc hit
-                    if daily_data.iloc[-1]['high'] >= poc and poc_hit == 0:
-                        poc_hit = poc
+                    if daily_data.iloc[-1]['high'] >= poc and trade.poc_hit == 0:
+                        trade.poc_hit = poc
 
                     #entry after poc hit
-                    if poc_hit > 0 and daily_data.iloc[-1]['low'] <= entry:
-                        a=0
+                    if trade.poc_hit is not None and trade.poc_hit > 0 and daily_data.iloc[-1]['low'] <= trade.entry:
+                        end_trade = True
 
                     #vah hit
                     if daily_data.iloc[-1]['high'] >= vah:
-                        range_hit = vah
+                        trade.range_hit = vah
+                        end_trade = True
 
 
                 #in short
-                elif not entry_long:
+                else:
                     #update deviation
-                    if daily_data.iloc[-1]['high'] - entry > deviation:
-                        deviation = daily_data.iloc[-1]['high'] - entry
+                    if daily_data.iloc[-1]['high'] - trade.entry > trade.deviation:
+                        trade.deviation = daily_data.iloc[-1]['high'] - trade.entry
+                        if trade.deviation > 300:
+                            end_trade = True
 
                     #poc hit
-                    if daily_data.iloc[-1]['low'] <= poc and poc_hit == 0:
-                        poc_hit = poc
+                    if daily_data.iloc[-1]['low'] <= poc and trade.poc_hit == 0:
+                        trade.poc_hit = poc
 
                     #entry after poc hit
-                    if poc_hit > 0 and daily_data.iloc[-1]['high'] >= entry:
-                        a=0
+                    if trade.poc_hit is not None and trade.poc_hit > 0 and daily_data.iloc[-1]['high'] >= trade.entry:
+                        end_trade = True
 
                     #val hit
                     if daily_data.iloc[-1]['low'] <= val:
-                        range_hit = val
+                        trade.range_hit = val
+                        end_trade = True
 
+                if end_trade:
+                    trade.finish_trade()
+                    end_trade = False
 
             #entry
-            if entry == 0:
+            if trade is None:
                 #short
                 if daily_data.iloc[-1]['high'] > vah:
-                    entry_long = False
-                    entry = vah
                     deviation = daily_data.iloc[-1]['high'] - vah
+                    trade = trade_model(vah, False, deviation)
 
                 #long
                 elif daily_data.iloc[-1]['low'] < val:
-                    entry_long = True
-                    entry = val
                     deviation = val - daily_data.iloc[-1]['low']
+                    trade = trade_model(val, True, deviation)
+
 
 
         poc, vah, val = create_tpo(daily_data)
