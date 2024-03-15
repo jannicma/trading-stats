@@ -141,6 +141,9 @@ def simulate_strategy(data):
     val: int = 0
     entry: float = 0.0
     deviation: float = 0.0
+    entry_long: bool = False
+    poc_hit: int = 0
+    range_hit: int = 0
 
     while loop:
         if current_time == time(hour=23, minute=30):
@@ -152,18 +155,60 @@ def simulate_strategy(data):
         daily_data: pd.DataFrame = data[boolean_series]
         
         if poc > 0:
-            if daily_data.iloc[-1]['high'] > vah and entry == 0:
+            #in trade
+            if entry > 0:
+                #in long
+                if entry_long:
+                    #update deviation
+                    if entry - daily_data.iloc[-1]['low'] > deviation:
+                        deviation = entry - daily_data.iloc[-1]['low']
+
+                    #poc hit
+                    if daily_data.iloc[-1]['high'] >= poc and poc_hit == 0:
+                        poc_hit = poc
+
+                    #entry after poc hit
+                    if poc_hit > 0 and daily_data.iloc[-1]['low'] <= entry:
+                        a=0
+
+                    #vah hit
+                    if daily_data.iloc[-1]['high'] >= vah:
+                        range_hit = vah
+
+
+                #in short
+                elif not entry_long:
+                    #update deviation
+                    if daily_data.iloc[-1]['high'] - entry > deviation:
+                        deviation = daily_data.iloc[-1]['high'] - entry
+
+                    #poc hit
+                    if daily_data.iloc[-1]['low'] <= poc and poc_hit == 0:
+                        poc_hit = poc
+
+                    #entry after poc hit
+                    if poc_hit > 0 and daily_data.iloc[-1]['high'] >= entry:
+                        a=0
+
+                    #val hit
+                    if daily_data.iloc[-1]['low'] <= val:
+                        range_hit = val
+
+
+            #entry
+            if entry == 0:
                 #short
-                #TODO kann nicht stimmen... ifs anschauen!
-                entry = vah
-                current_deviation: float = daily_data.iloc[-1]['high'] - vah
-                if current_deviation > deviation:
-                    deviation = current_deviation
+                if daily_data.iloc[-1]['high'] > vah:
+                    entry_long = False
+                    entry = vah
+                    deviation = daily_data.iloc[-1]['high'] - vah
 
-
-            elif daily_data.iloc[-1]['low'] < val:
                 #long
-                a = 0
+                elif daily_data.iloc[-1]['low'] < val:
+                    entry_long = True
+                    entry = val
+                    deviation = val - daily_data.iloc[-1]['low']
+
 
         poc, vah, val = create_tpo(daily_data)
 
