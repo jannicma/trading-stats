@@ -1,4 +1,4 @@
-from datetime import time, timedelta
+from datetime import datetime, time, timedelta
 import pandas as pd
 from trade_model import trade_model
 from helpers import add_minutes
@@ -20,6 +20,7 @@ def simulate_strategy(data):
     val: int = 0
     end_trade = False
     trade: Union[trade_model, None] = None
+    last_datetime: datetime = datetime.min
 
     while loop:
         if current_time == time(hour=23, minute=30):
@@ -38,11 +39,11 @@ def simulate_strategy(data):
                     #update deviation
                     if trade.entry - daily_data.iloc[-1]['low'] > trade.deviation:
                         trade.deviation = trade.entry - daily_data.iloc[-1]['low']
-                        if trade.deviation > 300:
+                        if trade.deviation > 500:
                             end_trade = True
 
                     #poc hit
-                    if daily_data.iloc[-1]['high'] >= poc and trade.poc_hit == 0:
+                    if daily_data.iloc[-1]['high'] >= poc and trade.poc_hit is None:
                         trade.poc_hit = poc
 
                     #entry after poc hit
@@ -64,7 +65,7 @@ def simulate_strategy(data):
                             end_trade = True
 
                     #poc hit
-                    if daily_data.iloc[-1]['low'] <= poc and trade.poc_hit == 0:
+                    if daily_data.iloc[-1]['low'] <= poc and trade.poc_hit is None:
                         trade.poc_hit = poc
 
                     #entry after poc hit
@@ -77,18 +78,20 @@ def simulate_strategy(data):
                         end_trade = True
 
                 if end_trade:
+                    last_datetime = trade.entry_time
                     trade = trade.finish_trade()
                     end_trade = False
 
             #entry
             if trade is None:
+                min_datetime: datetime = last_datetime + timedelta(hours=1)
                 #short
-                if daily_data.iloc[-1]['high'] > vah:
+                if daily_data.iloc[-1]['high'] > vah and min_datetime <= daily_data.iloc[-1]['timestamp']:
                     deviation = daily_data.iloc[-1]['high'] - vah
                     trade = trade_model(vah, daily_data.iloc[-1]['timestamp'], False, deviation)
 
                 #long
-                elif daily_data.iloc[-1]['low'] < val:
+                elif daily_data.iloc[-1]['low'] < val and min_datetime <= daily_data.iloc[-1]['timestamp']:
                     deviation = val - daily_data.iloc[-1]['low']
                     trade = trade_model(val, daily_data.iloc[-1]['timestamp'], True, deviation)
 
