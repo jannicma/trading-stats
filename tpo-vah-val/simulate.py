@@ -81,17 +81,20 @@ def simulate_strategy(data):
                     last_datetime = trade.entry_time
                     trade = trade.finish_trade()
                     end_trade = False
+                    print('-----------')
 
             #entry
             if trade is None:
                 min_datetime: datetime = last_datetime + timedelta(hours=1)
                 #short
                 if daily_data.iloc[-1]['high'] > vah and min_datetime <= daily_data.iloc[-1]['timestamp']:
+                    print(vah, val, poc)
                     deviation = daily_data.iloc[-1]['high'] - vah
                     trade = trade_model(vah, daily_data.iloc[-1]['timestamp'], False, deviation)
 
                 #long
                 elif daily_data.iloc[-1]['low'] < val and min_datetime <= daily_data.iloc[-1]['timestamp']:
+                    print(vah, val, poc)
                     deviation = val - daily_data.iloc[-1]['low']
                     trade = trade_model(val, daily_data.iloc[-1]['timestamp'], True, deviation)
 
