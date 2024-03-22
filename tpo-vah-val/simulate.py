@@ -39,7 +39,7 @@ def simulate_strategy(data):
                     #update deviation
                     if trade.entry - daily_data.iloc[-1]['low'] > trade.deviation:
                         trade.deviation = trade.entry - daily_data.iloc[-1]['low']
-                        if trade.deviation > 500:
+                        if trade.deviation > 1300:
                             end_trade = True
 
                     #poc hit
@@ -61,7 +61,7 @@ def simulate_strategy(data):
                     #update deviation
                     if daily_data.iloc[-1]['high'] - trade.entry > trade.deviation:
                         trade.deviation = daily_data.iloc[-1]['high'] - trade.entry
-                        if trade.deviation > 300:
+                        if trade.deviation > 1300:
                             end_trade = True
 
                     #poc hit
@@ -87,13 +87,13 @@ def simulate_strategy(data):
             if trade is None:
                 min_datetime: datetime = last_datetime + timedelta(hours=1)
                 #short
-                if daily_data.iloc[-1]['high'] > vah and min_datetime <= daily_data.iloc[-1]['timestamp']:
+                if daily_data.iloc[-1]['high'] > vah and daily_data.iloc[-2]['close'] <= vah and min_datetime <= daily_data.iloc[-1]['timestamp']:
                     print(vah, val, poc)
                     deviation = daily_data.iloc[-1]['high'] - vah
                     trade = trade_model(vah, daily_data.iloc[-1]['timestamp'], False, deviation)
 
                 #long
-                elif daily_data.iloc[-1]['low'] < val and min_datetime <= daily_data.iloc[-1]['timestamp']:
+                elif daily_data.iloc[-1]['low'] < val and daily_data.iloc[-2]['close'] >= val and min_datetime <= daily_data.iloc[-1]['timestamp']:
                     print(vah, val, poc)
                     deviation = val - daily_data.iloc[-1]['low']
                     trade = trade_model(val, daily_data.iloc[-1]['timestamp'], True, deviation)
