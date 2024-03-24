@@ -31,6 +31,9 @@ def simulate_strategy(data):
         boolean_series: pd.Series = (data['timestamp'].dt.date == daily_date.date()) & (data['timestamp'].dt.time <= current_time)
         daily_data: pd.DataFrame = data[boolean_series]
         
+        if len(daily_data) == 0:
+            break
+
         if poc > 0:
             #in trade
             if isinstance(trade, trade_model):
@@ -103,5 +106,6 @@ def simulate_strategy(data):
         poc, vah, val = create_tpo(daily_data)
 
         current_time = add_minutes(current_time)
-    
+
+
     a = 0
