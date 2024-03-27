@@ -7,6 +7,17 @@ from typing import Union
 from trade_logic import enter_logic, handle_trade
 
 
+def analyze_strategy(trades):
+    num_trades = len(trades)
+    num_poc = 0
+    num_range = 0
+    for trade in trades:
+        if trade.poc_hit is not None:
+            num_poc += 1
+        if trade.range_hit is not None:
+            num_range += 1
+
+    print(f'Trades: {num_trades}; POC Hits: {num_poc}; Range Hits: {num_range}')
 
 
 def simulate_strategy(data):
@@ -23,6 +34,7 @@ def simulate_strategy(data):
     trade: Union[trade_model, None] = None
     last_datetime: datetime = datetime.min
     trade_finished = False
+    all_trades = []
 
     while loop:
         if current_time == time(hour=23, minute=30):
@@ -44,6 +56,10 @@ def simulate_strategy(data):
             #entry
             if trade_finished:
                 trade_finished = False
+                all_trades.append(trade)
+                trade = None
+                
+            if trade is None:
                 trade = enter_logic(daily_data)
 
 
@@ -52,5 +68,6 @@ def simulate_strategy(data):
 
         current_time = add_minutes(current_time)
 
+    analyze_strategy(all_trades)
 
     a = 0

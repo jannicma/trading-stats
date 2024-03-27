@@ -9,7 +9,7 @@ simulate = True
 mexc = ccxt.mexc()
 
 if simulate:
-    data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=300)
+    data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=3000)
 
     pd_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
     pd_data['timestamp'] = pd.to_datetime(pd_data['timestamp'], unit='ms')
