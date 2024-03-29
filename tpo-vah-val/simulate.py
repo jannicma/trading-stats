@@ -60,7 +60,7 @@ def simulate_strategy(data):
                 trade = None
                 
             if trade is None:
-                trade = enter_logic(daily_data)
+                trade = enter_logic(daily_data, data)
 
 
 

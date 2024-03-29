@@ -1,23 +1,30 @@
 import pandas as pd
 from trade_model import trade_model
 from tpo import create_tpo
+from indicators import calc_atr, calc_rsi
 
 
 
-def enter_logic(data: pd.DataFrame):
+def enter_logic(data: pd.DataFrame, full_data):
     poc, vah, val = create_tpo(data)
     trade = None
 
     if data.iloc[-1]['high'] > vah and data.iloc[-2]['close'] <= vah:
-        print(vah, val, poc)
         deviation = data.iloc[-1]['high'] - vah
-        trade = trade_model(vah, data.iloc[-1]['timestamp'], False, deviation)
+
+        atr = calc_atr(full_data, data.iloc[-1]['timestamp'])
+        rsi= calc_rsi(full_data, data.iloc[-1]['timestamp'])
+
+        trade = trade_model(vah, data.iloc[-1]['timestamp'], False, deviation, atr, rsi)
 
     #long
     elif data.iloc[-1]['low'] < val and data.iloc[-2]['close'] >= val:
-        print(vah, val, poc)
         deviation = val - data.iloc[-1]['low']
-        trade = trade_model(val, data.iloc[-1]['timestamp'], True, deviation)
+
+        atr = calc_atr(full_data, data.iloc[-1]['timestamp'])
+        rsi= calc_rsi(full_data, data.iloc[-1]['timestamp'])
+
+        trade = trade_model(val, data.iloc[-1]['timestamp'], True, deviation, atr, rsi)
 
     return trade
 
