@@ -39,7 +39,7 @@ def handle_trade(data: pd.DataFrame, trade: trade_model):
         #update deviation
         if trade.entry - data.iloc[-1]['low'] > trade.deviation:
             trade.deviation = trade.entry - data.iloc[-1]['low']
-            if trade.deviation > 1300:
+            if trade.deviation > (2*trade.atr):
                 end_trade = True
 
         #poc hit
@@ -61,7 +61,7 @@ def handle_trade(data: pd.DataFrame, trade: trade_model):
         #update deviation
         if data.iloc[-1]['high'] - trade.entry > trade.deviation:
             trade.deviation = data.iloc[-1]['high'] - trade.entry
-            if trade.deviation > 1300:
+            if trade.deviation > (2*trade.atr):
                 end_trade = True
 
         #poc hit

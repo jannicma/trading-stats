@@ -5,11 +5,19 @@ from bot import run_bot
 
 
 simulate = True
+api = False
 
 mexc = ccxt.mexc()
 
 if simulate:
-    data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=3000)
+    if api:
+        data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=3000)
+    else:
+        df = pd.read_csv('/Users/jannicmarcon/Documents/mexc_data.csv')
+        df['timestamp'] = pd.to_datetime(df['time'], unit='s')  
+
+        data = df[['timestamp', 'open', 'high', 'low', 'close']]
+
 
     pd_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
     pd_data['timestamp'] = pd.to_datetime(pd_data['timestamp'], unit='ms')
