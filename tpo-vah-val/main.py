@@ -6,6 +6,7 @@ from bot import run_bot
 
 simulate = True
 api = False
+less_data = True
 
 mexc = ccxt.mexc()
 
@@ -17,7 +18,9 @@ if simulate:
         df['timestamp'] = pd.to_datetime(df['time'], unit='s')  
 
         data = df[['timestamp', 'open', 'high', 'low', 'close']]
-
+        
+        if less_data:
+            data = data[-200:]
 
     pd_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
     pd_data['timestamp'] = pd.to_datetime(pd_data['timestamp'], unit='ms')
