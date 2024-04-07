@@ -6,7 +6,7 @@ from bot import run_bot
 
 simulate = True
 api = False
-less_data = True
+less_data = False
 
 mexc = ccxt.mexc()
 

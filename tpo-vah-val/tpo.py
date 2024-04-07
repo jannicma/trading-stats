@@ -96,6 +96,8 @@ def create_tpo(df, tpo_size = 21):
     max_val: int = df['high'].max()
     min_val: int = df['low'].min()
 
+    tpo_size = floor((max_val - min_val) / 30)
+
     max_box_level = floor(max_val / tpo_size) * tpo_size
     min_box_level = floor(min_val / tpo_size) * tpo_size
 

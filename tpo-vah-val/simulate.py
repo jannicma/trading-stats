@@ -1,4 +1,5 @@
 from datetime import datetime, time, timedelta
+from math import floor
 import pandas as pd
 from trade_model import trade_model
 from helpers import add_minutes
@@ -20,10 +21,13 @@ def analyze_strategy(trades):
         if trade.range_hit is not None:
             num_range += 1
 
+        if trade.poc_hit is None:
+            minus += floor(abs(2*trade.atr))
+
     loss_trades = num_trades - num_poc
 
     print(f'Trades: {num_trades}; POC Hits: {num_poc}; Range Hits: {num_range}; Loss Trades: {loss_trades}')
-    print(f'Profit: {plus}')
+    print(f'Profit: {plus}; Loss: {minus}')
 
 
 
