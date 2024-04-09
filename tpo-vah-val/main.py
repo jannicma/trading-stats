@@ -4,7 +4,7 @@ import pandas as pd
 from bot import run_bot
 
 
-simulate = True
+simulate = False
 api = False
 less_data = False
 
