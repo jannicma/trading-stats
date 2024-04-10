@@ -1,7 +1,8 @@
+from datetime import datetime
 from trade_model import trade_model
 from trade_logic import enter_logic, handle_trade
 
-
+import pandas as pd
 import time
 import threading
 
@@ -35,12 +36,23 @@ def call_every_thirty_minutes(target_function, exchange):
 
 
 def bot_logic(exchange):
-    data = exchange.fetch_ohlcv('BTC/USDT', timeframe='1m', limit=3)
-    #TODO remove last candle - its only 10 seconds long
-    print(data)
-    print()
+    data = exchange.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=60, )
+    full_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
+    full_data['timestamp'] = pd.to_datetime(full_data['timestamp'], unit='ms')   
+    full_data = full_data[:-1]
+
+    boolean_series: pd.Series = full_data['timestamp'].dt.date == datetime.today().date()
+    daily_data: pd.DataFrame = full_data[boolean_series]
+
+    trade = enter_logic(daily_data, full_data)
+
+    if trade is not None:
+        print('in trade')
+
+
 
 def run_bot(exchange):
-    call_every_thirty_minutes(bot_logic, exchange)
+    bot_logic(exchange)
+    #call_every_thirty_minutes(bot_logic, exchange)
     
     print('running...')
