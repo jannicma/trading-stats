@@ -1,6 +1,7 @@
 from datetime import datetime
 from trade_model import trade_model
 from trade_logic import enter_logic, handle_trade
+from mail import send_mail
 
 import pandas as pd
 import time
@@ -47,7 +48,11 @@ def bot_logic(exchange):
     trade = enter_logic(daily_data, full_data)
 
     if trade is not None:
-        print('in trade')
+        now = datetime.now()
+        formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
+
+        msg = f'New Trade:\nTime:\t{formatted_datetime}\nPrice:\t{trade.entry}\nATR:\t{trade.atr}\nRSI:\t{trade.rsi}\nLong:\t{trade.is_long}'
+        send_mail(msg)
 
 
 
