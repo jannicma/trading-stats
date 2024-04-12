@@ -37,6 +37,14 @@ def call_every_thirty_minutes(target_function, exchange):
 
 
 def bot_logic(exchange):
+    now: datetime = datetime.now()
+    now_timestamp = now.timestamp()
+    now = now.replace(hour=6, minute=0, second=0, microsecond=0)
+    min_required_time = now.timestamp()
+
+    if now_timestamp <= min_required_time:
+        return None
+
     data = exchange.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=60, )
     full_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
     full_data['timestamp'] = pd.to_datetime(full_data['timestamp'], unit='ms')   
@@ -48,7 +56,6 @@ def bot_logic(exchange):
     trade = enter_logic(daily_data, full_data)
 
     if trade is not None:
-        now = datetime.now()
         formatted_datetime = now.strftime("%Y-%m-%d %H:%M:%S")
 
         msg = f'New Trade:\nTime:\t{formatted_datetime}\nPrice:\t{trade.entry}\nATR:\t{trade.atr}\nRSI:\t{trade.rsi}\nLong:\t{trade.is_long}'
