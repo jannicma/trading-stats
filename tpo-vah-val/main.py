@@ -2,6 +2,7 @@ import ccxt
 from simulate import simulate_strategy
 import pandas as pd
 from bot import run_bot
+from mail import send_mail
 
 
 simulate = False
@@ -27,5 +28,6 @@ if simulate:
     
     simulate_strategy(pd_data)
 else:
+    send_mail('Start Bot...')
     run_bot(mexc)
 
