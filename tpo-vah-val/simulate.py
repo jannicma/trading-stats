@@ -3,7 +3,6 @@ from math import floor
 import pandas as pd
 from trade_model import trade_model
 from helpers import add_minutes
-from tpo import create_tpo
 from typing import Union
 from trade_logic import enter_logic, handle_trade
 
