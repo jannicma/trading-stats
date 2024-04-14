@@ -2,6 +2,7 @@ from helpers import closest_number
 import matplotlib.pyplot as plt
 import seaborn as sns
 from math import floor
+import settings
 
 
 
@@ -113,7 +114,7 @@ def create_tpo(df, tpo_size = 21):
             if low < (key + tpo_size) and high >= key:
                 tpo_dict[key]+=1
         
-    if False:
+    if settings.print_tpo:
         print_tpo(tpo_dict)
     
     vah, val, poc = calculate_tpo_values(tpo_dict, tpo_size, 70)

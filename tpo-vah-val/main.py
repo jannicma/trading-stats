@@ -3,16 +3,13 @@ from simulate import simulate_strategy
 import pandas as pd
 from bot import run_bot
 from mail import send_mail
+import settings
 
-
-simulate = False
-api = False
-less_data = False
 
 mexc = ccxt.mexc()
 
-if simulate:
-    if api:
+if settings.simulate_strategy:
+    if settings.get_data_from_api:
         data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=3000)
     else:
         df = pd.read_csv('/Users/jannicmarcon/Documents/mexc_data.csv')
@@ -20,7 +17,7 @@ if simulate:
 
         data = df[['timestamp', 'open', 'high', 'low', 'close']]
         
-        if less_data:
+        if settings.less_data:
             data = data[-200:]
 
     pd_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])

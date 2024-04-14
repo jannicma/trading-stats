@@ -2,6 +2,7 @@ from datetime import datetime
 from trade_model import trade_model
 from trade_logic import enter_logic, handle_trade
 from mail import send_mail
+import settings
 
 import pandas as pd
 import time
@@ -11,7 +12,7 @@ def call_every_thirty_minutes(target_function, exchange):
     def schedule_task():
         while True:
             one_minute = True
-            if one_minute:
+            if settings.one_minute_bot_run:
                 # 1m + 10s
                 current_time = time.time()
                 # Get minutes since epoch (ignoring seconds)
