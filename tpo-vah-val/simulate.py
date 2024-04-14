@@ -5,6 +5,7 @@ from trade_model import trade_model
 from helpers import add_minutes
 from typing import Union
 from trade_logic import enter_logic, handle_trade
+import settings
 
 
 def analyze_strategy(trades):
@@ -27,6 +28,12 @@ def analyze_strategy(trades):
 
     print(f'Trades: {num_trades}; POC Hits: {num_poc}; Range Hits: {num_range}; Loss Trades: {loss_trades}')
     print(f'Profit: {plus}; Loss: {minus}')
+
+    if settings.print_csv:
+        with open("/Users/jannicmarcon/Desktop/trades.csv", "w") as file:
+            file.write("time,entry,long,deviation,atr,rsi,poc,range\n")
+            for trade in trades:
+                file.write(f"{trade.entry_time},{trade.entry},{trade.is_long},{trade.deviation},{trade.atr},{trade.rsi},{trade.poc_hit},{trade.range_hit}\n")
 
 
 
