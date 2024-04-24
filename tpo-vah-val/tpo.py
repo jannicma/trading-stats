@@ -5,8 +5,6 @@ from math import floor
 import settings
 
 
-
-
 def print_tpo(tpo_dict):
         # Extract data as lists
     keys = list(tpo_dict.keys())

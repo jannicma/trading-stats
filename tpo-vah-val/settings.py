@@ -4,3 +4,6 @@ get_data_from_api = False
 less_data = True
 print_tpo = False
 print_csv = False
+default_atr_len = 14
+default_rsi_len = 14
+long_atr_len = 150

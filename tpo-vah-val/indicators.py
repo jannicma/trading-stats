@@ -1,10 +1,16 @@
+from math import floor
 import pandas as pd
 from datetime import timedelta
 
 
 
-def calc_atr(data, timestamp):
-    start_timestamp = timestamp - timedelta(hours=7)
+def calc_atr(data, timestamp, atr_length):
+    subtract_hours = floor(atr_length / 2)
+
+    start_timestamp = timestamp - timedelta(hours=subtract_hours)
+    if atr_length % 2 == 1:
+        start_timestamp = start_timestamp - timedelta(minutes=30)
+    
     boolean_series: pd.Series = (data['timestamp'] <= timestamp) & (data['timestamp'] > start_timestamp)
     important_data: pd.DataFrame = data[boolean_series]
 
@@ -13,14 +19,19 @@ def calc_atr(data, timestamp):
         true_range = candle['high'] - candle['low']
         added_ranges += true_range
 
-    atr = added_ranges / 14
+    atr = added_ranges / atr_length
 
     return round(atr, 2)
 
 
 
-def calc_rsi(data, timestamp):
-    start_timestamp = timestamp - timedelta(hours=7)
+def calc_rsi(data, timestamp, rsi_length):
+    subtract_hours = floor(rsi_length / 2)
+
+    start_timestamp = timestamp - timedelta(hours=subtract_hours)
+    if rsi_length % 2 == 1:
+        start_timestamp = start_timestamp - timedelta(minutes=30)
+
     boolean_series: pd.Series = (data['timestamp'] <= timestamp) & (data['timestamp'] > start_timestamp)
     important_data: pd.DataFrame = data[boolean_series]
 
