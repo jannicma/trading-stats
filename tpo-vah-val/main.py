@@ -10,15 +10,15 @@ mexc = ccxt.mexc()
 
 if settings.simulate_strategy:
     if settings.get_data_from_api:
-        data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=3000)
+        data = mexc.fetch_ohlcv('BTC/USDT', timeframe='30m', limit=5000)
     else:
-        df = pd.read_csv('/Users/jannicmarcon/Documents/mexc_data.csv')
+        df = pd.read_csv('/Users/jannicmarcon/Documents/mexc_data_30m.csv')
         df['timestamp'] = pd.to_datetime(df['time'], unit='s')  
 
         data = df[['timestamp', 'open', 'high', 'low', 'close']]
         
-        if settings.less_data:
-            data = data[-200:]
+    if settings.less_data:
+        data = data[-500:]
 
     pd_data = pd.DataFrame(data, columns=['timestamp', 'open', 'high', 'low', 'close', 'volume'])
     pd_data['timestamp'] = pd.to_datetime(pd_data['timestamp'], unit='ms')
