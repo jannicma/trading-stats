@@ -1,2 +1,6 @@
 venv/
 trading-stats.code-workspace
+cheapest-day/data/AAPL_4h.csv
+cheapest-day/data/BTC_4h.csv
+cheapest-day/.DS_Store
+.DS_Store
