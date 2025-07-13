@@ -27,8 +27,9 @@ struct EvaluationController{
         
         var allRealizedR: [Double] = []
         for trade in simulatedTrades {
+            let isLong = trade.slPrice < trade.entryPrice
             let slDiff = abs(trade.entryPrice - trade.slPrice)
-            let exitDiff = abs(trade.entryPrice - trade.exitPrice!)
+            let exitDiff = isLong ? trade.exitPrice! - trade.entryPrice : trade.entryPrice - trade.exitPrice!
             
             let realizedR = exitDiff / slDiff
             allRealizedR.append(realizedR)
