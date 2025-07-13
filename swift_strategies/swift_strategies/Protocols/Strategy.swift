@@ -6,5 +6,5 @@
 //
 
 protocol Strategy {
-    func backtest(chart: String) -> EvaluationModel
+    func backtest(chart: String, tpMult: Double, slMult: Double) -> EvaluationModel
 }

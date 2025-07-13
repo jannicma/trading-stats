@@ -6,11 +6,12 @@
 //
 
 class TrippleEmaStrategy: Strategy {
-    let tpAtrMultiplier: Double = 8.0
-    let slAtrMultiplier: Double = 3.6
+    var tpAtrMultiplier: Double = 6
+    var slAtrMultiplier: Double = 3
     
-    func backtest(chart: String) -> EvaluationModel {
-        print("lets see if this shit can do anything...")
+    func backtest(chart: String, tpMult: Double, slMult: Double) -> EvaluationModel {
+        tpAtrMultiplier = tpMult
+        slAtrMultiplier = slMult
         
         let rawCandles = CsvController.getCandles(path: chart)
         let IndicatorController = IndicatorController()
@@ -73,6 +74,8 @@ class TrippleEmaStrategy: Strategy {
     
     private func createTrade(_ candle: IndicatorCandle) -> SimulatedTrade {
         var trade: SimulatedTrade
+        assert(candle.atr > 0)
+        
         if isBull(candle) {
             let entry = candle.ohlc.close
             let slPrice = entry - (slAtrMultiplier * candle.atr)
