@@ -6,25 +6,24 @@
 //
 
 class TrippleEmaStrategy: Strategy {
-    let tpAtrMultiplier: Double = 3.0
-    let slAtrMultiplier: Double = 2.0
+    let tpAtrMultiplier: Double = 8.0
+    let slAtrMultiplier: Double = 3.6
+    
     func backtest() {
         print("lets see if this shit can do anything...")
         
-        let rawCandles = CsvController.getCandles(path: "/Users/jannicmarcon/Documents/ChartCsv/BYBIT_ATOMUSDT.P, 15.csv")
+        let rawCandles = CsvController.getCandles(path: "/Users/jannicmarcon/Documents/ChartCsv/BYBIT_BTCUSDT.P, 15.csv")
         let IndicatorController = IndicatorController()
         let candles = IndicatorController.addIndicators(candles: rawCandles, "sma200", "sma20", "sma5", "atr")
         var allTrades: [SimulatedTrade] = []
+        var trade: SimulatedTrade?
 
         for i in 1..<candles.count-1 {
             let currCandle = candles[i]
             let prevCandle = candles[i-1]
-
-            var trade: SimulatedTrade?
             
-            if !isCorrectOrder(prevCandle) && isCorrectOrder(currCandle) {
+            if !isCorrectOrder(prevCandle) && isCorrectOrder(currCandle)  && trade == nil {
                 //this is the entry logic. All EMA/SMA crossed into the right order.
-                assert(trade == nil, "we should not already be in a trade here...")
                 trade = createTrade(currCandle)
             }
             

@@ -10,7 +10,7 @@ import Foundation
 @main
 struct StartingPoint {
     static func main() async throws {
-        var backtestingStrat: Strategy = TrippleEmaStrategy()
+        let backtestingStrat: Strategy = TrippleEmaStrategy()
         backtestingStrat.backtest()
     }
 
