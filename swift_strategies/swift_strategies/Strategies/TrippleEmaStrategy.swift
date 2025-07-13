@@ -9,10 +9,10 @@ class TrippleEmaStrategy: Strategy {
     let tpAtrMultiplier: Double = 8.0
     let slAtrMultiplier: Double = 3.6
     
-    func backtest() {
+    func backtest(chart: String) -> EvaluationModel {
         print("lets see if this shit can do anything...")
         
-        let rawCandles = CsvController.getCandles(path: "/Users/jannicmarcon/Documents/ChartCsv/BYBIT_BTCUSDT.P, 15.csv")
+        let rawCandles = CsvController.getCandles(path: chart)
         let IndicatorController = IndicatorController()
         let candles = IndicatorController.addIndicators(candles: rawCandles, "sma200", "sma20", "sma5", "atr")
         var allTrades: [SimulatedTrade] = []
@@ -40,7 +40,8 @@ class TrippleEmaStrategy: Strategy {
         }
         
         let evaluationController = EvaluationController()
-        evaluationController.evaluate(simulatedTrades: allTrades)
+        let evaluation = evaluationController.evaluateTrades(simulatedTrades: allTrades)
+        return evaluation
     }
     
     

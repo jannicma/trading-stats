@@ -9,4 +9,6 @@ struct EvaluationModel{
     var trades: Int
     var wins: Int
     var losses: Int
+    var winLossRatio: Double
+    var origin: String?
 }

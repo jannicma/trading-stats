@@ -4,6 +4,7 @@
 //
 //  Created by Jannic Marcon on 12.07.2025.
 //
+import Foundation
 
 struct CsvController {
     static public func getCandles(path: String) -> [Candle] {
@@ -32,4 +33,22 @@ struct CsvController {
 
         return candles
     }
+    
+    
+    static func getAllCharts() -> [String]{
+        let dirPath = "/Users/jannicmarcon/Documents/ChartCsv"
+        let fileManager = FileManager.default
+        var csvFiles: [String] = []
+        do {
+            let files = try fileManager.contentsOfDirectory(atPath: dirPath)
+            csvFiles = files.filter{$0.hasSuffix(".csv")}
+                .map { dirPath + "/" + $0 }
+            csvFiles = csvFiles.sorted()
+        } catch {
+            print("Error getting Csv files. Error: \(error)")
+        }
+        
+        return csvFiles
+    }
+
 }
