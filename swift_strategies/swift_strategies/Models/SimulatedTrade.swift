@@ -10,4 +10,5 @@ struct SimulatedTrade {
     var tpPrice: Double
     var slPrice: Double
     var exitPrice: Double?
+    var atrAtEntry: Double
 }

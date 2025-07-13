@@ -15,18 +15,33 @@ struct StartingPoint {
         
         let allCharts = CsvController.getAllCharts()
         var allEvaluations: [EvaluationModel] = []
-        for chart in allCharts {
-            print("Backtesting \(chart)")
-            
-            for tpMult in stride(from: 3.0, through: 9.0, by: 0.5){
-                for slMult in stride(from: 2.0, through: 6.0, by: 0.5){
-                    var eval = backtestingStrat.backtest(chart: chart, tpMult: tpMult, slMult: slMult)
-                    eval.origin = chart + "\n tpMult: \(tpMult), slMult: \(slMult)"
+        
+        await withTaskGroup(of: EvaluationModel?.self) { group in
+            for chart in allCharts {
+                print("Backtesting \(chart)")
+
+                for tpMult in stride(from: 3.0, through: 9.0, by: 0.5) {
+                    for slMult in stride(from: 2.0, through: 6.0, by: 0.5) {
+                        group.addTask {
+                            var eval = backtestingStrat.backtest(chart: chart, tpMult: tpMult, slMult: slMult)
+                            eval.origin = chart + "\n tpMult: \(tpMult), slMult: \(slMult)"
+                            return eval
+                        }
+                    }
+                }
+            }
+
+            for await eval in group {
+                if let eval = eval {
                     allEvaluations.append(eval)
+                    print("evaluation added...")
                 }
             }
         }
         
+        allEvaluations.sort(by: { $0.averageRMultiples > $1.averageRMultiples })
+        
+        JsonController.saveEvaluationsToJson(objects: allEvaluations, filename: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
         evaluationController.evaluateEvaluations(evaluations: allEvaluations)
     }
 }

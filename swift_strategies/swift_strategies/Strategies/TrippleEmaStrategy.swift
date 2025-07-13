@@ -41,7 +41,7 @@ class TrippleEmaStrategy: Strategy {
         }
         
         let evaluationController = EvaluationController()
-        let evaluation = evaluationController.evaluateTrades(simulatedTrades: allTrades)
+        let evaluation = evaluationController.evaluateTrades(simulatedTrades: allTrades, risk: slAtrMultiplier, reward: tpAtrMultiplier)
         return evaluation
     }
     
@@ -80,12 +80,12 @@ class TrippleEmaStrategy: Strategy {
             let entry = candle.ohlc.close
             let slPrice = entry - (slAtrMultiplier * candle.atr)
             let tpPrice = entry + (tpAtrMultiplier * candle.atr)
-            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice)
+            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: candle.atr)
         } else {
             let entry = candle.ohlc.close
             let slPrice = entry + (slAtrMultiplier * candle.atr)
             let tpPrice = entry - (tpAtrMultiplier * candle.atr)
-            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice)
+            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: candle.atr)
         }
 
         return trade
