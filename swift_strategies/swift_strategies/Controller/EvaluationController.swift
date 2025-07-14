@@ -7,11 +7,9 @@
 
 struct EvaluationController{
     func evaluateEvaluations(evaluations: [EvaluationModel]){
-        var evals = evaluations
-        
-        for i in 0...5{
-            print("Rank \(i+1): \(evals[i].origin ?? "unknown")")
-            printEvaluation(evals[i])
+        for i in 0...7{
+            print("Rank \(i+1): \(evaluations[i].origin ?? "unknown")")
+            printEvaluation(evaluations[i])
             print("\n")
         }
     }

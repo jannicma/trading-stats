@@ -5,27 +5,18 @@
 //  Created by Jannic Marcon on 12.07.2025.
 //
 
-class TrippleEmaStrategy: Strategy {
-    var tpAtrMultiplier: Double = 6
-    var slAtrMultiplier: Double = 3
-    
-    func backtest(chart: String, tpMult: Double, slMult: Double) -> EvaluationModel {
-        tpAtrMultiplier = tpMult
-        slAtrMultiplier = slMult
-        
-        let rawCandles = CsvController.getCandles(path: chart)
-        let IndicatorController = IndicatorController()
-        let candles = IndicatorController.addIndicators(candles: rawCandles, "sma200", "sma20", "sma5", "atr")
+struct TrippleEmaStrategy: Strategy {
+    func backtest(chart: [IndicatorCandle], tpMult: Double, slMult: Double) -> EvaluationModel {
         var allTrades: [SimulatedTrade] = []
         var trade: SimulatedTrade?
 
-        for i in 1..<candles.count-1 {
-            let currCandle = candles[i]
-            let prevCandle = candles[i-1]
+        for i in 1..<chart.count-1 {
+            let currCandle = chart[i]
+            let prevCandle = chart[i-1]
             
             if !isCorrectOrder(prevCandle) && isCorrectOrder(currCandle)  && trade == nil {
                 //this is the entry logic. All EMA/SMA crossed into the right order.
-                trade = createTrade(currCandle)
+                trade = createTrade(currCandle, tpMult: tpMult, slMult: slMult)
             }
             
             if trade != nil {
@@ -41,7 +32,7 @@ class TrippleEmaStrategy: Strategy {
         }
         
         let evaluationController = EvaluationController()
-        let evaluation = evaluationController.evaluateTrades(simulatedTrades: allTrades, risk: slAtrMultiplier, reward: tpAtrMultiplier)
+        let evaluation = evaluationController.evaluateTrades(simulatedTrades: allTrades, risk: slMult, reward: tpMult)
         return evaluation
     }
     
@@ -72,19 +63,19 @@ class TrippleEmaStrategy: Strategy {
     }
     
     
-    private func createTrade(_ candle: IndicatorCandle) -> SimulatedTrade {
+    private func createTrade(_ candle: IndicatorCandle, tpMult: Double, slMult: Double) -> SimulatedTrade {
         var trade: SimulatedTrade
         assert(candle.atr > 0)
         
         if isBull(candle) {
             let entry = candle.ohlc.close
-            let slPrice = entry - (slAtrMultiplier * candle.atr)
-            let tpPrice = entry + (tpAtrMultiplier * candle.atr)
+            let slPrice = entry - (slMult * candle.atr)
+            let tpPrice = entry + (tpMult * candle.atr)
             trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: candle.atr)
         } else {
             let entry = candle.ohlc.close
-            let slPrice = entry + (slAtrMultiplier * candle.atr)
-            let tpPrice = entry - (tpAtrMultiplier * candle.atr)
+            let slPrice = entry + (slMult * candle.atr)
+            let tpPrice = entry - (tpMult * candle.atr)
             trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: candle.atr)
         }
 
