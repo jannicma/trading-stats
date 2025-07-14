@@ -14,8 +14,7 @@ struct StartingPoint {
         let evaluationController = EvaluationController()
         let chartController = ChartController()
         
-        let allCharts = chartController.getAllChartsWithIndicaors()
-        var allEvaluations: [EvaluationModel] = []
+        let allCharts = await chartController.getAllChartsWithIndicaors()
         
         var parameterSets: [(chart: String, tpMult: Double, slMult: Double)] = []
 
@@ -31,6 +30,8 @@ struct StartingPoint {
         let batches = parameterSets.chunked(into: batchSize)
         
         var batchIndex = 0
+        var allEvaluations: [EvaluationModel] = []
+
         for batch in batches {
             batchIndex += 1
             await withTaskGroup(of: EvaluationModel?.self) { group in
