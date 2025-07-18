@@ -7,48 +7,56 @@
 import Foundation
 
 struct CsvController {
-    static public func getCandles(path: String) -> [Candle] {
+    static public func getCandles(path: URL) -> [Candle] {
         var candles: [Candle] = []
-
+        
         do {
-            let content = try String(contentsOfFile: path, encoding: .utf8)
-            let lines = content.components(separatedBy: .newlines).filter{ !$0.isEmpty }
-
-            for line in lines {
-                let fields = line.components(separatedBy: ",")
-                if fields.count == 5 && fields[0] != "time" {
-                    let candle = Candle( time: Int(fields[0])!,
-                        open: Double(fields[1])!,
-                        high: Double(fields[2])!,
-                        low: Double(fields[3])!,
-                        close: Double(fields[4])!
-                    )
-
-                    candles.append(candle)
-                }
+            let content = try String(contentsOf: path, encoding: .utf8)
+            var lines = content.components(separatedBy: .newlines).filter{ !$0.isEmpty }
+            if lines.first!.contains("time") { lines.removeFirst() }
+            
+            candles = lines.map{ line in
+                let values = line.split(separator: ",")
+                return Candle( time: Int(values[0])!,
+                               open: Double(values[1])!,
+                               high: Double(values[2])!,
+                               low: Double(values[3])!,
+                               close: Double(values[4])!
+                )
             }
         } catch {
             print(error)
         }
-
+        
         return candles
     }
     
     
-    static func getAllCharts() -> [String]{
-        let dirPath = "/Users/jannicmarcon/Documents/ChartCsv"
+    static func getAllCharts() -> [String: [URL]]{
+        var result: [String: [URL]] = [:]
         let fileManager = FileManager.default
-        var csvFiles: [String] = []
+        let rootURL = URL(string: "/Users/jannicmarcon/Documents/ChartCsv")!
+
         do {
-            let files = try fileManager.contentsOfDirectory(atPath: dirPath)
-            csvFiles = files.filter{$0.hasSuffix(".csv")}
-                .map { dirPath + "/" + $0 }
-            csvFiles = csvFiles.sorted()
+            let folderURLs = try fileManager.contentsOfDirectory(at: rootURL, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles])
+
+            for folderURL in folderURLs {
+                let resourceValues = try folderURL.resourceValues(forKeys: [.isDirectoryKey])
+                guard resourceValues.isDirectory == true else { continue }
+
+                let folderName = folderURL.lastPathComponent
+                let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles])
+
+                let csvFiles = fileURLs.filter { $0.pathExtension.lowercased() == "csv" }
+                if !csvFiles.isEmpty {
+                    result[folderName] = csvFiles
+                }
+            }
         } catch {
-            print("Error getting Csv files. Error: \(error)")
+            print("Error: \(error)")
         }
-        
-        return csvFiles
+
+        return result
     }
 
 }
