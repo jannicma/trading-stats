@@ -10,7 +10,17 @@ import Foundation
 @main
 struct StartingPoint {
     static func main() async throws {
-        let backtestController = BacktestController()
-        await backtestController.runBacktest()
+        let chartController = ChartController()
+        
+        let fixCharts: Bool = true
+        
+        if fixCharts {
+            chartController.fixCharts()
+        }else{
+            let backtestController = BacktestController()
+            await backtestController.runBacktest()
+
+        }
+
     }
 }

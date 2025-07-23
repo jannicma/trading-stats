@@ -7,10 +7,10 @@
 
 struct Candle: Codable {
     let time: Int
-    let open: Double
-    let high: Double
-    let low: Double
-    let close: Double
+    var open: Double
+    var high: Double
+    var low: Double
+    var close: Double
 }
 
 

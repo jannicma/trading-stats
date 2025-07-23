@@ -22,6 +22,11 @@ struct ChartController {
                     firstTimeGap = candle.time - lastTime
                 }
             }
+            
+            if candle.high == candle.low {
+                return false
+            }
+            
             lastTime = candle.time
         }
         
@@ -60,7 +65,80 @@ struct ChartController {
             }
         }
 
-        
         return allCharts
+    }
+    
+    
+    public func fixCharts(){
+        let allChartPaths = CsvController.getAllCharts().filter { $0.key != "bak" && $0.key != "tmp"  }
+        
+        for (name, chartParts) in allChartPaths {
+            var candles: [Candle] = []
+
+            for file in chartParts {
+                let part = CsvController.getCandles(path: file)
+                candles.append(contentsOf: part)
+            }
+            candles.sort { $0.time < $1.time }
+
+            var lastCorrectCloseIndex: Int?
+            var didChange = false
+            for i in 0..<candles.count-1 {
+                if isValidCandle(candles[i]) {
+                    let indexDifference = i - (lastCorrectCloseIndex ?? 0)
+                    if indexDifference > 1 {
+                        fixCandles(candles: &candles, startIndex: lastCorrectCloseIndex!, endIndex: i)
+                        didChange = true
+                    }
+                    lastCorrectCloseIndex = i
+                }
+            }
+            
+            if didChange {
+                do{
+                    try saveChartMonthly(chart: candles, name: name)
+                }catch{
+                    print("there was an error")
+                }
+            }
+        }
+    }
+    
+    private func saveChartMonthly(chart: [Candle], name: String) throws {
+        var groupedCandles: [String: [Candle]] = [:]
+        
+        for candle in chart{
+            guard let (year, month) = TimeController.getYearAndMonth(from: candle.time) else{
+                throw NSError(domain: "Some invalid timestamp", code: 0, userInfo: nil)
+            }
+            
+            let filename = "\(name)-\(year)-\(month)"
+            groupedCandles[filename] = (groupedCandles[filename] ?? []) + [candle]
+        }
+        
+        //TODO: save file
+    }
+    
+    private func fixCandles(candles: inout [Candle], startIndex: Int, endIndex: Int){
+        let prevCandle = candles[startIndex]
+        let nextCandle = candles[endIndex]
+        let countFaultyCandles = endIndex - startIndex
+        
+        let movement = nextCandle.close - prevCandle.close
+        let avgMovement = movement / Double(countFaultyCandles)
+        let wickSize = abs(avgMovement) / 4
+        
+        for i in startIndex+1...endIndex {
+            let open = candles[i-1].close
+            
+            candles[i].open = open
+            candles[i].close = open + avgMovement
+            candles[i].high = max(open, open+avgMovement) + wickSize
+            candles[i].low = min(open, open+avgMovement) - wickSize
+        }
+    }
+    
+    private func isValidCandle(_ candle: Candle) -> Bool {
+        return candle.high > candle.low
     }
 }
