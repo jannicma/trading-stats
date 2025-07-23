@@ -7,16 +7,47 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "D906A390-817C-4C2E-A219-FEFF1002FAF9"
+            uuid = "A0736136-9E3E-44D9-9184-73CBFBA8DE6C"
             shouldBeEnabled = "Yes"
-            condition = "indicators.count == 0"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "swift_strategies/Controller/BacktestController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "21"
+            endingLineNumber = "21"
+            landmarkName = "runBacktest()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F573AD96-D9B0-4598-97FF-C72B5AB17160"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "swift_strategies/Controller/BacktestController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
+            landmarkName = "runBacktest()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "7DA8F6C8-60F5-4998-BE47-D3F25D197CDF"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "swift_strategies/Controller/IndicatorController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "20"
-            endingLineNumber = "20"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
             landmarkName = "addIndicators(candles:_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -24,16 +55,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C8F9B0FB-565B-4348-B253-D6E9F330EED3"
+            uuid = "0FB4FC53-4CE7-4EDB-A0EB-7788567D6B20"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "swift_strategies/Controller/ChartController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "41"
-            endingLineNumber = "41"
-            landmarkName = "getChartWithIndicaors(filepaths:indicatorController:)"
+            startingLineNumber = "104"
+            endingLineNumber = "104"
+            landmarkName = "fixCharts()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "B65D9CB4-6BD4-48CB-8A7C-94498199A723"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "swift_strategies/Helpers/PlistHandler.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "12"
+            endingLineNumber = "12"
+            landmarkName = "value(forKey:fromPlistNamed:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

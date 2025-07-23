@@ -10,16 +10,19 @@ struct BacktestController{
         let backtestingStrat: Strategy = TrippleEmaStrategy()
         let evaluationController = EvaluationController()
         let chartController = ChartController()
+        let parameterController = ParameterController()
+        
+        let requiredParameters = backtestingStrat.getRequiredParameters()
+        // strategy.getRequiredIndicators
         
         let allCharts = await chartController.getAllChartsWithIndicaors()
+        let settings = parameterController.generateParameters(requirements: requiredParameters)
         
-        var parameterSets: [(chart: String, tpMult: Double, slMult: Double)] = []
+        var parameterSets: [(chart: String, settings: ParameterSet)] = []
 
         for (chartName, _) in allCharts {
-            for tpMult in stride(from: 3.0, through: 9.0, by: 0.5) {
-                for slMult in stride(from: 2.0, through: 6.0, by: 0.5) {
-                    parameterSets.append((chartName, tpMult, slMult))
-                }
+            for settig in settings{
+                parameterSets.append((chartName, settig))
             }
         }
 
@@ -32,10 +35,10 @@ struct BacktestController{
         for batch in batches {
             batchIndex += 1
             await withTaskGroup(of: EvaluationModel?.self) { group in
-                for (chartName, tpMult, slMult) in batch {
+                for (chartName, setting) in batch {
                     group.addTask {
-                        var eval = backtestingStrat.backtest(chart: allCharts[chartName]!, tpMult: tpMult, slMult: slMult)
-                        eval.origin = chartName + "\n tpMult: \(tpMult), slMult: \(slMult)"
+                        var eval = backtestingStrat.backtest(chart: allCharts[chartName]!, paramSet: setting)
+                        eval.origin = chartName
                         return eval
                     }
                 }

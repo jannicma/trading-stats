@@ -6,5 +6,6 @@
 //
 
 protocol Strategy {
-    func backtest(chart: [IndicatorCandle], tpMult: Double, slMult: Double) -> EvaluationModel
+    func backtest(chart: [IndicatorCandle], paramSet: ParameterSet) -> EvaluationModel
+    func getRequiredParameters() -> [ParameterRequirements]
 }

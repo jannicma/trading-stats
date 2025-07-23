@@ -6,7 +6,10 @@
 //
 
 struct TrippleEmaStrategy: Strategy {
-    func backtest(chart: [IndicatorCandle], tpMult: Double, slMult: Double) -> EvaluationModel {
+    func backtest(chart: [IndicatorCandle], paramSet: ParameterSet) -> EvaluationModel {
+        let tpMult = paramSet.parameters.filter{$0.name == "tpAtrMult"}.first!.value
+        let slMult = paramSet.parameters.filter{$0.name == "slAtrMult"}.first!.value
+        
         var allTrades: [SimulatedTrade] = []
         var trade: SimulatedTrade?
 
@@ -36,6 +39,14 @@ struct TrippleEmaStrategy: Strategy {
         return evaluation
     }
     
+    
+    public func getRequiredParameters() -> [ParameterRequirements] {
+        return [
+            ParameterRequirements(name: "tpAtrMult", minValue: 2, maxValue: 10, step: 0.3),
+            ParameterRequirements(name: "slAtrMult", minValue: 1, maxValue: 7, step: 0.3)
+        ]
+
+    }
     
     private func checkForExit(trade: inout SimulatedTrade, candle: IndicatorCandle) {
         let high = candle.ohlc.high
