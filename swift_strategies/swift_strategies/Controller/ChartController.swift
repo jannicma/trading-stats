@@ -9,17 +9,17 @@ import Foundation
 struct ChartController {
     private func validateChart(chart: [Candle]) -> Bool {
         //check for gaps in the candles
-        var firstTimeGap: Int = 0
+        var firstTimeDiff: Int = 0
         var lastTime: Int = 0
         for candle in chart {
-            if firstTimeGap > 0 {
-                if lastTime + firstTimeGap != candle.time {
+            if firstTimeDiff > 0 {
+                if lastTime + firstTimeDiff != candle.time {
                     return false
                 }
             }
             else{
                 if lastTime > 0{
-                    firstTimeGap = candle.time - lastTime
+                    firstTimeDiff = candle.time - lastTime
                 }
             }
             
@@ -70,7 +70,7 @@ struct ChartController {
     
     
     public func fixCharts(){
-        let allChartPaths = CsvController.getAllCharts().filter { $0.key != "bak" && $0.key != "tmp"  }
+        let allChartPaths = CsvController.getAllCharts()
         
         for (name, chartParts) in allChartPaths {
             var candles: [Candle] = []
@@ -95,10 +95,14 @@ struct ChartController {
             }
             
             if didChange {
-                do{
-                    try saveChartMonthly(chart: candles, name: name)
-                }catch{
-                    print("there was an error")
+                if validateChart(chart: candles){
+                    do{
+                        try saveChartMonthly(chart: candles, name: name)
+                    }catch{
+                        print("there was an error")
+                    }
+                }else{
+                    print("maaan, it did not fix it...")
                 }
             }
         }
@@ -131,8 +135,10 @@ struct ChartController {
         for i in startIndex+1...endIndex {
             let open = candles[i-1].close
             
+            if i != endIndex{
+                candles[i].close = open + avgMovement
+            }
             candles[i].open = open
-            candles[i].close = open + avgMovement
             candles[i].high = max(open, open+avgMovement) + wickSize
             candles[i].low = min(open, open+avgMovement) - wickSize
         }

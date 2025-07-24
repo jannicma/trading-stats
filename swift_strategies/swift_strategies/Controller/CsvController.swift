@@ -45,6 +45,10 @@ struct CsvController {
                 guard resourceValues.isDirectory == true else { continue }
 
                 let folderName = folderURL.lastPathComponent
+                if folderName == "bak" || folderName == "tmp"{
+                    continue
+                }
+                
                 let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles])
 
                 let csvFiles = fileURLs.filter { $0.pathExtension.lowercased() == "csv" }
