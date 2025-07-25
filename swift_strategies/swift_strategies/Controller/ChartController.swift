@@ -34,38 +34,84 @@ struct ChartController {
     }
     
     
-    private func getChartWithIndicaors(filepaths: [URL], indicatorController: IndicatorController) -> [IndicatorCandle] {
+    private func getChartWithIndicaors(chart: [Candle], indicatorController: IndicatorController) -> [IndicatorCandle] {
+        return indicatorController.addIndicators(candles: chart, "sma200", "sma20", "sma5", "atr")
+    }
+    
+    
+    private func getChartsInAllTimeframes(name: String, files: [URL]) -> [String: [Candle]] {
         var candles: [Candle] = []
-        for chartPart in filepaths {
+        for chartPart in files {
             let part = CsvController.getCandles(path: chartPart)
             candles.append(contentsOf: part)
         }
         candles.sort { $0.time < $1.time }
         assert(validateChart(chart: candles), "There is a gap in the chart")
         
-        return indicatorController.addIndicators(candles: candles, "sma200", "sma20", "sma5", "atr")
+        let allNewVariations = ["3m": 3,
+                                "5m": 5,
+                                "15m": 15,
+                                "30m": 30]
+        var finalCandles: [String: [Candle]] = [name+"_1m": candles]
+        
+        for (timeframeName, candleCount) in allNewVariations{
+            var result: [Candle] = []
+            var buffer: [Candle] = []
+
+            for candle in candles {
+                buffer.append(candle)
+                if buffer.count == candleCount {
+                    result.append(Candle(
+                        time: buffer.first!.time,
+                        open: buffer.first!.open,
+                        high: buffer.map(\.high).max()!,
+                        low: buffer.map(\.low).min()!,
+                        close: buffer.last!.close
+                    ))
+                    buffer.removeAll()
+                }
+            }
+            assert(validateChart(chart: result), "There is a gap in the chart")
+            finalCandles[name+"_\(timeframeName)"] = result
+        }
+        
+        return finalCandles
     }
-    
     
     public func getAllChartsWithIndicaors() async -> [String: [IndicatorCandle]] {
         let allChartPaths = CsvController.getAllCharts().filter { $0.key != "bak" && $0.key != "tmp"  }
-        var allCharts: [String: [IndicatorCandle]] = [:]
+        var allCharts: [String: [Candle]] = [:]
         
         let indicatorController = IndicatorController()
         
-        await withTaskGroup(of: (String, [IndicatorCandle]).self) { group in
+        //generate/load all charts
+        await withTaskGroup(of: [String: [Candle]].self) { group in
             for (name, files) in allChartPaths {
                 group.addTask {
-                    return (name, getChartWithIndicaors(filepaths: files, indicatorController: indicatorController))
+                    return getChartsInAllTimeframes(name: name, files: files)
                 }
             }
 
-            for await (name, data) in group {
-                allCharts[name] = data
+            for await data in group {
+                allCharts.merge(data, uniquingKeysWith: { $1 })
+            }
+        }
+        
+        var allIndicatorCharts: [String: [IndicatorCandle]] = [:]
+        //add indicators to charts
+        await withTaskGroup(of: (String, [IndicatorCandle]).self) { group in
+            for (name, chart) in allCharts {
+                group.addTask {
+                    return (name, getChartWithIndicaors(chart: chart, indicatorController: indicatorController))
+                }
+            }
+
+            for await (chartName, indicatorCandlesChart) in group {
+                allIndicatorCharts[chartName] = indicatorCandlesChart
             }
         }
 
-        return allCharts
+        return allIndicatorCharts
     }
     
     
