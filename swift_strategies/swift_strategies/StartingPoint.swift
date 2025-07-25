@@ -12,14 +12,13 @@ struct StartingPoint {
     static func main() async throws {
         let chartController = ChartController()
         
-        let fixCharts: Bool = true
+        let fixCharts: Bool = false
         
         if fixCharts {
             chartController.fixCharts()
         }else{
             let backtestController = BacktestController()
             await backtestController.runBacktest()
-
         }
 
     }

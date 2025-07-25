@@ -35,21 +35,21 @@ struct CsvController {
     static func convertToCSV<T: Encodable>(_ objects: [T]) throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
-        
+
         let data = try encoder.encode(objects)
         let jsonObjects = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] ?? []
 
-        guard let first = jsonObjects.first else { return "" }
+        guard !jsonObjects.isEmpty else { return "" }
 
-        let headers = Array(first.keys)
-        var csvString = headers.joined(separator: ",") + "\n"
+        let headers = ["time", "open", "high", "low", "close"]
+        var rows: [String] = [headers.joined(separator: ",")]
 
         for dict in jsonObjects {
             let row = headers.map { "\(dict[$0] ?? "")" }.joined(separator: ",")
-            csvString += row + "\n"
+            rows.append(row)
         }
 
-        return csvString
+        return rows.joined(separator: "\n")
     }
 
     
