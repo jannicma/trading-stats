@@ -116,11 +116,24 @@ struct ChartController {
                 throw NSError(domain: "Some invalid timestamp", code: 0, userInfo: nil)
             }
             
-            let filename = "\(name)-\(year)-\(month)"
+            let paddedMonth = "\(month < 10 ? "0" : "")\(month)"
+            let filename = "\(name)-\(year)-\(paddedMonth)"
             groupedCandles[filename] = (groupedCandles[filename] ?? []) + [candle]
         }
         
-        //TODO: save file
+        let basePath = "/Users/jannicmarcon/Documents/ChartCsv"
+        let folderPath = "\(basePath)/\(name)_new"
+        
+        for (fileToSave, chartPart) in groupedCandles {
+            let filepath = "\(folderPath)/\(fileToSave).csv"
+            do{
+                let csvString = try CsvController.convertToCSV(chartPart)
+                let url = URL(fileURLWithPath: filepath)
+                try csvString.write(to: url, atomically: true, encoding: .utf8)
+            } catch {
+                print("error on saving file: \(error)")
+            }
+        }
     }
     
     private func fixCandles(candles: inout [Candle], startIndex: Int, endIndex: Int){

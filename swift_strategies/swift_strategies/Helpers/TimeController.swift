@@ -9,7 +9,7 @@ import Foundation
 
 struct TimeController {
     static func getYearAndMonth(from unixTimestamp: Int) -> (year: Int, month: Int)? {
-        let interval = TimeInterval(unixTimestamp)
+        let interval = TimeInterval(unixTimestamp) / 1000.0
         let date = Date(timeIntervalSince1970: interval)
         
         var calendar = Calendar(identifier: .gregorian)

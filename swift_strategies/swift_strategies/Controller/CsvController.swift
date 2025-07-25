@@ -32,6 +32,27 @@ struct CsvController {
     }
     
     
+    static func convertToCSV<T: Encodable>(_ objects: [T]) throws -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        
+        let data = try encoder.encode(objects)
+        let jsonObjects = try JSONSerialization.jsonObject(with: data) as? [[String: Any]] ?? []
+
+        guard let first = jsonObjects.first else { return "" }
+
+        let headers = Array(first.keys)
+        var csvString = headers.joined(separator: ",") + "\n"
+
+        for dict in jsonObjects {
+            let row = headers.map { "\(dict[$0] ?? "")" }.joined(separator: ",")
+            csvString += row + "\n"
+        }
+
+        return csvString
+    }
+
+    
     static func getAllCharts() -> [String: [URL]]{
         var result: [String: [URL]] = [:]
         let fileManager = FileManager.default
