@@ -13,6 +13,7 @@ struct IndicatorController {
     let sma5Len = 5
     let atrLen = 14
     
+    //TODO: test
     private func initIndicators(names: [String]) -> [String: [Double]] {
         var indicators: [String: [Double]] = [:]
         for name in names {
@@ -22,93 +23,75 @@ struct IndicatorController {
     }
     
     
-    public func getIndicators(candles: [Candle], _ indicatorNames: String...) -> [String: Double] {
+    //TODO: test
+    public func getIndicators(candles: [Candle], _ indicatorNames: String...) -> [String: [Double]] {
         var indicators: [String: [Double]] = initIndicators(names: indicatorNames)
         
-        let minCandleAmount = calcMinCandleAmount(indicatorNames)
-
         if indicatorNames.contains("sma200") {
-            var a = calcSma(candles: candles, smaLen: sma200Len)
+            let values = calcSma(candles: candles, smaLen: sma200Len)
+            indicators["sma200"] = values
         }
 
         if indicatorNames.contains("sma20") {
-            var b = calcSma(candles: candles, smaLen: sma20Len)
+            let values = calcSma(candles: candles, smaLen: sma20Len)
+            indicators["sma20"] = values
         }
 
         if indicatorNames.contains("sma5") {
-            var c = calcSma(candles: candles, ind: i, smaLen: sma5Len)
+            let values = calcSma(candles: candles, smaLen: sma5Len)
+            indicators["sma5"] = values
         }
 
         if indicatorNames.contains("atr") {
-            var d = calcAtr(candles: candles, ind: i)
+            let values = calcAtr(candles: candles)
+            indicators["atr"] = values
         }
 
-        if indicatorNames.contains("atr%") {
-            var e = calcAtrPercentage(candles: candles, ind: i)
-        }
+        return indicators
+    }
 
-        return indicatorCandles
+    
+    //TODO: test
+    private func calcAtr(candles: [Candle]) -> [Double] {
+        var rangeBuffer: [Double] = []
+        var atrArray: [Double] = []
+        
+        for i in 0..<candles.count {
+            let range = abs(candles[i].high - candles[i].low)
+            rangeBuffer.append(range)
+            
+            if rangeBuffer.count < atrLen {
+                atrArray.append(0.0)
+                continue
+            }
+            
+            let rangeSum = rangeBuffer.reduce(0, +)
+            let averageRange = rangeSum / Double(atrLen)
+            atrArray.append(averageRange)
+            
+            rangeBuffer.removeFirst()
+        }
+        return atrArray
     }
 
 
-    private func calcAtrPercentage(candles: [Candle], ind: Int) -> Double {
-        let atr = calcAtr(candles: candles, ind: ind)
-        let close = candles[ind].close
-
-        return round((100 / close * atr) * 100) / 100
-    }
-
-
-    private func calcAtr(candles: [Candle], ind: Int) -> Double {
-        var addedRanges = 0.0
-
-        for i in ind-atrLen+1...ind {
-            let candle = candles[i]
-            let range = abs(candle.high - candle.low)
-            addedRanges += range
-        }
-
-        return addedRanges / Double(atrLen)
-    }
-
-
+    //TODO: test
     private func calcSma(candles: [Candle], smaLen: Int) -> [Double] {
-        var candleBuffer: [Double] = []
+        var closesBuffer: [Double] = []
         var smaArray: [Double] = []
         
         for i in 0..<candles.count {
-            if candleBuffer.count < smaLen {
-                candleBuffer.append(candles[i].close)
-                smaArray.append(0)
+            closesBuffer.append(candles[i].close)
+
+            if closesBuffer.count < smaLen {
+                smaArray.append(0.0)
                 continue
             }
-            var sum = candleBuffer.reduce(0, +)
-            var average = sum / Double(smaLen)
+            let sum = closesBuffer.reduce(0, +)
+            let average = sum / Double(smaLen)
             smaArray.append(average)
-            candleBuffer.removeFirst()
+            closesBuffer.removeFirst()
         }
         return smaArray
-    }
-
-
-    private func calcMinCandleAmount(_ indicators: [String]) -> Int {
-        var minAmount = 0
-
-        for indicator in indicators {
-            switch indicator {
-                case "sma200":
-                    minAmount = max(minAmount, sma200Len)
-                case "sma20":
-                    minAmount = max(minAmount, sma20Len)
-                case "sma5":
-                    minAmount = max(minAmount, sma5Len)
-                case "atr", "atr%":
-                    minAmount = max(minAmount, atrLen)
-                default:
-                    print("invalid indicator name")
-            }
-        }
-
-        return minAmount
     }
 }
