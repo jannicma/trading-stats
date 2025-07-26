@@ -78,7 +78,7 @@ struct ChartController {
         return finalCandles
     }
     
-    public func getAllChartsWithIndicaors() async -> [Chart] {
+    public func getAllCharts() async -> [Chart] {
         let allChartPaths = CsvController.getAllCharts().filter { $0.key != "bak" && $0.key != "tmp"  }
         var allCharts: [String: [Candle]] = [:]
         
@@ -102,8 +102,8 @@ struct ChartController {
         await withTaskGroup(of: Chart.self) { group in
             for (name, chart) in allCharts {
                 group.addTask {
-                    var indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController) //getChartWithIndicaors()
-                    var newChart = Chart(name: name, candles: chart, indicators: indicators)
+                    let indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController)
+                    let newChart = Chart(name: name, candles: chart, indicators: indicators)
                     return newChart
                 }
             }
