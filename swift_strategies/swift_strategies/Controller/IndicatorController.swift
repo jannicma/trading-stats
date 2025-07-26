@@ -13,36 +13,38 @@ struct IndicatorController {
     let sma5Len = 5
     let atrLen = 14
     
-
-    public func addIndicators(candles: [Candle], _ indicators: String...) -> [IndicatorCandle] {
-        var indicatorCandles: [IndicatorCandle] = []
+    private func initIndicators(names: [String]) -> [String: [Double]] {
+        var indicators: [String: [Double]] = [:]
+        for name in names {
+            indicators[name] = []
+        }
+        return indicators
+    }
+    
+    
+    public func getIndicators(candles: [Candle], _ indicatorNames: String...) -> [String: Double] {
+        var indicators: [String: [Double]] = initIndicators(names: indicatorNames)
         
-        let minCandleAmount = calcMinCandleAmount(indicators)
+        let minCandleAmount = calcMinCandleAmount(indicatorNames)
 
-        for i in minCandleAmount..<candles.count {
-            var newIndicatorCandle = IndicatorCandle(ohlc: candles[i])
-            
-            if indicators.contains("sma200") {
-                newIndicatorCandle.sma200 = calcSma(candles: candles, ind: i, smaLen: sma200Len)
-            }
+        if indicatorNames.contains("sma200") {
+            var a = calcSma(candles: candles, smaLen: sma200Len)
+        }
 
-            if indicators.contains("sma20") {
-                newIndicatorCandle.sma20 = calcSma(candles: candles, ind: i, smaLen: sma20Len)
-            }
+        if indicatorNames.contains("sma20") {
+            var b = calcSma(candles: candles, smaLen: sma20Len)
+        }
 
-            if indicators.contains("sma5") {
-                newIndicatorCandle.sma5 = calcSma(candles: candles, ind: i, smaLen: sma5Len)
-            }
+        if indicatorNames.contains("sma5") {
+            var c = calcSma(candles: candles, ind: i, smaLen: sma5Len)
+        }
 
-            if indicators.contains("atr") {
-                newIndicatorCandle.atr = calcAtr(candles: candles, ind: i)
-            }
+        if indicatorNames.contains("atr") {
+            var d = calcAtr(candles: candles, ind: i)
+        }
 
-            if indicators.contains("atr%") {
-                newIndicatorCandle.atrPercentage = calcAtrPercentage(candles: candles, ind: i)
-            }
-
-            indicatorCandles.append(newIndicatorCandle)
+        if indicatorNames.contains("atr%") {
+            var e = calcAtrPercentage(candles: candles, ind: i)
         }
 
         return indicatorCandles
@@ -70,14 +72,22 @@ struct IndicatorController {
     }
 
 
-    private func calcSma(candles: [Candle], ind: Int, smaLen: Int) -> Double {
-        var closeSum = 0.0
-
-        for i in ind-smaLen+1...ind {
-            closeSum += candles[i].close
+    private func calcSma(candles: [Candle], smaLen: Int) -> [Double] {
+        var candleBuffer: [Double] = []
+        var smaArray: [Double] = []
+        
+        for i in 0..<candles.count {
+            if candleBuffer.count < smaLen {
+                candleBuffer.append(candles[i].close)
+                smaArray.append(0)
+                continue
+            }
+            var sum = candleBuffer.reduce(0, +)
+            var average = sum / Double(smaLen)
+            smaArray.append(average)
+            candleBuffer.removeFirst()
         }
-
-        return closeSum / Double(smaLen)
+        return smaArray
     }
 
 

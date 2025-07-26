@@ -14,11 +14,9 @@ struct Candle: Codable {
 }
 
 
-struct IndicatorCandle: Codable {
-    let ohlc: Candle
-    var sma200: Double = 0.0
-    var sma20: Double = 0.0
-    var sma5: Double = 0.0
-    var atr: Double = 0.0
-    var atrPercentage: Double = 0.0
+struct Chart {
+    //use index to get indicator for each candle
+    let name: String
+    let candles: [Candle]
+    let indicators: [String: [Double]]
 }

@@ -34,8 +34,8 @@ struct ChartController {
     }
     
     
-    private func getChartWithIndicaors(chart: [Candle], indicatorController: IndicatorController) -> [IndicatorCandle] {
-        return indicatorController.addIndicators(candles: chart, "sma200", "sma20", "sma5", "atr")
+    private func getIndicatorsForChart(chart: [Candle], indicatorController: IndicatorController) -> [String: [Double]] {
+        return indicatorController.getIndicators(candles: chart, "sma200", "sma20", "sma5", "atr")
     }
     
     
@@ -78,7 +78,7 @@ struct ChartController {
         return finalCandles
     }
     
-    public func getAllChartsWithIndicaors() async -> [String: [IndicatorCandle]] {
+    public func getAllChartsWithIndicaors() async -> [Chart] {
         let allChartPaths = CsvController.getAllCharts().filter { $0.key != "bak" && $0.key != "tmp"  }
         var allCharts: [String: [Candle]] = [:]
         
@@ -97,17 +97,19 @@ struct ChartController {
             }
         }
         
-        var allIndicatorCharts: [String: [IndicatorCandle]] = [:]
+        var allIndicatorCharts: [Chart] = []
         //add indicators to charts
-        await withTaskGroup(of: (String, [IndicatorCandle]).self) { group in
+        await withTaskGroup(of: Chart.self) { group in
             for (name, chart) in allCharts {
                 group.addTask {
-                    return (name, getChartWithIndicaors(chart: chart, indicatorController: indicatorController))
+                    var indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController) //getChartWithIndicaors()
+                    var newChart = Chart(name: name, candles: chart, indicators: indicators)
+                    return newChart
                 }
             }
 
-            for await (chartName, indicatorCandlesChart) in group {
-                allIndicatorCharts[chartName] = indicatorCandlesChart
+            for await chart in group {
+                allIndicatorCharts.append(chart)
             }
         }
 
