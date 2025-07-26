@@ -102,8 +102,16 @@ struct ChartController {
         await withTaskGroup(of: Chart.self) { group in
             for (name, chart) in allCharts {
                 group.addTask {
-                    let indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController)
-                    let newChart = Chart(name: name, candles: chart, indicators: indicators)
+                    var indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController)
+                    
+                    let nullCount = indicators.map{ $0.value.filter{ $0 == 0.0 }.count }.max()
+                    for (key, value) in indicators {
+                        indicators[key] = Array(value.dropFirst(nullCount ?? 0))
+                    }
+                    let snippedChart = Array(chart.dropFirst(nullCount ?? 0))
+                    assert(snippedChart.count == indicators.first!.value.count)
+                    
+                    let newChart = Chart(name: name, candles: snippedChart, indicators: indicators)
                     return newChart
                 }
             }

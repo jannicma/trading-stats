@@ -6,20 +6,20 @@
 //
 
 struct TrippleEmaStrategy: Strategy {
-    func backtest(chart: [IndicatorCandle], paramSet: ParameterSet) -> EvaluationModel {
+    func backtest(chart: Chart, paramSet: ParameterSet) -> EvaluationModel {
         let tpMult = paramSet.parameters.filter{$0.name == "tpAtrMult"}.first!.value
         let slMult = paramSet.parameters.filter{$0.name == "slAtrMult"}.first!.value
         
         var allTrades: [SimulatedTrade] = []
         var trade: SimulatedTrade?
 
-        for i in 1..<chart.count-1 {
-            let currCandle = chart[i]
-            let prevCandle = chart[i-1]
+        for i in 1..<chart.candles.count-1 {
+            let currCandle = chart.candles[i]
             
-            if !isCorrectOrder(prevCandle) && isCorrectOrder(currCandle)  && trade == nil {
+            if !isCorrectOrder(index: i-1, indicators: chart.indicators) && isCorrectOrder(index: i, indicators: chart.indicators)  && trade == nil {
                 //this is the entry logic. All EMA/SMA crossed into the right order.
-                trade = createTrade(currCandle, tpMult: tpMult, slMult: slMult)
+                let atr = chart.indicators["atr"]![i]
+                trade = createTrade(currCandle, atr: atr, tpMult: tpMult, slMult: slMult)
             }
             
             if trade != nil {
@@ -48,9 +48,9 @@ struct TrippleEmaStrategy: Strategy {
 
     }
     
-    private func checkForExit(trade: inout SimulatedTrade, candle: IndicatorCandle) {
-        let high = candle.ohlc.high
-        let low = candle.ohlc.low
+    private func checkForExit(trade: inout SimulatedTrade, candle: Candle) {
+        let high = candle.high
+        let low = candle.low
         
         let isLong = trade.entryPrice > trade.slPrice
         
@@ -74,39 +74,42 @@ struct TrippleEmaStrategy: Strategy {
     }
     
     
-    private func createTrade(_ candle: IndicatorCandle, tpMult: Double, slMult: Double) -> SimulatedTrade {
+    private func createTrade(_ candle: Candle, atr: Double, tpMult: Double, slMult: Double) -> SimulatedTrade {
         var trade: SimulatedTrade
-        assert(candle.atr > 0)
+        assert(atr > 0)
         
         if isBull(candle) {
-            let entry = candle.ohlc.close
-            let slPrice = entry - (slMult * candle.atr)
-            let tpPrice = entry + (tpMult * candle.atr)
-            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: candle.atr)
+            let entry = candle.close
+            let slPrice = entry - (slMult * atr)
+            let tpPrice = entry + (tpMult * atr)
+            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: atr)
         } else {
-            let entry = candle.ohlc.close
-            let slPrice = entry + (slMult * candle.atr)
-            let tpPrice = entry - (tpMult * candle.atr)
-            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: candle.atr)
+            let entry = candle.close
+            let slPrice = entry + (slMult * atr)
+            let tpPrice = entry - (tpMult * atr)
+            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: atr)
         }
 
         return trade
     }
     
     
-    private func isBull(_ candle: IndicatorCandle) -> Bool {
-        return candle.ohlc.close > candle.sma5
+    private func isBull(_ candle: Candle) -> Bool {
+        return candle.close > candle.open
     }
     
     
-    private func isCorrectOrder(_ candle: IndicatorCandle) -> Bool {
+    private func isCorrectOrder(index: Int, indicators: [String: [Double]]) -> Bool {
         var correctOrder: Bool = false
+        let sma5 = indicators["sma5"]![index]
+        let sma20 = indicators["sma20"]![index]
+        let sma200 = indicators["sma200"]![index]
         
-        if candle.sma5 > candle.sma20 && candle.sma20 > candle.sma200 {
+        if sma5 > sma20 && sma20 > sma200 {
             correctOrder = true
         }
         
-        if candle.sma200 > candle.sma20 && candle.sma20 > candle.sma5 {
+        if sma200 > sma20 && sma20 > sma5 {
             correctOrder = true
         }
         
