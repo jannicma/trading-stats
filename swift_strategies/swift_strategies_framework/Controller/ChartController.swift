@@ -81,6 +81,34 @@ public struct ChartController {
         return finalCandles
     }
     
+    public func getTestCharts() async -> [Chart] {
+        let allChartPaths = CsvController.getAllCharts().filter { $0.key == "test"  }
+        let indicatorController = IndicatorController()
+
+        let files = allChartPaths.first!.value
+        let name = allChartPaths.first!.key
+        let allCharts: [String: [Candle]] = getChartsInAllTimeframes(name: name, files: files)
+
+        var allIndicatorCharts: [Chart] = []
+        for (name, chart) in allCharts {
+            var indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController)
+            
+            let nullCount = indicators.map{ $0.value.filter{ $0 == 0.0 }.count }.max()
+            for (key, value) in indicators {
+                indicators[key] = Array(value.dropFirst(nullCount ?? 0))
+            }
+            let snippedChart = Array(chart.dropFirst(nullCount ?? 0))
+            assert(snippedChart.count == indicators.first!.value.count)
+            
+            let newChart = Chart(name: name, candles: snippedChart, indicators: indicators)
+            
+            allIndicatorCharts.append(newChart)
+        }
+        
+        return allIndicatorCharts
+    }
+    
+    
     public func getAllCharts() async -> [Chart] {
         let allChartPaths = CsvController.getAllCharts().filter { $0.key != "bak" && $0.key != "tmp"  }
         var allCharts: [String: [Candle]] = [:]

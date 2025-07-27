@@ -9,11 +9,14 @@ import Testing
 @testable import swift_strategies_framework
 
 struct BacktestControllerTests {
-
+    private func getTestChart() async -> Chart {
+        let chartController = ChartController()
+        let charts = await chartController.getTestCharts()
+        return charts.filter { $0.name == "test_5m" }.first!
+    }
+    
     @Test func runBacktest() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-        var backtestController = BacktestController()
-        await backtestController.runBacktest()
+        let chart = await getTestChart()
         #expect(true)
     }
 
