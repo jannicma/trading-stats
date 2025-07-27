@@ -1,8 +1,8 @@
 //
-//  trippleEmaStrategy.swift
+//  TrippleEmaStrategy.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 12.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
 
 struct TrippleEmaStrategy: Strategy {
@@ -27,7 +27,7 @@ struct TrippleEmaStrategy: Strategy {
                 checkForExit(trade: &trade!, candle: currCandle)
                 
                 if trade?.exitPrice != nil {
-                    // exit condition (SL, TP) got hit. 
+                    // exit condition (SL, TP) got hit.
                     allTrades.append(trade!)
                     trade = nil
                 }

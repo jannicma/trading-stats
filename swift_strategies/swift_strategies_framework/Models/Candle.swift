@@ -2,7 +2,7 @@
 //  Candle.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 12.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
 
 struct Candle: Codable {
@@ -14,7 +14,7 @@ struct Candle: Codable {
 }
 
 
-struct Chart {
+public struct Chart {
     //use index to get indicator for each candle
     let name: String
     let candles: [Candle]

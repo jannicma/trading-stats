@@ -2,11 +2,14 @@
 //  ChartController.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 14.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
+
 import Foundation
 
-struct ChartController {
+public struct ChartController {
+    public init() { }
+    
     private func validateChart(chart: [Candle]) -> Bool {
         //check for gaps in the candles
         var firstTimeDiff: Int = 0

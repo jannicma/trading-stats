@@ -2,7 +2,7 @@
 //  ArrayExtention.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 14.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
 
 extension Array {

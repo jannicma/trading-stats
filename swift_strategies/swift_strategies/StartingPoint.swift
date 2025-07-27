@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import swift_strategies_framework
 
 @main
 struct StartingPoint {

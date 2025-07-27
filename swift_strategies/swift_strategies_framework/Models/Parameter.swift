@@ -2,7 +2,7 @@
 //  Parameter.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 18.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
 
 struct Parameter{

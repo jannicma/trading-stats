@@ -2,7 +2,7 @@
 //  TimeController.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 23.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
 
 import Foundation
