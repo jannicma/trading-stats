@@ -4,36 +4,41 @@
 //
 //  Created by Jannic Marcon on 27.07.2025.
 //
-
 import Foundation
 
 struct CsvController {
-    static public func getCandles(path: URL) -> [Candle] {
+    
+    // MARK: - Public API
+
+    static public func loadCandles(from fileURL: URL) -> [Candle] {
         var candles: [Candle] = []
-        
+
         do {
-            let content = try String(contentsOf: path, encoding: .utf8)
-            var lines = content.components(separatedBy: .newlines).filter{ !$0.isEmpty }
-            if lines.first!.contains("time") { lines.removeFirst() }
+            let content = try String(contentsOf: fileURL, encoding: .utf8)
+            var lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
             
-            candles = lines.map{ line in
+            if lines.first?.contains("time") == true {
+                lines.removeFirst()
+            }
+            
+            candles = lines.map { line in
                 let values = line.split(separator: ",")
-                return Candle( time: Int(values[0])!,
-                               open: Double(values[1])!,
-                               high: Double(values[2])!,
-                               low: Double(values[3])!,
-                               close: Double(values[4])!
+                return Candle(
+                    time: Int(values[0])!,
+                    open: Double(values[1])!,
+                    high: Double(values[2])!,
+                    low: Double(values[3])!,
+                    close: Double(values[4])!
                 )
             }
         } catch {
             print(error)
         }
-        
+
         return candles
     }
-    
-    
-    static func convertToCSV<T: Encodable>(_ objects: [T]) throws -> String {
+
+    static public func convertToCSVString<T: Encodable>(from objects: [T]) throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
 
@@ -53,29 +58,26 @@ struct CsvController {
         return rows.joined(separator: "\n")
     }
 
-    
-    static func getAllCharts() -> [String: [URL]]{
+    static public func loadAllChartFileURLs() -> [String: [URL]] {
         var result: [String: [URL]] = [:]
         let fileManager = FileManager.default
         let rootURL = URL(string: "/Users/jannicmarcon/Documents/ChartCsv")!
 
         do {
-            let folderURLs = try fileManager.contentsOfDirectory(at: rootURL, includingPropertiesForKeys: [.isDirectoryKey], options: [.skipsHiddenFiles])
+            let folderURLs = try fileManager.contentsOfDirectory(
+                at: rootURL,
+                includingPropertiesForKeys: [.isDirectoryKey],
+                options: [.skipsHiddenFiles]
+            )
 
             for folderURL in folderURLs {
-                let resourceValues = try folderURL.resourceValues(forKeys: [.isDirectoryKey])
-                guard resourceValues.isDirectory == true else { continue }
+                guard isDirectory(folderURL),
+                      !shouldSkipFolder(named: folderURL.lastPathComponent)
+                else { continue }
 
-                let folderName = folderURL.lastPathComponent
-                if folderName == "bak" || folderName == "tmp"{
-                    continue
-                }
-                
-                let fileURLs = try fileManager.contentsOfDirectory(at: folderURL, includingPropertiesForKeys: [.isRegularFileKey], options: [.skipsHiddenFiles])
-
-                let csvFiles = fileURLs.filter { $0.pathExtension.lowercased() == "csv" }
+                let csvFiles = loadCSVFiles(in: folderURL)
                 if !csvFiles.isEmpty {
-                    result[folderName] = csvFiles
+                    result[folderURL.lastPathComponent] = csvFiles
                 }
             }
         } catch {
@@ -85,4 +87,29 @@ struct CsvController {
         return result
     }
 
+    // MARK: - Private Helpers
+
+    private static func isDirectory(_ url: URL) -> Bool {
+        (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
+    }
+
+    private static func shouldSkipFolder(named folderName: String) -> Bool {
+        return folderName == "bak" || folderName == "tmp"
+    }
+
+    private static func loadCSVFiles(in folderURL: URL) -> [URL] {
+        let fileManager = FileManager.default
+        do {
+            let fileURLs = try fileManager.contentsOfDirectory(
+                at: folderURL,
+                includingPropertiesForKeys: [.isRegularFileKey],
+                options: [.skipsHiddenFiles]
+            )
+            return fileURLs.filter { $0.pathExtension.lowercased() == "csv" }
+        } catch {
+            print("Failed to load files in folder \(folderURL.lastPathComponent): \(error)")
+            return []
+        }
+    }
 }
+

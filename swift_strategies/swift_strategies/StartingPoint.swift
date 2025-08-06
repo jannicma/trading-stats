@@ -16,7 +16,7 @@ struct StartingPoint {
         let fixCharts: Bool = false
         
         if fixCharts {
-            chartController.fixCharts()
+            chartController.attemptFixAndSaveAllCharts()
         }else{
             let backtestController = BacktestController()
             await backtestController.runBacktest()

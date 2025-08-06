@@ -9,62 +9,165 @@ import Foundation
 
 public struct ChartController {
     public init() { }
-    
-    private func validateChart(chart: [Candle]) -> Bool {
-        //check for gaps in the candles
+
+    // MARK: - Public API
+
+    public func loadTestCharts() async -> [Chart] {
+        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key == "test"  }
+        let indicatorController = IndicatorController()
+        let (name, files) = allChartPaths.first!
+        
+        let allCharts = generateMultiTimeframeCharts(from: files, name: name)
+
+        var allIndicatorCharts: [Chart] = []
+        for (chartName, chartCandles) in allCharts {
+            var indicators = computeIndicators(for: chartCandles, using: indicatorController)
+            let dropCount = indicators.map { $0.value.filter { $0 == 0.0 }.count }.max() ?? 0
+            
+            for (key, value) in indicators {
+                indicators[key] = Array(value.dropFirst(dropCount))
+            }
+            let trimmedCandles = Array(chartCandles.dropFirst(dropCount))
+            assert(trimmedCandles.count == indicators.first!.value.count)
+            
+            allIndicatorCharts.append(Chart(name: chartName, candles: trimmedCandles, indicators: indicators))
+        }
+        
+        return allIndicatorCharts
+    }
+
+    public func loadAllCharts() async -> [Chart] {
+        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp"  }
+        var allRawCharts: [String: [Candle]] = [:]
+        let indicatorController = IndicatorController()
+        
+        await withTaskGroup(of: [String: [Candle]].self) { group in
+            for (name, files) in allChartPaths {
+                group.addTask {
+                    generateMultiTimeframeCharts(from: files, name: name)
+                }
+            }
+
+            for await result in group {
+                allRawCharts.merge(result, uniquingKeysWith: { $1 })
+            }
+        }
+
+        var chartsWithIndicators: [Chart] = []
+        await withTaskGroup(of: Chart.self) { group in
+            for (name, candles) in allRawCharts {
+                group.addTask {
+                    var indicators = computeIndicators(for: candles, using: indicatorController)
+                    let dropCount = indicators.map { $0.value.filter { $0 == 0.0 }.count }.max() ?? 0
+
+                    for (key, value) in indicators {
+                        indicators[key] = Array(value.dropFirst(dropCount))
+                    }
+                    let trimmedCandles = Array(candles.dropFirst(dropCount))
+                    assert(trimmedCandles.count == indicators.first!.value.count)
+                    
+                    return Chart(name: name, candles: trimmedCandles, indicators: indicators)
+                }
+            }
+
+            for await chart in group {
+                chartsWithIndicators.append(chart)
+            }
+        }
+
+        return chartsWithIndicators
+    }
+
+    public func attemptFixAndSaveAllCharts() {
+        let allChartPaths = CsvController.loadAllChartFileURLs()
+
+        for (name, chartParts) in allChartPaths {
+            var candles: [Candle] = []
+
+            for file in chartParts {
+                let part = CsvController.loadCandles(from: file)
+                candles.append(contentsOf: part)
+            }
+            candles.sort { $0.time < $1.time }
+
+            var lastValidIndex: Int?
+            var modified = false
+
+            for i in 0..<candles.count - 1 {
+                if candleHasValidRange(candles[i]) {
+                    let gap = i - (lastValidIndex ?? 0)
+                    if gap > 1 {
+                        interpolateInvalidCandles(in: &candles, from: lastValidIndex!, to: i)
+                        modified = true
+                    }
+                    lastValidIndex = i
+                }
+            }
+
+            if modified {
+                if isValidChart(candles) {
+                    do {
+                        try saveChartGroupedByMonth(candles, named: name)
+                    } catch {
+                        print("there was an error")
+                    }
+                } else {
+                    print("maaan, it did not fix it...")
+                }
+            }
+        }
+    }
+
+    // MARK: - Private Helper Methods
+
+    private func isValidChart(_ chart: [Candle]) -> Bool {
         var firstTimeDiff: Int = 0
         var lastTime: Int = 0
+
         for candle in chart {
             if firstTimeDiff > 0 {
                 if lastTime + firstTimeDiff != candle.time {
                     return false
                 }
+            } else if lastTime > 0 {
+                firstTimeDiff = candle.time - lastTime
             }
-            else{
-                if lastTime > 0{
-                    firstTimeDiff = candle.time - lastTime
-                }
-            }
-            
+
             if candle.high == candle.low {
                 return false
             }
-            
+
             lastTime = candle.time
         }
-        
+
         return true
     }
-    
-    
-    private func getIndicatorsForChart(chart: [Candle], indicatorController: IndicatorController) -> [String: [Double]] {
-        return indicatorController.getIndicators(candles: chart, "sma200", "sma20", "sma5", "atr")
+
+    private func computeIndicators(for chart: [Candle], using controller: IndicatorController) -> [String: [Double]] {
+        return controller.computeIndicators(for: chart, indicators: ["sma200", "sma20", "sma5", "atr"])
     }
-    
-    
-    private func getChartsInAllTimeframes(name: String, files: [URL]) -> [String: [Candle]] {
+
+    private func generateMultiTimeframeCharts(from files: [URL], name: String) -> [String: [Candle]] {
         var candles: [Candle] = []
-        for chartPart in files {
-            let part = CsvController.getCandles(path: chartPart)
+        for url in files {
+            let part = CsvController.loadCandles(from: url)
             candles.append(contentsOf: part)
         }
+
         candles.sort { $0.time < $1.time }
-        assert(validateChart(chart: candles), "There is a gap in the chart")
-        
-        let allNewVariations = ["3m": 3,
-                                "5m": 5,
-                                "15m": 15,
-                                "30m": 30]
-        var finalCandles: [String: [Candle]] = [name+"_1m": candles]
-        
-        for (timeframeName, candleCount) in allNewVariations{
-            var result: [Candle] = []
+        assert(isValidChart(candles), "There is a gap in the chart")
+
+        let variations = ["3m": 3, "5m": 5, "15m": 15, "30m": 30]
+        var result: [String: [Candle]] = [name + "_1m": candles]
+
+        for (label, groupSize) in variations {
+            var grouped: [Candle] = []
             var buffer: [Candle] = []
 
             for candle in candles {
                 buffer.append(candle)
-                if buffer.count == candleCount {
-                    result.append(Candle(
+                if buffer.count == groupSize {
+                    grouped.append(Candle(
                         time: buffer.first!.time,
                         open: buffer.first!.open,
                         high: buffer.map(\.high).max()!,
@@ -74,177 +177,61 @@ public struct ChartController {
                     buffer.removeAll()
                 }
             }
-            assert(validateChart(chart: result), "There is a gap in the chart")
-            finalCandles[name+"_\(timeframeName)"] = result
+
+            assert(isValidChart(grouped), "There is a gap in the \(label) chart")
+            result[name + "_\(label)"] = grouped
         }
-        
-        return finalCandles
+
+        return result
     }
-    
-    public func getTestCharts() async -> [Chart] {
-        let allChartPaths = CsvController.getAllCharts().filter { $0.key == "test"  }
-        let indicatorController = IndicatorController()
 
-        let files = allChartPaths.first!.value
-        let name = allChartPaths.first!.key
-        let allCharts: [String: [Candle]] = getChartsInAllTimeframes(name: name, files: files)
+    private func saveChartGroupedByMonth(_ chart: [Candle], named name: String) throws {
+        var grouped: [String: [Candle]] = [:]
 
-        var allIndicatorCharts: [Chart] = []
-        for (name, chart) in allCharts {
-            var indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController)
-            
-            let nullCount = indicators.map{ $0.value.filter{ $0 == 0.0 }.count }.max()
-            for (key, value) in indicators {
-                indicators[key] = Array(value.dropFirst(nullCount ?? 0))
-            }
-            let snippedChart = Array(chart.dropFirst(nullCount ?? 0))
-            assert(snippedChart.count == indicators.first!.value.count)
-            
-            let newChart = Chart(name: name, candles: snippedChart, indicators: indicators)
-            
-            allIndicatorCharts.append(newChart)
-        }
-        
-        return allIndicatorCharts
-    }
-    
-    
-    public func getAllCharts() async -> [Chart] {
-        let allChartPaths = CsvController.getAllCharts().filter { $0.key != "bak" && $0.key != "tmp"  }
-        var allCharts: [String: [Candle]] = [:]
-        
-        let indicatorController = IndicatorController()
-        
-        //generate/load all charts
-        await withTaskGroup(of: [String: [Candle]].self) { group in
-            for (name, files) in allChartPaths {
-                group.addTask {
-                    return getChartsInAllTimeframes(name: name, files: files)
-                }
+        for candle in chart {
+            guard let (year, month) = TimeController.getYearAndMonth(from: candle.time) else {
+                throw NSError(domain: "Invalid timestamp", code: 0, userInfo: nil)
             }
 
-            for await data in group {
-                allCharts.merge(data, uniquingKeysWith: { $1 })
-            }
-        }
-        
-        var allIndicatorCharts: [Chart] = []
-        //add indicators to charts
-        await withTaskGroup(of: Chart.self) { group in
-            for (name, chart) in allCharts {
-                group.addTask {
-                    var indicators: [String: [Double]] = getIndicatorsForChart(chart: chart, indicatorController: indicatorController)
-                    
-                    let nullCount = indicators.map{ $0.value.filter{ $0 == 0.0 }.count }.max()
-                    for (key, value) in indicators {
-                        indicators[key] = Array(value.dropFirst(nullCount ?? 0))
-                    }
-                    let snippedChart = Array(chart.dropFirst(nullCount ?? 0))
-                    assert(snippedChart.count == indicators.first!.value.count)
-                    
-                    let newChart = Chart(name: name, candles: snippedChart, indicators: indicators)
-                    return newChart
-                }
-            }
-
-            for await chart in group {
-                allIndicatorCharts.append(chart)
-            }
+            let paddedMonth = String(format: "%02d", month)
+            let fileName = "\(name)-\(year)-\(paddedMonth)"
+            grouped[fileName, default: []].append(candle)
         }
 
-        return allIndicatorCharts
-    }
-    
-    
-    public func fixCharts(){
-        let allChartPaths = CsvController.getAllCharts()
-        
-        for (name, chartParts) in allChartPaths {
-            var candles: [Candle] = []
-
-            for file in chartParts {
-                let part = CsvController.getCandles(path: file)
-                candles.append(contentsOf: part)
-            }
-            candles.sort { $0.time < $1.time }
-
-            var lastCorrectCloseIndex: Int?
-            var didChange = false
-            for i in 0..<candles.count-1 {
-                if isValidCandle(candles[i]) {
-                    let indexDifference = i - (lastCorrectCloseIndex ?? 0)
-                    if indexDifference > 1 {
-                        fixCandles(candles: &candles, startIndex: lastCorrectCloseIndex!, endIndex: i)
-                        didChange = true
-                    }
-                    lastCorrectCloseIndex = i
-                }
-            }
-            
-            if didChange {
-                if validateChart(chart: candles){
-                    do{
-                        try saveChartMonthly(chart: candles, name: name)
-                    }catch{
-                        print("there was an error")
-                    }
-                }else{
-                    print("maaan, it did not fix it...")
-                }
-            }
-        }
-    }
-    
-    private func saveChartMonthly(chart: [Candle], name: String) throws {
-        var groupedCandles: [String: [Candle]] = [:]
-        
-        for candle in chart{
-            guard let (year, month) = TimeController.getYearAndMonth(from: candle.time) else{
-                throw NSError(domain: "Some invalid timestamp", code: 0, userInfo: nil)
-            }
-            
-            let paddedMonth = "\(month < 10 ? "0" : "")\(month)"
-            let filename = "\(name)-\(year)-\(paddedMonth)"
-            groupedCandles[filename] = (groupedCandles[filename] ?? []) + [candle]
-        }
-        
         let basePath = "/Users/jannicmarcon/Documents/ChartCsv"
         let folderPath = "\(basePath)/\(name)_new"
-        
-        for (fileToSave, chartPart) in groupedCandles {
-            let filepath = "\(folderPath)/\(fileToSave).csv"
-            do{
-                let csvString = try CsvController.convertToCSV(chartPart)
-                let url = URL(fileURLWithPath: filepath)
-                try csvString.write(to: url, atomically: true, encoding: .utf8)
+
+        for (file, chartPart) in grouped {
+            let path = "\(folderPath)/\(file).csv"
+            do {
+                let csv = try CsvController.convertToCSVString(from: chartPart)
+                try csv.write(to: URL(fileURLWithPath: path), atomically: true, encoding: .utf8)
             } catch {
                 print("error on saving file: \(error)")
             }
         }
     }
-    
-    private func fixCandles(candles: inout [Candle], startIndex: Int, endIndex: Int){
-        let prevCandle = candles[startIndex]
-        let nextCandle = candles[endIndex]
-        let countFaultyCandles = endIndex - startIndex
-        
-        let movement = nextCandle.close - prevCandle.close
-        let avgMovement = movement / Double(countFaultyCandles)
-        let wickSize = abs(avgMovement) / 4
-        
-        for i in startIndex+1...endIndex {
-            let open = candles[i-1].close
-            
-            if i != endIndex{
-                candles[i].close = open + avgMovement
+
+    private func interpolateInvalidCandles(in candles: inout [Candle], from start: Int, to end: Int) {
+        let previous = candles[start]
+        let next = candles[end]
+        let count = end - start
+        let totalMovement = next.close - previous.close
+        let avgMove = totalMovement / Double(count)
+        let wickSize = abs(avgMove) / 4
+
+        for i in (start + 1)...end {
+            let open = candles[i - 1].close
+            if i != end {
+                candles[i].close = open + avgMove
             }
             candles[i].open = open
-            candles[i].high = max(open, open+avgMovement) + wickSize
-            candles[i].low = min(open, open+avgMovement) - wickSize
+            candles[i].high = max(open, open + avgMove) + wickSize
+            candles[i].low = min(open, open + avgMove) - wickSize
         }
     }
-    
-    private func isValidCandle(_ candle: Candle) -> Bool {
+
+    private func candleHasValidRange(_ candle: Candle) -> Bool {
         return candle.high > candle.low
     }
 }

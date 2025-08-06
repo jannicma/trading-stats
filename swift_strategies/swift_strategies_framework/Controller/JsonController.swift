@@ -7,25 +7,18 @@
 
 import Foundation
 
-struct JsonController{
-    static func saveEvaluationsToJson(objects: [EvaluationModel], filename: String) {
+struct JsonController {
+    static func saveToJSON<T: Encodable>(_ objects: [T], filePath: String) {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted // Make the JSON human-readable
+        encoder.outputFormatting = .prettyPrinted
 
         do {
-            // Encode the array of objects to JSON Data
             let jsonData = try encoder.encode(objects)
-
-            // Determine the full file path
-            let fileURL = URL(fileURLWithPath: filename)
-
-            // Write the JSON data to the file
+            let fileURL = URL(fileURLWithPath: filePath)
             try jsonData.write(to: fileURL)
-            print("Successfully saved \(objects.count) objects to \(fileURL.lastPathComponent)")
-
+            print("Saved \(objects.count) item(s) to '\(fileURL.lastPathComponent)'")
         } catch {
-            print("Error saving objects to JSON file: \(error.localizedDescription)")
+            print("Failed to save JSON file: \(error.localizedDescription)")
         }
     }
-
 }

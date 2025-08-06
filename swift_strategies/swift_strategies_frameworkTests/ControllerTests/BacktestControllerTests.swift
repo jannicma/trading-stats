@@ -11,7 +11,7 @@ import Testing
 struct BacktestControllerTests {
     private func getTestChart() async -> Chart {
         let chartController = ChartController()
-        let charts = await chartController.getTestCharts()
+        let charts = await chartController.loadTestCharts()
         return charts.filter { $0.name == "test_5m" }.first!
     }
     

@@ -17,7 +17,7 @@ public struct BacktestController{
         let requiredParameters = backtestingStrat.getRequiredParameters()
         // strategy.getRequiredIndicators
         
-        let allCharts = await chartController.getAllCharts()
+        let allCharts = await chartController.loadAllCharts()
         let settings = parameterController.generateParameters(requirements: requiredParameters)
         
         var parameterSets: [(chart: Chart, settings: ParameterSet)] = []
@@ -56,7 +56,7 @@ public struct BacktestController{
 
         allEvaluations.sort(by: { $0.averageRMultiples > $1.averageRMultiples })
         
-        JsonController.saveEvaluationsToJson(objects: allEvaluations, filename: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
+        JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
         evaluationController.evaluateEvaluations(evaluations: allEvaluations)
 
     }

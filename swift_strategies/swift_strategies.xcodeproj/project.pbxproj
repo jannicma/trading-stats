@@ -109,7 +109,6 @@
 				D30E00662E22EB43003660AD /* swift_strategies */,
 				D3FDA9E12E3633D200BEE429 /* swift_strategies_framework */,
 				D3FDA9EC2E3633D200BEE429 /* swift_strategies_frameworkTests */,
-				D3FDAA312E3636E800BEE429 /* Frameworks */,
 				D30E00652E22EB43003660AD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -122,13 +121,6 @@
 				D3FDA9E82E3633D200BEE429 /* swift_strategies_frameworkTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		D3FDAA312E3636E800BEE429 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
