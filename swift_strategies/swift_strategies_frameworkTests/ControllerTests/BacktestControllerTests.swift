@@ -16,7 +16,10 @@ struct BacktestControllerTests {
     }
     
     @Test func runBacktest() async throws {
-        let chart = await getTestChart()
+        let initChart = await getTestChart()
+        let chartController = ChartController()
+        
+        let calculatedChart = await chartController.loadAllCharts(initChartsForTesting: [initChart.name: initChart.candles])
         #expect(true)
     }
 

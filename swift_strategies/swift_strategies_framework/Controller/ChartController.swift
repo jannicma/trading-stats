@@ -36,20 +36,22 @@ public struct ChartController {
         return allIndicatorCharts
     }
 
-    public func loadAllCharts() async -> [Chart] {
+    public func loadAllCharts(initChartsForTesting: [String: [Candle]] = [:]) async -> [Chart] {
         let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp"  }
-        var allRawCharts: [String: [Candle]] = [:]
+        var allRawCharts: [String: [Candle]] = initChartsForTesting
         let indicatorController = IndicatorController()
         
-        await withTaskGroup(of: [String: [Candle]].self) { group in
-            for (name, files) in allChartPaths {
-                group.addTask {
-                    generateMultiTimeframeCharts(from: files, name: name)
+        if allRawCharts.isEmpty {
+            await withTaskGroup(of: [String: [Candle]].self) { group in
+                for (name, files) in allChartPaths {
+                    group.addTask {
+                        generateMultiTimeframeCharts(from: files, name: name)
+                    }
                 }
-            }
-
-            for await result in group {
-                allRawCharts.merge(result, uniquingKeysWith: { $1 })
+                
+                for await result in group {
+                    allRawCharts.merge(result, uniquingKeysWith: { $1 })
+                }
             }
         }
 

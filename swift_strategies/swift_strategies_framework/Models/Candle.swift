@@ -5,7 +5,7 @@
 //  Created by Jannic Marcon on 27.07.2025.
 //
 
-struct Candle: Codable {
+public struct Candle: Codable {
     let time: Int
     var open: Double
     var high: Double
