@@ -9,6 +9,7 @@ import Foundation
 
 public struct ChartController {
     public init() { }
+    private var indicatorsToCompute: [Indicator] = []
 
     // MARK: - Public API
 
@@ -37,7 +38,7 @@ public struct ChartController {
     }
 
     public func loadAllCharts(initChartsForTesting: [String: [Candle]] = [:]) async -> [Chart] {
-        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp"  }
+        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp" && $0.key != "test"  }
         var allRawCharts: [String: [Candle]] = initChartsForTesting
         let indicatorController = IndicatorController()
         
@@ -78,6 +79,11 @@ public struct ChartController {
         }
 
         return chartsWithIndicators
+    }
+    
+    
+    public mutating func setRequiredIndicators(_ indicators: [Indicator]) {
+        indicatorsToCompute = indicators
     }
 
     public func attemptFixAndSaveAllCharts() {
@@ -146,7 +152,7 @@ public struct ChartController {
     }
 
     private func computeIndicators(for chart: [Candle], using controller: IndicatorController) -> [String: [Double]] {
-        return controller.computeIndicators(for: chart, indicators: ["sma200", "sma20", "sma5", "atr"])
+        return controller.computeIndicators(for: chart, requiredIndicators: indicatorsToCompute)
     }
 
     private func generateMultiTimeframeCharts(from files: [URL], name: String) -> [String: [Candle]] {

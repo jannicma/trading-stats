@@ -7,26 +7,18 @@
 import Foundation
 
 struct IndicatorController {
-    // MARK: - Configuration
-
-    private let smaLengths: [String: Int] = [
-        "sma200": 200,
-        "sma20": 20,
-        "sma5": 5
-    ]
-
-    private let atrLength = 14
-
+    
     // MARK: - Public API
 
-    public func computeIndicators(for candles: [Candle], indicators indicatorNames: [String]) -> [String: [Double]] {
-        var indicators = makeEmptyIndicatorMap(from: indicatorNames)
+    public func computeIndicators(for candles: [Candle], requiredIndicators: [Indicator]) -> [String: [Double]] {
+        var indicators = makeEmptyIndicatorMap(from: requiredIndicators)
 
-        for name in indicatorNames {
-            if let length = smaLengths[name] {
-                indicators[name] = computeSimpleMovingAverage(on: candles, period: length)
-            } else if name == "atr" {
-                indicators[name] = computeAverageTrueRange(on: candles, period: atrLength)
+        for indicator in requiredIndicators {
+            switch indicator{
+            case .sma(let period):
+                indicators[indicator.name] = computeSimpleMovingAverage(on: candles, period: period)
+            case .atr(let length):
+                indicators[indicator.name] = computeAverageTrueRange(on: candles, period: length)
             }
         }
 
@@ -35,10 +27,10 @@ struct IndicatorController {
 
     // MARK: - Private Helpers
 
-    private func makeEmptyIndicatorMap(from names: [String]) -> [String: [Double]] {
+    private func makeEmptyIndicatorMap(from indicators: [Indicator]) -> [String: [Double]] {
         var result: [String: [Double]] = [:]
-        for name in names {
-            result[name] = []
+        for indicator in indicators {
+            result[indicator.name] = []
         }
         return result
     }

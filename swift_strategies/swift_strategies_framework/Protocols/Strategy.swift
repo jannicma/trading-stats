@@ -8,4 +8,5 @@
 protocol Strategy {
     func backtest(chart: Chart, paramSet: ParameterSet) -> EvaluationModel
     func getRequiredParameters() -> [ParameterRequirements]
+    func getRequiredIndicators() -> [Indicator]
 }

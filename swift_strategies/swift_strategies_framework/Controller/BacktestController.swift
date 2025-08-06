@@ -11,20 +11,21 @@ public struct BacktestController{
     public func runBacktest() async {
         let backtestingStrat: Strategy = TrippleEmaStrategy()
         let evaluationController = EvaluationController()
-        let chartController = ChartController()
+        var chartController = ChartController()
         let parameterController = ParameterController()
         
         let requiredParameters = backtestingStrat.getRequiredParameters()
-        // strategy.getRequiredIndicators
+        let requiredIndicators = backtestingStrat.getRequiredIndicators()
         
+        chartController.setRequiredIndicators(requiredIndicators)
         let allCharts = await chartController.loadAllCharts()
         let settings = parameterController.generateParameters(requirements: requiredParameters)
         
         var parameterSets: [(chart: Chart, settings: ParameterSet)] = []
 
-        for chart in allCharts {
-            for settig in settings{
-                parameterSets.append((chart, settig))
+        for setting in settings{
+            for chart in allCharts{
+                parameterSets.append((chart, setting))
             }
         }
 

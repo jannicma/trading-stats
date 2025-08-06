@@ -6,6 +6,23 @@
 //
 
 struct TrippleEmaStrategy: Strategy {
+    public func getRequiredParameters() -> [ParameterRequirements] {
+        return [
+            ParameterRequirements(name: "tpAtrMult", minValue: 2, maxValue: 10, step: 0.5),
+            ParameterRequirements(name: "slAtrMult", minValue: 1, maxValue: 7, step: 0.5)
+        ]
+    }
+    
+    public func getRequiredIndicators() -> [Indicator] {
+        return [
+            Indicator.sma(period: 5),
+            Indicator.sma(period: 20),
+            Indicator.sma(period: 200),
+            Indicator.atr(length: 14)
+        ]
+    }
+
+    
     func backtest(chart: Chart, paramSet: ParameterSet) -> EvaluationModel {
         let tpMult = paramSet.parameters.filter{$0.name == "tpAtrMult"}.first!.value
         let slMult = paramSet.parameters.filter{$0.name == "slAtrMult"}.first!.value
@@ -18,7 +35,7 @@ struct TrippleEmaStrategy: Strategy {
             
             if !isCorrectOrder(index: i-1, indicators: chart.indicators) && isCorrectOrder(index: i, indicators: chart.indicators)  && trade == nil {
                 //this is the entry logic. All EMA/SMA crossed into the right order.
-                let atr = chart.indicators["atr"]![i]
+                let atr = chart.indicators["ATR14"]![i]
                 trade = createTrade(currCandle, atr: atr, tpMult: tpMult, slMult: slMult)
             }
             
@@ -39,14 +56,6 @@ struct TrippleEmaStrategy: Strategy {
         return evaluation
     }
     
-    
-    public func getRequiredParameters() -> [ParameterRequirements] {
-        return [
-            ParameterRequirements(name: "tpAtrMult", minValue: 2, maxValue: 10, step: 0.3),
-            ParameterRequirements(name: "slAtrMult", minValue: 1, maxValue: 7, step: 0.3)
-        ]
-
-    }
     
     private func checkForExit(trade: inout SimulatedTrade, candle: Candle) {
         let high = candle.high
@@ -101,9 +110,9 @@ struct TrippleEmaStrategy: Strategy {
     
     private func isCorrectOrder(index: Int, indicators: [String: [Double]]) -> Bool {
         var correctOrder: Bool = false
-        let sma5 = indicators["sma5"]![index]
-        let sma20 = indicators["sma20"]![index]
-        let sma200 = indicators["sma200"]![index]
+        let sma5 = indicators["SMA5"]![index]
+        let sma20 = indicators["SMA20"]![index]
+        let sma200 = indicators["SMA200"]![index]
         
         if sma5 > sma20 && sma20 > sma200 {
             correctOrder = true
