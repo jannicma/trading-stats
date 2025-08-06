@@ -2,7 +2,7 @@
 //  EvaluationModel.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 12.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
 
 struct EvaluationModel: Codable{

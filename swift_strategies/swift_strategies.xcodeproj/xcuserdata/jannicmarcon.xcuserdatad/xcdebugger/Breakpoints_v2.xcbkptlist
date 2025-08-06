@@ -7,80 +7,94 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "E4EC7A7A-1D0D-449F-979B-AFECBF9DA326"
+            uuid = "366314C6-A203-40E9-8DD1-E05F365DA2CD"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "swift_strategies/Controller/BacktestController.swift"
+            filePath = "swift_strategies_framework/Controller/ChartController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "30"
-            endingLineNumber = "30"
+            startingLineNumber = "41"
+            endingLineNumber = "41"
+            landmarkName = "loadAllCharts(initChartsForTesting:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "167C56E5-9AFE-459B-9B12-D7E9D56DCC15"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "swift_strategies_frameworkTests/ControllerTests/BacktestControllerTests.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "22"
+            endingLineNumber = "22"
             landmarkName = "runBacktest()"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "167C56E5-9AFE-459B-9B12-D7E9D56DCC15 - 8fd0c5bbe5533783"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for swift_strategies_frameworkTests.BacktestControllerTests.runBacktest() async throws -&gt; ()"
+                  moduleName = "swift_strategies_frameworkTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jannicmarcon/Documents/GitHub/trading-stats/swift_strategies/swift_strategies_frameworkTests/ControllerTests/BacktestControllerTests.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "22"
+                  endingLineNumber = "22">
+               </Location>
+               <Location
+                  uuid = "167C56E5-9AFE-459B-9B12-D7E9D56DCC15 - efc3428531251ab2"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for swift_strategies_frameworkTests.BacktestControllerTests.runBacktest() async throws -&gt; ()"
+                  moduleName = "swift_strategies_frameworkTests"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///var/folders/j0/w0cpl1hs0xn7g7m9bwdyp_wc0000gn/T/-3786b1.@__swiftmacro_31swift_strategies_frameworkTests0034BacktestControllerTestsswift_oeBCkfMX22_8_6expectfMf_.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "1"
+                  endingLineNumber = "1">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "04CA55C1-04F8-461D-8C74-87FF0D812D56"
+            uuid = "D9F238A2-BE30-408E-916E-FD00BE8445CD"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "swift_strategies/Controller/ChartController.swift"
+            filePath = "swift_strategies_framework/Controller/ChartController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
-            landmarkName = "getChartsInAllTimeframes(name:files:)"
+            startingLineNumber = "62"
+            endingLineNumber = "62"
+            landmarkName = "loadAllCharts(initChartsForTesting:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "408302CF-B2CC-4AB8-95B0-4321B1CFA432"
+            uuid = "102EB8F5-AABD-4274-B752-FBB3B0209C73"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "swift_strategies/Controller/ChartController.swift"
+            filePath = "swift_strategies_framework/Controller/ChartController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "85"
-            endingLineNumber = "85"
-            landmarkName = "getAllChartsWithIndicaors()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "206129DB-8657-4691-B2C1-1504EB1325B7"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "swift_strategies/Controller/ChartController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "78"
-            endingLineNumber = "78"
-            landmarkName = "getChartsInAllTimeframes(name:files:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "ED2179D8-32E9-45AA-BE1F-30181B1CB2C5"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "swift_strategies/Controller/ChartController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "114"
-            endingLineNumber = "114"
-            landmarkName = "getAllChartsWithIndicaors()"
+            startingLineNumber = "80"
+            endingLineNumber = "80"
+            landmarkName = "loadAllCharts(initChartsForTesting:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

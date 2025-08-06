@@ -2,10 +2,12 @@
 //  BacktestController.swift
 //  swift_strategies
 //
-//  Created by Jannic Marcon on 18.07.2025.
+//  Created by Jannic Marcon on 27.07.2025.
 //
 
-struct BacktestController{
+public struct BacktestController{
+    public init() { }
+    
     public func runBacktest() async {
         let backtestingStrat: Strategy = TrippleEmaStrategy()
         let evaluationController = EvaluationController()
@@ -15,14 +17,14 @@ struct BacktestController{
         let requiredParameters = backtestingStrat.getRequiredParameters()
         // strategy.getRequiredIndicators
         
-        let allCharts = await chartController.getAllChartsWithIndicaors()
+        let allCharts = await chartController.loadAllCharts()
         let settings = parameterController.generateParameters(requirements: requiredParameters)
         
-        var parameterSets: [(chart: String, settings: ParameterSet)] = []
+        var parameterSets: [(chart: Chart, settings: ParameterSet)] = []
 
-        for (chartName, _) in allCharts {
+        for chart in allCharts {
             for settig in settings{
-                parameterSets.append((chartName, settig))
+                parameterSets.append((chart, settig))
             }
         }
 
@@ -35,10 +37,10 @@ struct BacktestController{
         for batch in batches {
             batchIndex += 1
             await withTaskGroup(of: EvaluationModel?.self) { group in
-                for (chartName, setting) in batch {
+                for (chart, setting) in batch {
                     group.addTask {
-                        var eval = backtestingStrat.backtest(chart: allCharts[chartName]!, paramSet: setting)
-                        eval.origin = chartName
+                        var eval = backtestingStrat.backtest(chart: chart, paramSet: setting)
+                        eval.origin = chart.name
                         return eval
                     }
                 }
@@ -54,7 +56,7 @@ struct BacktestController{
 
         allEvaluations.sort(by: { $0.averageRMultiples > $1.averageRMultiples })
         
-        JsonController.saveEvaluationsToJson(objects: allEvaluations, filename: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
+        JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
         evaluationController.evaluateEvaluations(evaluations: allEvaluations)
 
     }

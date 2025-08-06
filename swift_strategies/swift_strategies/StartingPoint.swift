@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import swift_strategies_framework
 
 @main
 struct StartingPoint {
@@ -15,7 +16,7 @@ struct StartingPoint {
         let fixCharts: Bool = false
         
         if fixCharts {
-            chartController.fixCharts()
+            chartController.attemptFixAndSaveAllCharts()
         }else{
             let backtestController = BacktestController()
             await backtestController.runBacktest()

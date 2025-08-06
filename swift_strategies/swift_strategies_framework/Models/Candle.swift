@@ -1,0 +1,22 @@
+//
+//  Candle.swift
+//  swift_strategies
+//
+//  Created by Jannic Marcon on 27.07.2025.
+//
+
+public struct Candle: Codable {
+    let time: Int
+    var open: Double
+    var high: Double
+    var low: Double
+    var close: Double
+}
+
+
+public struct Chart {
+    //use index to get indicator for each candle
+    let name: String
+    let candles: [Candle]
+    let indicators: [String: [Double]]
+}
