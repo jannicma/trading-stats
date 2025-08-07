@@ -6,7 +6,7 @@
 //
 
 protocol Strategy {
-    func backtest(chart: Chart, paramSet: ParameterSet) -> EvaluationModel
+    func backtest(chart: Chart, paramSet: ParameterSet) -> [SimulatedTrade]
     func getRequiredParameters() -> [ParameterRequirements]
     func getRequiredIndicators() -> [Indicator]
 }

@@ -41,7 +41,7 @@ public struct BacktestController{
                 for (chart, setting) in batch {
                     group.addTask {
                         var eval = backtestingStrat.backtest(chart: chart, paramSet: setting)
-                        eval.origin = chart.name
+                        eval.origin = chart.name // make evaluation
                         return eval
                     }
                 }

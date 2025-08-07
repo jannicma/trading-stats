@@ -5,12 +5,12 @@
 //  Created by Jannic Marcon on 27.07.2025.
 //
 
-struct Parameter{
+public struct Parameter{
     var name: String
     var value: Double
 }
 
-struct ParameterSet{
+public struct ParameterSet{
     var parameters: [Parameter]
 }
 
