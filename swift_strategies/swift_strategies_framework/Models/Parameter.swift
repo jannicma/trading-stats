@@ -5,12 +5,12 @@
 //  Created by Jannic Marcon on 27.07.2025.
 //
 
-public struct Parameter{
+public struct Parameter: Codable{
     var name: String
     var value: Double
 }
 
-public struct ParameterSet{
+public struct ParameterSet: Codable{
     var parameters: [Parameter]
 }
 

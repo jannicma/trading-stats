@@ -40,8 +40,13 @@ public struct BacktestController{
             await withTaskGroup(of: EvaluationModel?.self) { group in
                 for (chart, setting) in batch {
                     group.addTask {
-                        var eval = backtestingStrat.backtest(chart: chart, paramSet: setting)
-                        eval.origin = chart.name // make evaluation
+                        let trades = backtestingStrat.backtest(chart: chart, paramSet: setting)
+                        var eval = evaluationController.evaluateTrades(simulatedTrades: trades)
+                        eval.paramSet = setting
+                        let chartnameParts = chart.name.split(separator: "_")
+                        eval.timeframe = Int(chartnameParts[1])!
+                        eval.symbol = String(chartnameParts[0])
+
                         return eval
                     }
                 }

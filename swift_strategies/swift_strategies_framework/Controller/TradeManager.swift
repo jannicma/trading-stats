@@ -8,16 +8,6 @@ import Foundation
 
 public class TradeManager {
     private var trades: [UUID: SimulatedTrade] = [:]
-    private var timeframe: Int
-    private var chart: String
-    private var parameter: ParameterSet
-    
-    public init(chartName: String, parameter: ParameterSet){
-        var chartnameParts = chartName.split(separator: "_")
-        self.timeframe = Int(chartnameParts[1])!
-        self.chart = String(chartnameParts[0])
-        self.parameter = parameter
-    }
     
     public func enter(time: Int, open: Double, volume: Double,
                       sl: Double, tp: Double, atr: Double) -> UUID {

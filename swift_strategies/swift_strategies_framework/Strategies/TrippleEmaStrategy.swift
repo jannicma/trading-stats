@@ -27,7 +27,7 @@ struct TrippleEmaStrategy: Strategy {
     func backtest(chart: Chart, paramSet: ParameterSet) -> [SimulatedTrade] {
         let tpMult = paramSet.parameters.filter{$0.name == "tpAtrMult"}.first!.value
         let slMult = paramSet.parameters.filter{$0.name == "slAtrMult"}.first!.value
-        let tradeManager = TradeManager(chartName: chart.name, parameter: paramSet)
+        let tradeManager = TradeManager()
         
         var trade: UUID?
 
