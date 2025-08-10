@@ -44,7 +44,7 @@ public struct BacktestController{
                         var eval = evaluationController.evaluateTrades(simulatedTrades: trades)
                         eval.paramSet = setting
                         let chartnameParts = chart.name.split(separator: "_")
-                        eval.timeframe = Int(chartnameParts[1])!
+                        eval.timeframe = String(chartnameParts[1])
                         eval.symbol = String(chartnameParts[0])
 
                         return eval
@@ -59,10 +59,10 @@ public struct BacktestController{
             }
             print("batch \(batchIndex)/\(batches.count) done")
         }
-
+        print()
         allEvaluations.sort(by: { $0.averageRMultiples > $1.averageRMultiples })
-        
         JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
+        print()
         evaluationController.evaluateEvaluations(evaluations: allEvaluations)
 
     }

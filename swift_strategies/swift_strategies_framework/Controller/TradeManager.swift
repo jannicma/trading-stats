@@ -41,6 +41,6 @@ public class TradeManager {
     }
     
     public func finishBacktest() -> [SimulatedTrade] {
-        return Array(trades.values)
+        return Array(trades.values).filter{$0.exitPrice != nil}
     }
 }

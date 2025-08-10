@@ -42,7 +42,8 @@ struct TrippleEmaStrategy: Strategy {
             
             if trade != nil {
                 //exit check!
-                checkForExit(tradeId: trade!, candle: currCandle, manager: tradeManager)
+                var isExit = checkForExit(tradeId: trade!, candle: currCandle, manager: tradeManager)
+                if isExit { trade = nil }
             }
         }
         
@@ -50,30 +51,43 @@ struct TrippleEmaStrategy: Strategy {
     }
     
     
-    private func checkForExit(tradeId: UUID, candle: Candle, manager: TradeManager) {
+    private func checkForExit(tradeId: UUID, candle: Candle, manager: TradeManager) -> Bool {
         let high = candle.high
         let low = candle.low
         let trade = manager.get(tradeId)
         
         let isLong = trade.entryPrice > trade.slPrice
         
+        var isExit = false
+        var closePrice = 0.0
+        
         //calculate exit prices (when long, low below SL price, ...)
         if isLong{
             if low <= trade.slPrice{
-                _ = manager.exit(tradeId, close: trade.slPrice)
+                closePrice = trade.slPrice
+                isExit = true
             }
             if high >= trade.tpPrice{
-                _ = manager.exit(tradeId, close: trade.tpPrice)
+                closePrice = trade.tpPrice
+                isExit = true
             }
         }
         else{
             if high >= trade.slPrice{
-                _ = manager.exit(tradeId, close: trade.slPrice)
+                closePrice = trade.slPrice
+                isExit = true
             }
             if low <= trade.tpPrice{
-                _ = manager.exit(tradeId, close: trade.tpPrice)
+                closePrice = trade.tpPrice
+                isExit = true
             }
         }
+        
+        if isExit{
+            _ = manager.exit(tradeId, close: closePrice)
+        }
+        
+        return isExit
     }
     
     

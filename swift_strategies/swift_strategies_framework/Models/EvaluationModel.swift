@@ -6,7 +6,7 @@
 //
 
 struct EvaluationModel: Codable{
-    var timeframe: Int?
+    var timeframe: String?
     var symbol: String?
     var paramSet: ParameterSet?
     
@@ -14,8 +14,6 @@ struct EvaluationModel: Codable{
     var wins: Int
     var losses: Int
     var winRate: Double
-    var riskAtrMult: Double
-    var rewardAtrMult: Double
 
     // R-multiple stats (remain in R)
     var averageRMultiples: Double      // mean R across all trades

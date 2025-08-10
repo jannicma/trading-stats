@@ -35,7 +35,6 @@ struct EvaluationController{
         var grossProfitMoney: Double = 0
         var grossLossMoney: Double = 0
         
-        //Money equity curve
         var equityMoney: [Double] = []
         equityMoney.reserveCapacity(tradesCount)
         var cumMoney: Double = 0.0
@@ -58,7 +57,7 @@ struct EvaluationController{
             if pnl > 0 { grossProfitMoney += pnl } else { grossLossMoney += abs(pnl) }
             if pnl < 0 { downsideSquaresMoney.append(pnl * pnl) }
             
-            cumMoney += pnl // TODO: is cumMoney really needed outside of loop? why?
+            cumMoney += pnl
             equityMoney.append(cumMoney)
             
             if cumMoney > peakMoney { peakMoney = cumMoney }
@@ -90,7 +89,7 @@ struct EvaluationController{
         let downsideStd = sqrt(downsideVar)
         let sortino = downsideStd > 0 ? expectancyMoney / downsideStd : 0.0
         
-        let profitFactor = grossLossMoney > 0 ? grossLossMoney / grossProfitMoney : 0.0
+        let profitFactor = grossLossMoney > 0 ? grossProfitMoney / grossLossMoney : 0.0
         let ulcerIndex = ulcerSquares.isEmpty ? 0.0 : ulcerSquares.reduce(0, +) / Double(ulcerSquares.count)
         
         var equityVariance: Double = 0.0
@@ -107,24 +106,22 @@ struct EvaluationController{
         
         let netMoney = moneyReturns.reduce(0, +)
         let maxDrowdown = maxDDMoney
-        let denom = maxDrowdown > 0 ? maxDrowdown : 0.0 //why??
-        let calmerRatio = denom > 0 ? netMoney / denom : 0.0        //same?
-        let recoveryFactor = denom > 0 ? netMoney / denom : 0.0     //same?
+        let denom = maxDrowdown > 0 ? maxDrowdown : 0.0
+        let calmarRatio = denom > 0 ? netMoney / denom : 0.0
+        let recoveryFactor = denom > 0 ? netMoney / denom : 0.0
         
         let evaluation = EvaluationModel(
             trades: tradesCount,
             wins: wins,
             losses: losses,
             winRate: winRate,
-            riskAtrMult: 0.0,
-            rewardAtrMult: 0.0,
             averageRMultiples: meanR,
             expectancy: expectancyMoney,
             avgRRR: averageRRR,
             sharpe: sharpe,
             sortino: sortino,
             maxDrawdown: maxDrowdown,
-            calmarRatio: calmerRatio,
+            calmarRatio: calmarRatio,
             profitFactor: profitFactor,
             ulcerIndex: ulcerIndex,
             recoveryFactor: recoveryFactor,
@@ -136,42 +133,15 @@ struct EvaluationController{
         return evaluation
     }
     
-   
-    /*
-    func evaluateTrades(simulatedTrades: [SimulatedTrade], printEval: Bool = false) -> EvaluationModel {
-        var evaluation = EvaluationModel(trades: 0, wins: 0, losses: 0, winRate: 0.0, riskAtrMult: risk, rewardAtrMult: reward, averageRMultiples: 0.0)
-        
-        evaluation.trades = simulatedTrades.count
-        evaluation.wins = simulatedTrades.filter { $0.exitPrice == $0.tpPrice }.count
-        evaluation.losses = simulatedTrades.filter { $0.exitPrice == $0.slPrice}.count
-        evaluation.winRate = (Double(evaluation.wins) / Double(evaluation.trades)) * 100
-        
-        var allRealizedR: [Double] = []
-        for trade in simulatedTrades {
-            let isLong = trade.slPrice < trade.entryPrice
-            let slDiff = abs(trade.entryPrice - trade.slPrice)
-            let exitDiff = isLong ? trade.exitPrice! - trade.entryPrice : trade.entryPrice - trade.exitPrice!
-            
-            let realizedR = exitDiff / slDiff
-            allRealizedR.append(realizedR)
-        }
-        let sumR = allRealizedR.reduce(0, +)
-        evaluation.averageRMultiples = sumR / Double(allRealizedR.count)
-
-        assert(evaluation.trades == evaluation.wins + evaluation.losses, "evaluation trades do not count up correctly")
-        
-        if printEval { printEvaluation(evaluation) }
-        return evaluation
-    }
-    */
     
     private func printEvaluation(_ evaluation: EvaluationModel) {
+        print("Chart: \(evaluation.symbol ?? "No Symbol")")
+        print("Timeframe: \(evaluation.timeframe ?? "No Timeframe")")
+        print(evaluation.paramSet?.stringRepresentation ?? "no Parameter Set")
         print("Total Trades: \(evaluation.trades)")
         print("Wins: \(evaluation.wins)")
         print("Losses: \(evaluation.losses)")
         print(String(format: "Win Rate: %.2f%%", evaluation.winRate))
-        print(String(format: "ATR Risk: %.2f", evaluation.riskAtrMult))
-        print(String(format: "ATR Reward: %.2f", evaluation.rewardAtrMult))
         print(String(format: "Average R Multiples: %.4f (R)", evaluation.averageRMultiples))
         print(String(format: "Expectancy (money/trade): %.4f", evaluation.expectancy))
         print(String(format: "Average R:R (TP/SL): %.4f", evaluation.avgRRR))
