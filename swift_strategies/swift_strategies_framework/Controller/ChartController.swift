@@ -120,7 +120,7 @@ public struct ChartController {
                         print("there was an error")
                     }
                 } else {
-                    print("maaan, it did not fix it...")
+                    print("maaan, it did not fix it... \(name)")
                 }
             }
         }

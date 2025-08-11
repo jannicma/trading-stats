@@ -94,7 +94,7 @@ struct CsvController {
     }
 
     private static func shouldSkipFolder(named folderName: String) -> Bool {
-        return folderName == "bak" || folderName == "tmp"
+        return folderName == "bak" || folderName == "tmp" || folderName == "test"
     }
 
     private static func loadCSVFiles(in folderURL: URL) -> [URL] {
