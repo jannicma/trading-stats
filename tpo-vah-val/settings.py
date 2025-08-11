@@ -1,9 +1,0 @@
-one_minute_bot_run = False
-simulate_strategy = True
-get_data_from_api = False
-less_data = False
-print_tpo = False
-print_csv = False
-default_atr_len = 14
-default_rsi_len = 14
-long_atr_len = 150
