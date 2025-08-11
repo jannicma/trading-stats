@@ -42,7 +42,7 @@ struct TrippleEmaStrategy: Strategy {
             
             if trade != nil {
                 //exit check!
-                var isExit = checkForExit(tradeId: trade!, candle: currCandle, manager: tradeManager)
+                let isExit = checkForExit(tradeId: trade!, candle: currCandle, manager: tradeManager)
                 if isExit { trade = nil }
             }
         }
