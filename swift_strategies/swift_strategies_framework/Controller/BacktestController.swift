@@ -22,19 +22,19 @@ public struct BacktestController{
         let settings = parameterController.generateParameters(requirements: requiredParameters)
         
         var parameterSets: [(chart: Chart, settings: ParameterSet)] = []
-
+        
         for setting in settings{
             for chart in allCharts{
                 parameterSets.append((chart, setting))
             }
         }
-
+        
         let batchSize = 50
         let batches = parameterSets.chunked(into: batchSize)
         
         var batchIndex = 0
         var allEvaluations: [EvaluationModel] = []
-
+        
         for batch in batches {
             batchIndex += 1
             await withTaskGroup(of: EvaluationModel?.self) { group in
@@ -46,11 +46,11 @@ public struct BacktestController{
                         let chartnameParts = chart.name.split(separator: "_")
                         eval.timeframe = String(chartnameParts[1])
                         eval.symbol = String(chartnameParts[0])
-
+                        
                         return eval
                     }
                 }
-
+                
                 for await eval in group {
                     if let eval = eval {
                         allEvaluations.append(eval)
@@ -60,10 +60,22 @@ public struct BacktestController{
             print("batch \(batchIndex)/\(batches.count) done")
         }
         print()
-        allEvaluations.sort(by: { $0.averageRMultiples > $1.averageRMultiples })
+        
+        allEvaluations.sort {
+            ( $0.calmarRatio * 0.4 ) +
+            ( $0.expectancy * 0.3 ) +
+            ( $0.sharpe * 0.2 ) -
+            ( $0.maxDrawdown * 0.1 )
+            >
+            ( $1.calmarRatio * 0.4 ) +
+            ( $1.expectancy * 0.3 ) +
+            ( $1.sharpe * 0.2 ) -
+            ( $1.maxDrawdown * 0.1 )
+        }
+        
         JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
         print()
         evaluationController.evaluateEvaluations(evaluations: allEvaluations)
-
+        
     }
 }

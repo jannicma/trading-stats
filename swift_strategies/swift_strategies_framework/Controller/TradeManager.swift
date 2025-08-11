@@ -8,6 +8,8 @@ import Foundation
 
 public class TradeManager {
     private var trades: [UUID: SimulatedTrade] = [:]
+    private var startBalance: Double = 100000.0
+    private var riskPerTrade: Double = 0.015
     
     public func enter(time: Int, open: Double, volume: Double,
                       sl: Double, tp: Double, atr: Double) -> UUID {
@@ -42,5 +44,12 @@ public class TradeManager {
     
     public func finishBacktest() -> [SimulatedTrade] {
         return Array(trades.values).filter{$0.exitPrice != nil}
+    }
+    
+    
+    public func computeVolume(slDistance: Double) -> Double {
+        let risk = startBalance * riskPerTrade
+        let positionSize = risk / slDistance
+        return positionSize
     }
 }

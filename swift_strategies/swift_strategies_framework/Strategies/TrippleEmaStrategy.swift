@@ -104,7 +104,8 @@ struct TrippleEmaStrategy: Strategy {
             slPrice = entry + (slMult * atr)
             tpPrice = entry - (tpMult * atr)
         }
-        trade = manager.enter(time: candle.time, open: entry, volume: 02, sl: slPrice, tp: tpPrice, atr: atr)
+        let volume = manager.computeVolume(slDistance: abs(entry - slPrice))
+        trade = manager.enter(time: candle.time, open: entry, volume: volume, sl: slPrice, tp: tpPrice, atr: atr)
 
         return trade
     }
