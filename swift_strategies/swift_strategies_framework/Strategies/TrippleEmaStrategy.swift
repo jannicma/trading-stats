@@ -4,6 +4,7 @@
 //
 //  Created by Jannic Marcon on 27.07.2025.
 //
+import Foundation
 
 struct TrippleEmaStrategy: Strategy {
     public func getRequiredParameters() -> [ParameterRequirements] {
@@ -23,12 +24,12 @@ struct TrippleEmaStrategy: Strategy {
     }
 
     
-    func backtest(chart: Chart, paramSet: ParameterSet) -> EvaluationModel {
+    func backtest(chart: Chart, paramSet: ParameterSet) -> [SimulatedTrade] {
         let tpMult = paramSet.parameters.filter{$0.name == "tpAtrMult"}.first!.value
         let slMult = paramSet.parameters.filter{$0.name == "slAtrMult"}.first!.value
+        let tradeManager = TradeManager()
         
-        var allTrades: [SimulatedTrade] = []
-        var trade: SimulatedTrade?
+        var trade: UUID?
 
         for i in 1..<chart.candles.count-1 {
             let currCandle = chart.candles[i]
@@ -36,68 +37,74 @@ struct TrippleEmaStrategy: Strategy {
             if !isCorrectOrder(index: i-1, indicators: chart.indicators) && isCorrectOrder(index: i, indicators: chart.indicators)  && trade == nil {
                 //this is the entry logic. All EMA/SMA crossed into the right order.
                 let atr = chart.indicators["ATR14"]![i]
-                trade = createTrade(currCandle, atr: atr, tpMult: tpMult, slMult: slMult)
+                trade = createTrade(with: tradeManager, candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult)
             }
             
             if trade != nil {
                 //exit check!
-                checkForExit(trade: &trade!, candle: currCandle)
-                
-                if trade?.exitPrice != nil {
-                    // exit condition (SL, TP) got hit.
-                    allTrades.append(trade!)
-                    trade = nil
-                }
+                let isExit = checkForExit(tradeId: trade!, candle: currCandle, manager: tradeManager)
+                if isExit { trade = nil }
             }
         }
         
-        let evaluationController = EvaluationController()
-        let evaluation = evaluationController.evaluateTrades(simulatedTrades: allTrades, risk: slMult, reward: tpMult)
-        return evaluation
+        return tradeManager.finishBacktest()
     }
     
     
-    private func checkForExit(trade: inout SimulatedTrade, candle: Candle) {
+    private func checkForExit(tradeId: UUID, candle: Candle, manager: TradeManager) -> Bool {
         let high = candle.high
         let low = candle.low
+        let trade = manager.get(tradeId)
         
         let isLong = trade.entryPrice > trade.slPrice
+        
+        var isExit = false
+        var closePrice = 0.0
         
         //calculate exit prices (when long, low below SL price, ...)
         if isLong{
             if low <= trade.slPrice{
-                trade.exitPrice = trade.slPrice
+                closePrice = trade.slPrice
+                isExit = true
             }
             if high >= trade.tpPrice{
-                trade.exitPrice = trade.tpPrice
+                closePrice = trade.tpPrice
+                isExit = true
             }
         }
         else{
             if high >= trade.slPrice{
-                trade.exitPrice = trade.slPrice
+                closePrice = trade.slPrice
+                isExit = true
             }
             if low <= trade.tpPrice{
-                trade.exitPrice = trade.tpPrice
+                closePrice = trade.tpPrice
+                isExit = true
             }
         }
+        
+        if isExit{
+            _ = manager.exit(tradeId, close: closePrice)
+        }
+        
+        return isExit
     }
     
     
-    private func createTrade(_ candle: Candle, atr: Double, tpMult: Double, slMult: Double) -> SimulatedTrade {
-        var trade: SimulatedTrade
+    private func createTrade(with manager: TradeManager, candle: Candle, atr: Double, tpMult: Double, slMult: Double) -> UUID {
+        var trade: UUID
         assert(atr > 0)
-        
+        var entry, slPrice, tpPrice: Double
+        entry = candle.close
+
         if isBull(candle) {
-            let entry = candle.close
-            let slPrice = entry - (slMult * atr)
-            let tpPrice = entry + (tpMult * atr)
-            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: atr)
+            slPrice = entry - (slMult * atr)
+            tpPrice = entry + (tpMult * atr)
         } else {
-            let entry = candle.close
-            let slPrice = entry + (slMult * atr)
-            let tpPrice = entry - (tpMult * atr)
-            trade = SimulatedTrade(entryPrice: entry, tpPrice: tpPrice, slPrice: slPrice, atrAtEntry: atr)
+            slPrice = entry + (slMult * atr)
+            tpPrice = entry - (tpMult * atr)
         }
+        trade = manager.enter(time: candle.time, open: entry, volume: 02, sl: slPrice, tp: tpPrice, atr: atr)
 
         return trade
     }

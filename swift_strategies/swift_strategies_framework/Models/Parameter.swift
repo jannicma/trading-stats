@@ -5,13 +5,23 @@
 //  Created by Jannic Marcon on 27.07.2025.
 //
 
-struct Parameter{
+public struct Parameter: Codable{
     var name: String
     var value: Double
 }
 
-struct ParameterSet{
+public struct ParameterSet: Codable{
     var parameters: [Parameter]
+    
+    var stringRepresentation: String {
+        get {
+            var paramText: [String] = []
+            for parameter in parameters {
+                paramText.append("\(parameter.name): \(parameter.value)")
+            }
+            return paramText.joined(separator: "\n")
+        }
+    }
 }
 
 struct ParameterRequirements{
