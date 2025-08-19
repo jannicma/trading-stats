@@ -117,9 +117,12 @@ struct EvaluationController{
 
     private func cagr(equitySeries: [DailyPoint], calendar: Calendar) -> Double {
         guard let first = equitySeries.first, let last = equitySeries.last, first.equity > 0 else { return 0.0 }
+        // If terminal equity is zero or negative, define CAGR as -100%
+        if last.equity <= 0 { return -1.0 }
         let days = max(1, calendar.dateComponents([.day], from: first.date, to: last.date).day ?? 0)
         let years = Double(days) / 365.0
-        return years > 0 ? pow(last.equity / first.equity, 1.0 / years) - 1.0 : 0.0
+        guard years > 0 else { return 0.0 }
+        return pow(last.equity / first.equity, 1.0 / years) - 1.0
     }
     
     func evaluateEvaluations(evaluations: [EvaluationModel]){
