@@ -34,7 +34,7 @@ struct IndicatorTests {
         let computedIndicators = IndicatorController.computeIndicators(for: ohlcChart, requiredIndicators: requiredIndicators)
         
         for i in 0..<ohlcChart.count{
-            if i < 6 { continue }
+            if i < 40 { continue }
             
             let expectedCandle = testChart[i]
             
@@ -47,14 +47,14 @@ struct IndicatorTests {
             let computedStoch5 = computedIndicators["STOCH5"]![i]
             let computedStoch7 = computedIndicators["STOCH7"]![i]
             
-            #expect(abs(expectedCandle.sma5 - computedSma5) < 1.0, "SMA5 failed to compute correctly! Index \(i)")
-            #expect(abs(expectedCandle.sma7 - computedSma7) < 1.0, "SMA7 failed to compute correctly! Index \(i)")
-            #expect(abs(expectedCandle.atr5 - computedAtr5) < 1.0, "ATR5 failed to compute correctly! Index \(i)")
-            #expect(abs(expectedCandle.atr7 - computedAtr7) < 1.0, "ATR7 failed to compute correctly! Index \(i)")
-            #expect(abs(expectedCandle.rsi5 - computedRsi5) < 1.0, "RSI5 failed to compute correctly! Index \(i)")
-            #expect(abs(expectedCandle.rsi7 - computedRsi7) < 1.0, "RSI7 failed to compute correctly! Index \(i)")
-            #expect(abs(expectedCandle.stoch5 - computedStoch5) < 1.0, "STOCH5 failed to compute correctly! Index \(i)")
-            #expect(abs(expectedCandle.stoch7 - computedStoch7) < 1.0, "STOCH7 failed to compute correctly! Index \(i)")
+            #expect(abs(expectedCandle.sma5 - computedSma5) < 0.2, "SMA5 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
+            #expect(abs(expectedCandle.sma7 - computedSma7) < 0.2, "SMA7 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
+            #expect(abs(expectedCandle.atr5 - computedAtr5) < 0.2, "ATR5 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
+            #expect(abs(expectedCandle.atr7 - computedAtr7) < 0.2, "ATR7 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
+            #expect(abs(expectedCandle.rsi5 - computedRsi5) < 0.2, "RSI5 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
+            #expect(abs(expectedCandle.rsi7 - computedRsi7) < 0.2, "RSI7 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
+            #expect(abs(expectedCandle.stoch5 - computedStoch5) < 0.2, "STOCH5 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
+            #expect(abs(expectedCandle.stoch7 - computedStoch7) < 0.2, "STOCH7 failed to compute correctly! Index \(i) - Timestammp: \(expectedCandle.time)")
         }
     }
 
