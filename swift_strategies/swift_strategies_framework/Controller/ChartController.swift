@@ -38,7 +38,7 @@ public struct ChartController {
     }
 
     public func loadAllCharts(initChartsForTesting: [String: [Candle]] = [:]) async -> [Chart] {
-        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp" && $0.key != "test"  }
+        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp" && $0.key != "test" && $0.key != "indicatorTesting"  }
         var allRawCharts: [String: [Candle]] = initChartsForTesting
         let indicatorController = IndicatorController()
         

@@ -38,6 +38,42 @@ struct CsvController {
         return candles
     }
 
+    static public func loadTestIndicatorChart(from fileURL: URL) -> [TestIndicatorCandle] {
+        var candles: [TestIndicatorCandle] = []
+
+        do {
+            let content = try String(contentsOf: fileURL, encoding: .utf8)
+            var lines = content.components(separatedBy: .newlines).filter { !$0.isEmpty }
+            
+            if lines.first?.contains("open_time") == true {
+                lines.removeFirst()
+            }
+            
+            candles = lines.map { line in
+                let values = line.split(separator: ",", omittingEmptySubsequences: false)
+                return TestIndicatorCandle(
+                    time: Int(values[0])!,
+                    open: Double(values[1])!,
+                    high: Double(values[2])!,
+                    low: Double(values[3])!,
+                    close: Double(values[4])!,
+                    sma5: Double(values[5]) ?? 0.0,
+                    sma7: Double(values[6]) ?? 0.0,
+                    atr5: Double(values[7]) ?? 0.0,
+                    atr7: Double(values[8]) ?? 0.0,
+                    rsi5: Double(values[9]) ?? 0.0,
+                    rsi7: Double(values[10]) ?? 0.0,
+                    stoch5: Double(values[11]) ?? 0.0,
+                    stoch7: Double(values[12]) ?? 0.0
+                )
+            }
+        } catch {
+            print(error)
+        }
+
+        return candles
+    }
+
     static public func convertToCSVString<T: Encodable>(from objects: [T]) throws -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted
@@ -94,7 +130,7 @@ struct CsvController {
     }
 
     private static func shouldSkipFolder(named folderName: String) -> Bool {
-        return folderName == "bak" || folderName == "tmp" || folderName == "test"
+        return folderName == "bak" || folderName == "tmp" || folderName == "test" || folderName == "indicatorTesting"
     }
 
     private static func loadCSVFiles(in folderURL: URL) -> [URL] {

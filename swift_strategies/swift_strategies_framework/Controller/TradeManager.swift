@@ -46,7 +46,6 @@ public class TradeManager {
         return Array(trades.values).filter{$0.exitPrice != nil}
     }
     
-    
     public func computeVolume(slDistance: Double) -> Double {
         let risk = startBalance * riskPerTrade
         let positionSize = risk / slDistance

@@ -8,6 +8,8 @@
 public enum Indicator {
     case sma(period: Int)
     case atr(length: Int)
+    case rsi(length: Int)
+    case stoch(KLen: Int)
     
     var name: String{
         switch self {
@@ -15,6 +17,10 @@ public enum Indicator {
             return "SMA\(p)"
         case .atr(length: let l):
             return "ATR\(l)"
+        case .rsi(length: let l):
+            return "RSI\(l)"
+        case .stoch(KLen: let kLen):
+            return "STOCH\(kLen)"
         }
     }
 }
