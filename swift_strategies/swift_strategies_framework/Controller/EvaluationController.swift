@@ -152,7 +152,7 @@ struct EvaluationController{
 
         let tradesCount = simulatedTrades.count
         let wins = simulatedTrades.filter { $0.isLong ? $0.exitPrice! > $0.entryPrice : $0.exitPrice! < $0.entryPrice}.count
-        let losses = simulatedTrades.filter { $0.isLong ? $0.exitPrice! < $0.entryPrice : $0.exitPrice! > $0.entryPrice}.count
+        let losses = simulatedTrades.filter { $0.isLong ? $0.exitPrice! <= $0.entryPrice : $0.exitPrice! >= $0.entryPrice}.count
         let winRate = (Double(wins) / Double(tradesCount)) * 100
 
         assert(tradesCount == wins+losses, "trade wins and losses dont sum up correctly")

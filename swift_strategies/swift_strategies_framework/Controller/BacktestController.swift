@@ -9,7 +9,7 @@ public struct BacktestController{
     public init() { }
     
     public func runBacktest() async {
-        let backtestingStrat: Strategy = TrippleEmaStrategy()
+        let backtestingStrat: Strategy = StochRsiStrategy()
         let evaluationController = EvaluationController()
         var chartController = ChartController()
         let parameterController = ParameterController()
@@ -61,21 +61,17 @@ public struct BacktestController{
         }
         print()
         
-        allEvaluations.sort {
-            ( $0.calmarRatio * 0.4 ) +
-            ( $0.expectancy * 0.3 ) +
-            ( $0.sharpe * 0.2 ) -
-            ( $0.maxDrawdown * 0.1 )
-            >
-            ( $1.calmarRatio * 0.4 ) +
-            ( $1.expectancy * 0.3 ) +
-            ( $1.sharpe * 0.2 ) -
-            ( $1.maxDrawdown * 0.1 )
+        allEvaluations = allEvaluations.filter { $0.averageRMultiples > 0.15 && $0.maxDrawdown < 10_000 && $0.trades > 50}
+        if allEvaluations.count < 10 {
+            print("Not enough evaluations found, quitting...")
+            return
         }
+        
+        
+        allEvaluations.sort {$0.expectancy * Double($0.trades) > $1.expectancy * Double($1.trades)}
         
         JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
         print()
         evaluationController.evaluateEvaluations(evaluations: allEvaluations)
-        
     }
 }
