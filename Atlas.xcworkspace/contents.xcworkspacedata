@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:AtlasCore">
+   </FileRef>
+   <FileRef
+      location = "group:AtlasEngine">
+   </FileRef>
+   <FileRef
+      location = "group:AtlasKit">
+   </FileRef>
+   <FileRef
+      location = "group:AtlasPlaybook">
+   </FileRef>
+   <FileRef
+      location = "group:AtlasSim">
+   </FileRef>
+   <FileRef
+      location = "group:AtlasDesk/AtlasDesk.xcodeproj">
+   </FileRef>
+</Workspace>
