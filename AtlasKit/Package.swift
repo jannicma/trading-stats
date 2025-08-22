@@ -11,11 +11,16 @@ let package = Package(
             name: "AtlasKit",
             targets: ["AtlasKit"]),
     ],
+    dependencies: [
+        .package(path: "../AtlasCore")
+    ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "AtlasKit"),
+            name: "AtlasKit",
+            dependencies: ["AtlasCore"]
+        ),
         .testTarget(
             name: "AtlasKitTests",
             dependencies: ["AtlasKit"]

@@ -6,6 +6,14 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D3784F6F2E58FC8900D0A635 /* AtlasCore in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F6E2E58FC8900D0A635 /* AtlasCore */; };
+		D3784F712E58FC8900D0A635 /* AtlasEngine in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F702E58FC8900D0A635 /* AtlasEngine */; };
+		D3784F732E58FC8900D0A635 /* AtlasKit in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F722E58FC8900D0A635 /* AtlasKit */; };
+		D3784F752E58FC8900D0A635 /* AtlasPlaybook in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F742E58FC8900D0A635 /* AtlasPlaybook */; };
+		D3784F772E58FC8900D0A635 /* AtlasSim in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F762E58FC8900D0A635 /* AtlasSim */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D3784F252E58F67000D0A635 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -57,6 +65,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3784F712E58FC8900D0A635 /* AtlasEngine in Frameworks */,
+				D3784F772E58FC8900D0A635 /* AtlasSim in Frameworks */,
+				D3784F732E58FC8900D0A635 /* AtlasKit in Frameworks */,
+				D3784F6F2E58FC8900D0A635 /* AtlasCore in Frameworks */,
+				D3784F752E58FC8900D0A635 /* AtlasPlaybook in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,6 +101,7 @@
 				D3784F182E58F66F00D0A635 /* AtlasDesk */,
 				D3784F272E58F67000D0A635 /* AtlasDeskTests */,
 				D3784F312E58F67000D0A635 /* AtlasDeskUITests */,
+				D3784F6D2E58FC8900D0A635 /* Frameworks */,
 				D3784F172E58F66F00D0A635 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -100,6 +114,13 @@
 				D3784F2E2E58F67000D0A635 /* AtlasDeskUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		D3784F6D2E58FC8900D0A635 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -122,6 +143,11 @@
 			);
 			name = AtlasDesk;
 			packageProductDependencies = (
+				D3784F6E2E58FC8900D0A635 /* AtlasCore */,
+				D3784F702E58FC8900D0A635 /* AtlasEngine */,
+				D3784F722E58FC8900D0A635 /* AtlasKit */,
+				D3784F742E58FC8900D0A635 /* AtlasPlaybook */,
+				D3784F762E58FC8900D0A635 /* AtlasSim */,
 			);
 			productName = AtlasDesk;
 			productReference = D3784F162E58F66F00D0A635 /* AtlasDesk.app */;
@@ -561,6 +587,29 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D3784F6E2E58FC8900D0A635 /* AtlasCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasCore;
+		};
+		D3784F702E58FC8900D0A635 /* AtlasEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasEngine;
+		};
+		D3784F722E58FC8900D0A635 /* AtlasKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasKit;
+		};
+		D3784F742E58FC8900D0A635 /* AtlasPlaybook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasPlaybook;
+		};
+		D3784F762E58FC8900D0A635 /* AtlasSim */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasSim;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D3784F0E2E58F66F00D0A635 /* Project object */;
 }
