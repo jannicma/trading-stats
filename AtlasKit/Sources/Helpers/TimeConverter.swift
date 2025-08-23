@@ -1,13 +1,13 @@
 //
-//  TimeController.swift
-//  swift_strategies
+//  TimeConverter.swift
+//  AtlasKit
 //
-//  Created by Jannic Marcon on 27.07.2025.
+//  Created by Jannic Marcon on 23.08.2025.
 //
 
 import Foundation
 
-struct TimeController {
+struct TimeConverter {
     static func getYearAndMonth(from unixTimestamp: Int) -> (year: Int, month: Int)? {
         let interval = TimeInterval(unixTimestamp) / 1000.0
         let date = Date(timeIntervalSince1970: interval)
