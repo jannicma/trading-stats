@@ -9,7 +9,9 @@ import Foundation
 import AtlasCore
 import AtlasKit
 
-struct TrippleEmaStrategy: Strategy {
+public struct TrippleEmaStrategy: Strategy {
+    public init() {}
+    
     public func getRequiredParameters() -> [ParameterRequirements] {
         return [
             ParameterRequirements(name: "tpAtrMult", minValue: 2, maxValue: 10, step: 0.5),
@@ -27,7 +29,7 @@ struct TrippleEmaStrategy: Strategy {
     }
 
     
-    func backtest(chart: Chart, paramSet: ParameterSet) -> [Trade] {
+    public func backtest(chart: Chart, paramSet: ParameterSet) -> [Trade] {
         let tpMult = paramSet.parameters.filter{$0.name == "tpAtrMult"}.first!.value
         let slMult = paramSet.parameters.filter{$0.name == "slAtrMult"}.first!.value
         let tradeManager = TradeManager()

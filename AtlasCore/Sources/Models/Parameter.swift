@@ -6,11 +6,20 @@
 //
 
 public struct Parameter: Codable{
+    public init(name: String, value: Double) {
+        self.name = name
+        self.value = value
+    }
+    
     public var name: String
     public var value: Double
 }
 
 public struct ParameterSet: Codable{
+    public init(parameters: [Parameter]) {
+        self.parameters = parameters
+    }
+    
     public var parameters: [Parameter]
     
     public var stringRepresentation: String {
@@ -25,10 +34,10 @@ public struct ParameterSet: Codable{
 }
 
 public struct ParameterRequirements{
-    var name: String
-    var minValue: Double
-    var maxValue: Double
-    var step: Double
+    public var name: String
+    public var minValue: Double
+    public var maxValue: Double
+    public var step: Double
     
     public init(name: String, minValue: Double, maxValue: Double, step: Double) {
         self.name = name

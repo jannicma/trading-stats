@@ -9,8 +9,10 @@ import Foundation
 import AtlasCore
 import AtlasKit
 
-struct StochRsiStrategy : Strategy{
-    func getRequiredParameters() -> [ParameterRequirements] {
+public struct StochRsiStrategy : Strategy{
+    public init() {}
+    
+    public func getRequiredParameters() -> [ParameterRequirements] {
         return [
             ParameterRequirements(name: "rsiThreashold", minValue: 40, maxValue: 70, step: 5),  // added from 0 when long, subtracted from 100 when short
             ParameterRequirements(name: "rsiLimit", minValue: 0, maxValue: 20, step: 5),        // subtracted from 100 when long, added from 0 when short
@@ -22,7 +24,7 @@ struct StochRsiStrategy : Strategy{
     let rsiIndicator = Indicator.rsi(length: 14)
     let stochIndicaor = Indicator.stoch(KLen: 14)
     
-    func getRequiredIndicators() -> [Indicator] {
+    public func getRequiredIndicators() -> [Indicator] {
         return [atrIndicator, rsiIndicator, stochIndicaor]
     }
     
@@ -38,7 +40,7 @@ struct StochRsiStrategy : Strategy{
         var stochThreashold: Double
     }
     
-    func backtest(chart: Chart, paramSet: ParameterSet) -> [Trade] {
+    public func backtest(chart: Chart, paramSet: ParameterSet) -> [Trade] {
         let tradeManager = TradeManager()
         let rsiThreasholdParam = paramSet.parameters.filter{$0.name == "rsiThreashold"}.first!.value
         let rsiLimitParam = paramSet.parameters.filter{$0.name == "rsiLimit"}.first!.value

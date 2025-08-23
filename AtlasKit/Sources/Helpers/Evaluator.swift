@@ -7,7 +7,9 @@
 
 import Foundation
 
-struct Evaluator{
+public struct Evaluator{
+    public init() {}
+    
     // MARK: - Performance helpers (daily, percentage-based)
     private struct DailyPoint { let date: Date; let equity: Double }
 
@@ -126,7 +128,7 @@ struct Evaluator{
         return pow(last.equity / first.equity, 1.0 / years) - 1.0
     }
     
-    func evaluateEvaluations(evaluations: [EvaluationModel]){
+    public func evaluateEvaluations(evaluations: [EvaluationModel]){
         for i in 0...7{
             print("Rank \(i+1): \(evaluations[i].symbol ?? "unknown")")
             printEvaluation(evaluations[i])
@@ -135,7 +137,7 @@ struct Evaluator{
     }
     
     
-    func evaluateTrades(simulatedTrades: [SimulatedTrade], printEval: Bool = false) -> EvaluationModel {
+    public func evaluateTrades(simulatedTrades: [SimulatedTrade], printEval: Bool = false) -> EvaluationModel {
         // --- Inputs / constants ---
         let startEquity: Double = 100_000.0
         let periodsPerYear: Double = 365.0

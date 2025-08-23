@@ -1,0 +1,81 @@
+//
+//  BacktestController.swift
+//  AtlasSim
+//
+//  Created by Jannic Marcon on 23.08.2025.
+//
+import Foundation
+import AtlasCore
+import AtlasKit
+import AtlasPlaybook
+
+public struct BacktestController{
+    public init() { }
+    
+    public func runBacktest() async {
+        let backtestingStrat: Strategy = StochRsiStrategy()
+        let evaluationController: Evaluator = Evaluator()
+        var chartController: ChartService = ChartService()
+        let parameterController: ParameterGenerator = ParameterGenerator()
+        
+        let requiredParameters = backtestingStrat.getRequiredParameters()
+        let requiredIndicators = backtestingStrat.getRequiredIndicators()
+        
+        chartController.setRequiredIndicators(requiredIndicators)
+        let allCharts = await chartController.loadAllCharts()
+        let settings = parameterController.generateParameters(requirements: requiredParameters)
+        
+        var parameterSets: [(chart: Chart, settings: ParameterSet)] = []
+        
+        for setting in settings{
+            for chart in allCharts{
+                parameterSets.append((chart, setting))
+            }
+        }
+        
+        let batchSize = 50
+        let batches = parameterSets.chunked(into: batchSize)
+        
+        var batchIndex = 0
+        var allEvaluations: [Evaluation] = []
+        
+        for batch in batches {
+            batchIndex += 1
+            await withTaskGroup(of: Evaluation?.self) { group in
+                for (chart, setting) in batch {
+                    group.addTask {
+                        let trades = backtestingStrat.backtest(chart: chart, paramSet: setting)
+                        var eval = evaluationController.evaluateTrades(simulatedTrades: trades)
+                        eval.paramSet = setting
+                        let chartnameParts = chart.name.split(separator: "_")
+                        eval.timeframe = String(chartnameParts[1])
+                        eval.symbol = String(chartnameParts[0])
+                        
+                        return eval
+                    }
+                }
+                
+                for await eval in group {
+                    if let eval = eval {
+                        allEvaluations.append(eval)
+                    }
+                }
+            }
+            print("batch \(batchIndex)/\(batches.count) done")
+        }
+        print()
+        
+        allEvaluations = allEvaluations.filter { $0.averageRMultiples > 0.15 && $0.maxDrawdown < 10_000 && $0.trades > 50}
+        if allEvaluations.count < 10 {
+            print("Not enough evaluations found, quitting...")
+            return
+        }
+        
+        
+        allEvaluations.sort {$0.expectancy * Double($0.trades) > $1.expectancy * Double($1.trades)}
+        
+        JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
+        print()
+        evaluationController.evaluateEvaluations(evaluations: allEvaluations)
+    }
+}
