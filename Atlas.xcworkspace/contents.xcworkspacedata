@@ -19,4 +19,7 @@
    <FileRef
       location = "group:AtlasDesk/AtlasDesk.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:AtlasVault">
+   </FileRef>
 </Workspace>
