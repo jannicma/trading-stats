@@ -9,6 +9,8 @@ import Foundation
 import AtlasCore
 
 public class TradeManager {
+    public init() {}
+    
     private var trades: [UUID: Trade] = [:]
     private var startBalance: Double = 100000.0
     private var riskPerTrade: Double = 0.015

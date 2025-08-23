@@ -11,7 +11,7 @@ public enum Indicator {
     case rsi(length: Int)
     case stoch(KLen: Int)
     
-    var name: String{
+    public var name: String{
         switch self {
         case .sma(period: let p):
             return "SMA\(p)"

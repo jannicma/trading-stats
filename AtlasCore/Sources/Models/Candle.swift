@@ -6,17 +6,17 @@
 //
 
 public struct Candle: Codable {
-    let time: Int
-    var open: Double
-    var high: Double
-    var low: Double
-    var close: Double
+    public let time: Int
+    public var open: Double
+    public var high: Double
+    public var low: Double
+    public var close: Double
 }
 
 
 public struct Chart {
     //use index to get indicator for each candle
-    let name: String
-    let candles: [Candle]
-    let indicators: [String: [Double]]
+    public let name: String
+    public let candles: [Candle]
+    public let indicators: [String: [Double]]
 }
