@@ -5,7 +5,7 @@
 //  Created by Jannic Marcon on 23.08.2025.
 //
 
-public enum Indicator {
+public enum Indicator: Sendable {
     case sma(period: Int)
     case atr(length: Int)
     case rsi(length: Int)

@@ -6,7 +6,7 @@
 //
 import AtlasCore
 
-struct ParameterController{
+struct ParameterGenerator{
     func generateParameters(requirements: [ParameterRequirements], parameters: [ParameterSet] = []) -> [ParameterSet]{
         //early return when we reached no more requirements
         guard let firstRequirement = requirements.first else{

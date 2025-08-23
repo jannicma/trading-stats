@@ -5,7 +5,15 @@
 //  Created by Jannic Marcon on 23.08.2025.
 //
 
-public struct Candle: Codable {
+public struct Candle: Codable, Sendable {
+    public init(time: Int, open: Double, high: Double, low: Double, close: Double) {
+        self.time = time
+        self.open = open
+        self.high = high
+        self.low = low
+        self.close = close
+    }
+    
     public let time: Int
     public var open: Double
     public var high: Double
@@ -14,7 +22,13 @@ public struct Candle: Codable {
 }
 
 
-public struct Chart {
+public struct Chart: Sendable {
+    public init(name: String, candles: [Candle], indicators: [String : [Double]]) {
+        self.name = name
+        self.candles = candles
+        self.indicators = indicators
+    }
+    
     //use index to get indicator for each candle
     public let name: String
     public let candles: [Candle]

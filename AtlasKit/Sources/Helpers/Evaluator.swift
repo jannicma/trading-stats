@@ -6,18 +6,18 @@
 //
 
 import Foundation
+import AtlasCore
 
-public struct Evaluator{
-    public init() {}
+public struct Evaluator {
     
     // MARK: - Performance helpers (daily, percentage-based)
     private struct DailyPoint { let date: Date; let equity: Double }
 
-    private func dailyRiskFreeRate(annualRf: Double, periodsPerYear: Double) -> Double {
+    private static func dailyRiskFreeRate(annualRf: Double, periodsPerYear: Double) -> Double {
         return pow(1.0 + annualRf, 1.0 / periodsPerYear) - 1.0
     }
 
-    private func buildDailyEquity(trades: [SimulatedTrade], startEquity: Double, calendar: Calendar) -> [DailyPoint] {
+    private static func buildDailyEquity(trades: [Trade], startEquity: Double, calendar: Calendar) -> [DailyPoint] {
         guard !trades.isEmpty else { return [] }
         var pnlByDay: [Date: Double] = [:]
         for t in trades {
@@ -45,7 +45,7 @@ public struct Evaluator{
         return out
     }
 
-    private func dailyReturns(from equitySeries: [DailyPoint]) -> [Double] {
+    private static func dailyReturns(from equitySeries: [DailyPoint]) -> [Double] {
         guard equitySeries.count >= 2 else { return [] }
         var r: [Double] = []
         r.reserveCapacity(equitySeries.count - 1)
@@ -58,9 +58,9 @@ public struct Evaluator{
         return r
     }
 
-    private func sharpeFromDailyReturns(_ r: [Double], annualRf: Double, periodsPerYear: Double) -> Double {
+    private static func sharpeFromDailyReturns(_ r: [Double], annualRf: Double, periodsPerYear: Double) -> Double {
         guard r.count > 1 else { return 0.0 }
-        let rfDaily = dailyRiskFreeRate(annualRf: annualRf, periodsPerYear: periodsPerYear)
+        let rfDaily = Self.dailyRiskFreeRate(annualRf: annualRf, periodsPerYear: periodsPerYear)
         let excess = r.map { $0 - rfDaily }
         let mean = excess.reduce(0.0, +) / Double(excess.count)
         let varSample = excess.reduce(0.0) { $0 + pow($1 - mean, 2) } / Double(excess.count - 1)
@@ -68,7 +68,7 @@ public struct Evaluator{
         return sd > 0 ? mean / sd * sqrt(periodsPerYear) : 0.0
     }
 
-    private func sortinoFromDailyReturns(_ r: [Double], marDaily: Double, periodsPerYear: Double) -> Double {
+    private static func sortinoFromDailyReturns(_ r: [Double], marDaily: Double, periodsPerYear: Double) -> Double {
         guard r.count > 1 else { return 0.0 }
         let excess = r.map { $0 - marDaily }
         let meanExcess = excess.reduce(0.0, +) / Double(excess.count)
@@ -78,7 +78,7 @@ public struct Evaluator{
         return dd > 0 ? meanExcess / dd * sqrt(periodsPerYear) : 0.0
     }
 
-    private func maxDrawdownPct(equitySeries: [DailyPoint]) -> Double {
+    private static func maxDrawdownPct(equitySeries: [DailyPoint]) -> Double {
         guard !equitySeries.isEmpty else { return 0.0 }
         var peak = equitySeries.first!.equity
         var mdd: Double = 0.0
@@ -92,7 +92,7 @@ public struct Evaluator{
         return mdd
     }
 
-    private func maxDrawdownMoney(equitySeries: [DailyPoint]) -> Double {
+    private static func maxDrawdownMoney(equitySeries: [DailyPoint]) -> Double {
         guard !equitySeries.isEmpty else { return 0.0 }
         var peak = equitySeries.first!.equity
         var mdd: Double = 0.0
@@ -104,7 +104,7 @@ public struct Evaluator{
         return mdd
     }
 
-    private func ulcerIndexPct(equitySeries: [DailyPoint]) -> Double {
+    private static func ulcerIndexPct(equitySeries: [DailyPoint]) -> Double {
         guard !equitySeries.isEmpty else { return 0.0 }
         var peak = equitySeries.first!.equity
         var squares: [Double] = []
@@ -118,7 +118,7 @@ public struct Evaluator{
         return sqrt(squares.reduce(0.0, +) / Double(squares.count))
     }
 
-    private func cagr(equitySeries: [DailyPoint], calendar: Calendar) -> Double {
+    private static func cagr(equitySeries: [DailyPoint], calendar: Calendar) -> Double {
         guard let first = equitySeries.first, let last = equitySeries.last, first.equity > 0 else { return 0.0 }
         // If terminal equity is zero or negative, define CAGR as -100%
         if last.equity <= 0 { return -1.0 }
@@ -128,16 +128,16 @@ public struct Evaluator{
         return pow(last.equity / first.equity, 1.0 / years) - 1.0
     }
     
-    public func evaluateEvaluations(evaluations: [EvaluationModel]){
+    public static func evaluateEvaluations(evaluations: [Evaluation]){
         for i in 0...7{
             print("Rank \(i+1): \(evaluations[i].symbol ?? "unknown")")
-            printEvaluation(evaluations[i])
+            Self.printEvaluation(evaluations[i])
             print("\n")
         }
     }
     
     
-    public func evaluateTrades(simulatedTrades: [SimulatedTrade], printEval: Bool = false) -> EvaluationModel {
+    public static func evaluateTrades(simulatedTrades: [Trade], printEval: Bool = false) -> Evaluation {
         // --- Inputs / constants ---
         let startEquity: Double = 100_000.0
         let periodsPerYear: Double = 365.0
@@ -176,13 +176,13 @@ public struct Evaluator{
 
             if pnl > 0 { grossProfitMoney += pnl } else { grossLossMoney += abs(pnl) }
 
-            let rr = abs(trade.tpPrice - trade.entryPrice) / slDiff
+            let rr = 1.0 //abs(trade.tpPrice - trade.entryPrice) / slDiff
             rrRatios.append(rr)
         }
 
         // --- Build daily equity curve (includes non-trade days) ---
-        let equityDaily: [DailyPoint] = buildDailyEquity(trades: simulatedTrades, startEquity: startEquity, calendar: calendar)
-        let returnsDaily: [Double] = dailyReturns(from: equityDaily)
+        let equityDaily: [DailyPoint] = Self.buildDailyEquity(trades: simulatedTrades, startEquity: startEquity, calendar: calendar)
+        let returnsDaily: [Double] = Self.dailyReturns(from: equityDaily)
 
         // --- Expectancy (money/trade) unchanged ---
         let nR = rMultiples.count
@@ -192,14 +192,14 @@ public struct Evaluator{
         let expectancyMoney = nM > 0 ? moneyReturns.reduce(0, +) / Double(nM) : 0.0
 
         // --- Risk-adjusted metrics on DAILY RETURNS ---
-        let sharpe = sharpeFromDailyReturns(returnsDaily, annualRf: annualRiskFree, periodsPerYear: periodsPerYear)
-        let sortino = sortinoFromDailyReturns(returnsDaily, marDaily: 0.0, periodsPerYear: periodsPerYear)
+        let sharpe = Self.sharpeFromDailyReturns(returnsDaily, annualRf: annualRiskFree, periodsPerYear: periodsPerYear)
+        let sortino = Self.sortinoFromDailyReturns(returnsDaily, marDaily: 0.0, periodsPerYear: periodsPerYear)
 
         // Profit factor unchanged (money-based)
         let profitFactor = grossLossMoney > 0 ? grossProfitMoney / grossLossMoney : 0.0
 
         // Ulcer Index on PERCENT drawdowns with sqrt of mean squares
-        let ulcerIndex = ulcerIndexPct(equitySeries: equityDaily)
+        let ulcerIndex = Self.ulcerIndexPct(equitySeries: equityDaily)
 
         // Equity variance (money-level variance of daily equity series)
         var equityVariance: Double = 0.0
@@ -217,13 +217,13 @@ public struct Evaluator{
 
         // --- Calmar / MDD / Recovery ---
         let netMoney = moneyReturns.reduce(0, +)
-        let mddPct = maxDrawdownPct(equitySeries: equityDaily)
-        let mddMoney = maxDrawdownMoney(equitySeries: equityDaily)
-        let cagrVal = cagr(equitySeries: equityDaily, calendar: calendar)
+        let mddPct = Self.maxDrawdownPct(equitySeries: equityDaily)
+        let mddMoney = Self.maxDrawdownMoney(equitySeries: equityDaily)
+        let cagrVal = Self.cagr(equitySeries: equityDaily, calendar: calendar)
         let calmarRatio = mddPct > 0 ? cagrVal / mddPct : 0.0
         let recoveryFactor = mddMoney > 0 ? netMoney / mddMoney : 0.0
 
-        let evaluation = EvaluationModel(
+        let evaluation = Evaluation(
             trades: tradesCount,
             wins: wins,
             losses: losses,
@@ -242,12 +242,12 @@ public struct Evaluator{
             returnSpread50: returnSpread50
         )
 
-        if printEval { printEvaluation(evaluation)}
+        if printEval { Self.printEvaluation(evaluation)}
         return evaluation
     }
     
     
-    private func printEvaluation(_ evaluation: EvaluationModel) {
+    private static func printEvaluation(_ evaluation: Evaluation) {
         print("Chart: \(evaluation.symbol ?? "No Symbol")")
         print("Timeframe: \(evaluation.timeframe ?? "No Timeframe")")
         print(evaluation.paramSet?.stringRepresentation ?? "no Parameter Set")

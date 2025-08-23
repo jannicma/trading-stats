@@ -5,7 +5,29 @@
 //  Created by Jannic Marcon on 23.08.2025.
 //
 
-public struct Evaluation: Codable{
+public struct Evaluation: Codable, Sendable{
+    public init(timeframe: String? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double) {
+        self.timeframe = timeframe
+        self.symbol = symbol
+        self.paramSet = paramSet
+        self.trades = trades
+        self.wins = wins
+        self.losses = losses
+        self.winRate = winRate
+        self.averageRMultiples = averageRMultiples
+        self.expectancy = expectancy
+        self.avgRRR = avgRRR
+        self.sharpe = sharpe
+        self.sortino = sortino
+        self.maxDrawdown = maxDrawdown
+        self.calmarRatio = calmarRatio
+        self.profitFactor = profitFactor
+        self.ulcerIndex = ulcerIndex
+        self.recoveryFactor = recoveryFactor
+        self.equityVariance = equityVariance
+        self.returnSpread50 = returnSpread50
+    }
+    
     public var timeframe: String?
     public var symbol: String?
     public var paramSet: ParameterSet?

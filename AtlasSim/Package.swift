@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "AtlasSim",
+    platforms: [
+        .macOS(.v10_15)
+    ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
@@ -14,6 +17,7 @@ let package = Package(
     dependencies: [
         .package(path: "../AtlasCore"),
         .package(path: "../AtlasKit"),
+        .package(path: "../AtlasVault"),
         .package(path: "../AtlasPlaybook")
     ],
     targets: [
@@ -24,6 +28,7 @@ let package = Package(
             dependencies: [
                 "AtlasCore",
                 "AtlasKit",
+                "AtlasVault",
                 "AtlasPlaybook"
             ]
         ),

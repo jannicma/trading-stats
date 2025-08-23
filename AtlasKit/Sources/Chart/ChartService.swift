@@ -8,23 +8,28 @@
 
 
 import Foundation
+import AtlasCore
+import AtlasVault
 
-public struct ChartService {
-    public init() { }
-    private var indicatorsToCompute: [Indicator] = []
+public struct ChartService: Sendable {
+    public init(indicatorsToCompute: [Indicator]) {
+        self.indicatorsToCompute = indicatorsToCompute
+    }
+
+    private let indicatorsToCompute: [Indicator]
 
     // MARK: - Public API
 
     public func loadTestCharts() async -> [Chart] {
         let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key == "test"  }
-        let indicatorController = IndicatorController()
+        let indicatorEngine = IndicatorEngine()
         let (name, files) = allChartPaths.first!
         
         let allCharts = generateMultiTimeframeCharts(from: files, name: name)
 
         var allIndicatorCharts: [Chart] = []
         for (chartName, chartCandles) in allCharts {
-            var indicators = computeIndicators(for: chartCandles, using: indicatorController)
+            var indicators = computeIndicators(for: chartCandles, using: indicatorEngine)
             let dropCount = indicators.map { $0.value.filter { $0 == 0.0 }.count }.max() ?? 0
             
             for (key, value) in indicators {
@@ -42,7 +47,7 @@ public struct ChartService {
     public func loadAllCharts(initChartsForTesting: [String: [Candle]] = [:]) async -> [Chart] {
         let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp" && $0.key != "test" && $0.key != "indicatorTesting"  }
         var allRawCharts: [String: [Candle]] = initChartsForTesting
-        let indicatorController = IndicatorController()
+        let indicatorController = IndicatorEngine()
         
         if allRawCharts.isEmpty {
             await withTaskGroup(of: [String: [Candle]].self) { group in
@@ -82,14 +87,9 @@ public struct ChartService {
 
         return chartsWithIndicators
     }
-    
-    
-    public mutating func setRequiredIndicators(_ indicators: [Indicator]) {
-        indicatorsToCompute = indicators
-    }
 
     public func attemptFixAndSaveAllCharts() {
-        let allChartPaths = CsvController.loadAllChartFileURLs()
+    /*    let allChartPaths = CsvController.loadAllChartFileURLs()
 
         for (name, chartParts) in allChartPaths {
             var candles: [Candle] = []
@@ -125,7 +125,7 @@ public struct ChartService {
                     print("maaan, it did not fix it... \(name)")
                 }
             }
-        }
+        } */
     }
 
     // MARK: - Private Helper Methods
@@ -153,7 +153,7 @@ public struct ChartService {
         return true
     }
 
-    private func computeIndicators(for chart: [Candle], using controller: IndicatorController) -> [String: [Double]] {
+    private func computeIndicators(for chart: [Candle], using controller: IndicatorEngine) -> [String: [Double]] {
         return controller.computeIndicators(for: chart, requiredIndicators: indicatorsToCompute)
     }
 
@@ -199,7 +199,7 @@ public struct ChartService {
         var grouped: [String: [Candle]] = [:]
 
         for candle in chart {
-            guard let (year, month) = TimeController.getYearAndMonth(from: candle.time) else {
+            guard let (year, month) = TimeConverter.getYearAndMonth(from: candle.time) else {
                 throw NSError(domain: "Invalid timestamp", code: 0, userInfo: nil)
             }
 

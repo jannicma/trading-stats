@@ -8,20 +8,20 @@ import Foundation
 import AtlasCore
 import AtlasKit
 import AtlasPlaybook
+import AtlasVault
 
 public struct BacktestController{
     public init() { }
     
     public func runBacktest() async {
         let backtestingStrat: Strategy = StochRsiStrategy()
-        let evaluationController: Evaluator = Evaluator()
-        var chartController: ChartService = ChartService()
         let parameterController: ParameterGenerator = ParameterGenerator()
         
         let requiredParameters = backtestingStrat.getRequiredParameters()
         let requiredIndicators = backtestingStrat.getRequiredIndicators()
         
-        chartController.setRequiredIndicators(requiredIndicators)
+        let chartController: ChartService = ChartService(indicatorsToCompute: requiredIndicators)
+
         let allCharts = await chartController.loadAllCharts()
         let settings = parameterController.generateParameters(requirements: requiredParameters)
         
@@ -41,11 +41,11 @@ public struct BacktestController{
         
         for batch in batches {
             batchIndex += 1
-            await withTaskGroup(of: Evaluation?.self) { group in
+            await withTaskGroup(of: Evaluation.self) { group in
                 for (chart, setting) in batch {
                     group.addTask {
                         let trades = backtestingStrat.backtest(chart: chart, paramSet: setting)
-                        var eval = evaluationController.evaluateTrades(simulatedTrades: trades)
+                        var eval = Evaluator.evaluateTrades(simulatedTrades: trades)
                         eval.paramSet = setting
                         let chartnameParts = chart.name.split(separator: "_")
                         eval.timeframe = String(chartnameParts[1])
@@ -56,9 +56,7 @@ public struct BacktestController{
                 }
                 
                 for await eval in group {
-                    if let eval = eval {
-                        allEvaluations.append(eval)
-                    }
+                    allEvaluations.append(eval)
                 }
             }
             print("batch \(batchIndex)/\(batches.count) done")
@@ -76,6 +74,6 @@ public struct BacktestController{
         
         JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
         print()
-        evaluationController.evaluateEvaluations(evaluations: allEvaluations)
+        Evaluator.evaluateEvaluations(evaluations: allEvaluations)
     }
 }
