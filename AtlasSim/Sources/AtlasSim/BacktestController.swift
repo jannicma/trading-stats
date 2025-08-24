@@ -13,15 +13,20 @@ import AtlasVault
 public struct BacktestController{
     public init() { }
     
+    private let allStrategies: [any Strategy] = [
+        StochRsiStrategy(),
+        TrippleEmaStrategy(),
+    ]
+    
     public func getAllStrategies() -> [any Strategy] {
-        return [
-            StochRsiStrategy(),
-            TrippleEmaStrategy(),
-        ]
+        return allStrategies
     }
     
-    public func runBacktest() async {
-        let backtestingStrat: any Strategy = StochRsiStrategy()
+    public func runBacktest(strategyName: String) async -> StrategyEvaluations {
+        let backtestingStrat: any Strategy = allStrategies.filter{ $0.name == strategyName }.first!
+        print("Strategy backtest is running now...")
+        var result = StrategyEvaluations(strategyName: strategyName, evaluations: [])
+        
         let parameterController: ParameterGenerator = ParameterGenerator()
         
         let requiredParameters = backtestingStrat.getRequiredParameters()
@@ -73,7 +78,7 @@ public struct BacktestController{
         allEvaluations = allEvaluations.filter { $0.averageRMultiples > 0.15 && $0.maxDrawdown < 10_000 && $0.trades > 50}
         if allEvaluations.count < 10 {
             print("Not enough evaluations found, quitting...")
-            return
+            return result
         }
         
         
@@ -82,5 +87,8 @@ public struct BacktestController{
         JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
         print()
         Evaluator.evaluateEvaluations(evaluations: allEvaluations)
+        
+        result.evaluations = allEvaluations
+        return result
     }
 }

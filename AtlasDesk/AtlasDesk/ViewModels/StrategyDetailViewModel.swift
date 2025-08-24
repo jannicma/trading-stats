@@ -6,16 +6,28 @@
 //
 import SwiftUI
 import AtlasCore
+import AtlasSim
 
 final class StrategyDetailViewModel: ObservableObject {
-    let evaluation: StrategyEvaluations
+    var evaluation: StrategyEvaluations
     @Published var results: [BacktestResult] = []
     @Published var selected: BacktestResult?
+    
+    private let backtestController: BacktestController
 
     init(evaluation: StrategyEvaluations) {
         self.evaluation = evaluation
+        self.backtestController = BacktestController()
         self.results = Self.mockResults()
         self.selected = results.first
+    }
+    
+    func runBacktest() async {
+        let simulatedEvaluations = await backtestController.runBacktest(strategyName: evaluation.strategyName)
+        
+        await MainActor.run {
+            self.evaluation = simulatedEvaluations
+        }
     }
 
     func equity(for result: BacktestResult) -> [EquityPoint] {

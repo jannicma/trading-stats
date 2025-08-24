@@ -38,12 +38,28 @@ struct StrategyDetail: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Title of the selected Strategy
-            Text(viewModel.evaluation.strategyName)
-                .font(.title2)
-                .bold()
-                .frame(maxWidth: .infinity, alignment: .leading)
-
+            HStack{
+                // Title of the selected Strategy
+                Text(viewModel.evaluation.strategyName)
+                    .font(.title2)
+                    .bold()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text(String(viewModel.evaluation.evaluations.count))
+                                
+                Button {
+                    Task{
+                        await viewModel.runBacktest()
+                    }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .imageScale(.large)
+                }
+                .keyboardShortcut("r", modifiers: [.command])
+                .accessibilityLabel("Run backtest")
+                .buttonStyle(.borderless)
+                .help("Run backtest")
+            }
             // Top: Table of backtests
             Table(viewModel.results, selection: $selection) {
                 TableColumn("Timeframe") { r in Text(r.timeframe) }
@@ -139,4 +155,10 @@ struct StrategyDetail: View {
     private func percent(_ value: Double) -> String {
         return String(format: "%.1f%%", value * 100)
     }
+}
+
+
+
+#Preview {
+    StrategyDetail(evaluation: StrategyEvaluations(strategyName: "Test", evaluations: []))
 }

@@ -15,14 +15,18 @@ let package = Package(
             targets: ["AtlasVault"]),
     ],
     dependencies: [
-        .package(path: "../AtlasCore")
+        .package(path: "../AtlasCore"),
+        .package(url: "https://github.com/groue/GRDB.swift.git", from: "7.6.1")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "AtlasVault",
-            dependencies: ["AtlasCore"]
+            dependencies: [
+                "AtlasCore",
+                .product(name: "GRDB", package: "GRDB.swift")
+            ]
         ),
         .testTarget(
             name: "AtlasVaultTests",

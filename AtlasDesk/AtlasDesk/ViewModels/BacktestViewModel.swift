@@ -17,4 +17,10 @@ final class BacktestViewModel: ObservableObject {
         backtestController = BacktestController()
         strategies = backtestController.getAllStrategies()
     }
+    
+    func getStrategyEvaluation(for stratIndex: Int) -> StrategyEvaluations{
+        let name = strategies[stratIndex].name
+        let evaluation = StrategyEvaluations(strategyName: name, evaluations: [])
+        return evaluation
+    }
 }

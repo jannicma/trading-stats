@@ -20,9 +20,10 @@ struct StrategyGrid: View {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach($viewModel.strategies.indices, id:\.self ) { i in
                     let binding = $viewModel.strategies[i]
+                    let strategyEvaluation = viewModel.getStrategyEvaluation(for: i)
                     StrategyCard(strategy: binding.wrappedValue)
                         .onTapGesture {
-                            openWindow(value: binding.wrappedValue)
+                            openWindow(value: strategyEvaluation)
                         }
                 }
             }
