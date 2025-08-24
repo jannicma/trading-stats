@@ -5,7 +5,7 @@
 //  Created by Jannic Marcon on 23.08.2025.
 //
 
-public struct Evaluation: Codable, Sendable{
+public struct Evaluation: Codable, Sendable, Hashable{
     public init(timeframe: String? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double) {
         self.timeframe = timeframe
         self.symbol = symbol

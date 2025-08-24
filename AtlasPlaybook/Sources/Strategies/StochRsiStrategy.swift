@@ -11,6 +11,8 @@ import AtlasKit
 
 public struct StochRsiStrategy : Strategy{
     public init() {}
+    public var id: UUID = UUID()
+    public var name = "Stochastic/RSI Strategy"
     
     public func getRequiredParameters() -> [ParameterRequirements] {
         return [
@@ -20,21 +22,21 @@ public struct StochRsiStrategy : Strategy{
         ]
     }
     
-    let atrIndicator = Indicator.atr(length: 14)
-    let rsiIndicator = Indicator.rsi(length: 14)
-    let stochIndicaor = Indicator.stoch(KLen: 14)
+    var atrIndicator = Indicator.atr(length: 14)
+    var rsiIndicator = Indicator.rsi(length: 14)
+    var stochIndicaor = Indicator.stoch(KLen: 14)
     
     public func getRequiredIndicators() -> [Indicator] {
         return [atrIndicator, rsiIndicator, stochIndicaor]
     }
     
-    enum DirectionForTrade{
+    enum DirectionForTrade: Codable, Sendable{
         case long
         case short
         case none
     }
     
-    struct TradeConditions{
+    struct TradeConditions: Codable, Sendable{
         var rsiThreashold: Double
         var rsiLimit: Double
         var stochThreashold: Double

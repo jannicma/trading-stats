@@ -14,15 +14,8 @@ enum Mode: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-struct Strategy: Identifiable, Hashable {
-    let id = UUID()
-    let name: String
-    let metrics: [Metric]
-    let color: Color
-}
-
-struct Metric: Identifiable, Hashable {
-    let id = UUID()
+struct Metric: Identifiable, Hashable, Codable {
+    let id: UUID
     let label: String
     let value: Double
 }

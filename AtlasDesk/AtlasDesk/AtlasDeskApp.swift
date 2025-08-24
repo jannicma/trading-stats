@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AtlasCore
 
 @main
 struct AtlasDeskApp: App {
@@ -13,5 +14,14 @@ struct AtlasDeskApp: App {
         WindowGroup {
             ContentView()
         }
+        WindowGroup(for: StrategyEvaluations.self) { $evaluation in
+            if let evaluation {
+                StrategyDetail(evaluation: evaluation)
+            } else {
+                Text("No strategy selected")
+            }
+        }
+        .defaultSize(width: 820, height: 620)
+        .windowResizability(.contentSize)
     }
 }

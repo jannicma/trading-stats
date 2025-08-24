@@ -5,7 +5,7 @@
 //  Created by Jannic Marcon on 23.08.2025.
 //
 
-public struct Parameter: Codable, Sendable{
+public struct Parameter: Codable, Sendable, Hashable{
     public init(name: String, value: Double) {
         self.name = name
         self.value = value
@@ -15,7 +15,7 @@ public struct Parameter: Codable, Sendable{
     public var value: Double
 }
 
-public struct ParameterSet: Codable, Sendable{
+public struct ParameterSet: Codable, Sendable, Hashable{
     public init(parameters: [Parameter]) {
         self.parameters = parameters
     }

@@ -13,8 +13,15 @@ import AtlasVault
 public struct BacktestController{
     public init() { }
     
+    public func getAllStrategies() -> [any Strategy] {
+        return [
+            StochRsiStrategy(),
+            TrippleEmaStrategy(),
+        ]
+    }
+    
     public func runBacktest() async {
-        let backtestingStrat: Strategy = StochRsiStrategy()
+        let backtestingStrat: any Strategy = StochRsiStrategy()
         let parameterController: ParameterGenerator = ParameterGenerator()
         
         let requiredParameters = backtestingStrat.getRequiredParameters()
