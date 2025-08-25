@@ -23,14 +23,16 @@ public struct Candle: Codable, Sendable {
 
 
 public struct Chart: Sendable {
-    public init(name: String, candles: [Candle], indicators: [String : [Double]]) {
+    public init(name: String, timeframe: Int, candles: [Candle], indicators: [String : [Double]]) {
         self.name = name
+        self.timeframe = timeframe
         self.candles = candles
         self.indicators = indicators
     }
     
     //use index to get indicator for each candle
     public let name: String
+    public let timeframe: Int
     public let candles: [Candle]
-    public let indicators: [String: [Double]]
+    public var indicators: [String: [Double]]
 }

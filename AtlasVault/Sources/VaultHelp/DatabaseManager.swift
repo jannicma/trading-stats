@@ -76,6 +76,7 @@ public actor DatabaseManager {
             try db.create(index: "backtestEvaluation_strategyUuid_idx", on: "backtestEvaluation", columns: ["strategyUuid"])
             
             try db.create(table: "backtestEquity") { t in
+                t.autoIncrementedPrimaryKey("id")
                 t.column("tradeNumber", .integer).notNull()
                 t.column("equity", .double).notNull()
                 
