@@ -38,7 +38,7 @@ public struct ChartServiceOld: Sendable {
             let trimmedCandles = Array(chartCandles.dropFirst(dropCount))
             assert(trimmedCandles.count == indicators.first!.value.count)
             
-            allIndicatorCharts.append(Chart(name: chartName, candles: trimmedCandles, indicators: indicators))
+            allIndicatorCharts.append(Chart(name: chartName, timeframe: 1, candles: trimmedCandles, indicators: indicators))
         }
         
         return allIndicatorCharts
@@ -76,7 +76,7 @@ public struct ChartServiceOld: Sendable {
                     let trimmedCandles = Array(candles.dropFirst(dropCount))
                     assert(trimmedCandles.count == indicators.first!.value.count)
                     
-                    return Chart(name: name, candles: trimmedCandles, indicators: indicators)
+                    return Chart(name: name, timeframe: 1, candles: trimmedCandles, indicators: indicators)
                 }
             }
 

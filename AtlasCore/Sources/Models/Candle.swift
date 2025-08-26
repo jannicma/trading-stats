@@ -6,12 +6,13 @@
 //
 
 public struct Candle: Codable, Sendable {
-    public init(time: Int, open: Double, high: Double, low: Double, close: Double) {
+    public init(time: Int, open: Double, high: Double, low: Double, close: Double, volume: Double = 0.0) {
         self.time = time
         self.open = open
         self.high = high
         self.low = low
         self.close = close
+        self.volume = volume
     }
     
     public let time: Int
@@ -19,11 +20,12 @@ public struct Candle: Codable, Sendable {
     public var high: Double
     public var low: Double
     public var close: Double
+    public var volume: Double
 }
 
 
 public struct Chart: Sendable {
-    public init(name: String, timeframe: Int, candles: [Candle], indicators: [String : [Double]]) {
+    public init(name: String, timeframe: Int, candles: [Candle], indicators: [String : [Double]] = [:]) {
         self.name = name
         self.timeframe = timeframe
         self.candles = candles

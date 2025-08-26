@@ -34,7 +34,7 @@ public struct BacktestController{
         
         let chartController: ChartService = ChartService(indicatorsToCompute: requiredIndicators)
 
-        let allCharts = await chartController.loadAllCharts()
+        let allCharts = await chartController.loadAllCharts(timeframes: [1, 3, 5, 15, 30])
         let settings = parameterController.generateParameters(requirements: requiredParameters)
         
         var parameterSets: [(chart: Chart, settings: ParameterSet)] = []
