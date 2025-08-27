@@ -7,6 +7,8 @@
 import GRDB
 
 struct IndicatorTestExtensionDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
+    static let databaseTableName = "indicatorTestExtension"
+
     let id: Int
     let sma5: Double
     let sma7: Double

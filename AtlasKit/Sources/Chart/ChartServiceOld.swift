@@ -89,7 +89,7 @@ public struct ChartServiceOld: Sendable {
     }
 
     public func attemptFixAndSaveAllCharts() {
-    /*    let allChartPaths = CsvController.loadAllChartFileURLs()
+        let allChartPaths = CsvController.loadAllChartFileURLs()
 
         for (name, chartParts) in allChartPaths {
             var candles: [Candle] = []
@@ -125,7 +125,7 @@ public struct ChartServiceOld: Sendable {
                     print("maaan, it did not fix it... \(name)")
                 }
             }
-        } */
+        }
     }
 
     // MARK: - Private Helper Methods

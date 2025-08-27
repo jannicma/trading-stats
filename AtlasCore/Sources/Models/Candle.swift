@@ -21,6 +21,10 @@ public struct Candle: Codable, Sendable {
     public var low: Double
     public var close: Double
     public var volume: Double
+    
+    public func hasValidRange() -> Bool {
+        return high - low > 0 
+    }
 }
 
 

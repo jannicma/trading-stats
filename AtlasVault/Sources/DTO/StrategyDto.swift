@@ -8,6 +8,8 @@ import GRDB
 import Foundation
 
 struct StrategyDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
+    static let databaseTableName = "strategy"
+
     let id: Int
     let uuid: UUID
     let name: String

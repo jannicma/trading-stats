@@ -9,6 +9,8 @@ import Foundation
 import AtlasCore
 
 struct BacktestEvaluationDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
+    static let databaseTableName = "backtestEvaluation"
+
     let id: Int
     let strategyUuid: UUID
     let asset: String

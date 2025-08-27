@@ -7,6 +7,8 @@
 import GRDB
 
 struct BacktestEquityDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
+    static let databaseTableName = "backtestEquity"
+    
     let id: Int
     let tradeNumber: Int
     let equity: Double

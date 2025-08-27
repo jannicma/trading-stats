@@ -7,7 +7,9 @@
 import GRDB
 
 struct KlineDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
-    let id: Int
+    static let databaseTableName = "kline"
+    
+    let id: Int? = nil
     let symbol: String
     let timeframe: Int
     let timestamp: Int
