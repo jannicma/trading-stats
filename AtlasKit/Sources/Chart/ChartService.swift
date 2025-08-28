@@ -50,7 +50,10 @@ public struct ChartService {
             let newCandlesCount = Int(ceil(Double(baseCandles.count) / Double(timeframe)))
             for i in 1...newCandlesCount {
                 let startIndex = (i - 1) * timeframe
-                let endIndex = i * timeframe - 1
+                var endIndex = i * timeframe - 1
+                if endIndex >= baseCandles.count {
+                    endIndex = baseCandles.count - 1
+                }
                 
                 let time = baseCandles[startIndex].time
                 let open = baseCandles[startIndex].open

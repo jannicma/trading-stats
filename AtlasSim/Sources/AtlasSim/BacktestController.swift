@@ -59,9 +59,8 @@ public struct BacktestController{
                         let trades = backtestingStrat.backtest(chart: chart, paramSet: setting)
                         var eval = Evaluator.evaluateTrades(simulatedTrades: trades)
                         eval.paramSet = setting
-                        let chartnameParts = chart.name.split(separator: "_")
-                        eval.timeframe = String(chartnameParts[1])
-                        eval.symbol = String(chartnameParts[0])
+                        eval.timeframe = String(chart.timeframe)  //TODO: change to Int
+                        eval.symbol = chart.name
                         
                         return eval
                     }
@@ -75,7 +74,7 @@ public struct BacktestController{
         }
         print()
         
-        allEvaluations = allEvaluations.filter { $0.averageRMultiples > 0.15 && $0.maxDrawdown < 10_000 && $0.trades > 50}
+        //allEvaluations = allEvaluations.filter { $0.averageRMultiples > 0.15 && $0.maxDrawdown < 10_000 && $0.trades > 50}
         if allEvaluations.count < 10 {
             print("Not enough evaluations found, quitting...")
             return result

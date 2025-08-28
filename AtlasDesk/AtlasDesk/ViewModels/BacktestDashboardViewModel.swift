@@ -9,7 +9,7 @@ import SwiftUI
 import AtlasCore
 import AtlasSim
 
-final class BacktestViewModel: ObservableObject {
+final class BacktestDashboardViewModel: ObservableObject {
     @Published var strategies: [any Strategy] = []
     private let backtestController: BacktestController
     
@@ -18,7 +18,7 @@ final class BacktestViewModel: ObservableObject {
         strategies = backtestController.getAllStrategies()
     }
     
-    func getStrategyEvaluation(for stratIndex: Int) -> StrategyEvaluations{
+    func getStrategyEvaluation(for stratIndex: Int) -> StrategyEvaluations {
         let name = strategies[stratIndex].name
         let evaluation = StrategyEvaluations(strategyName: name, evaluations: [])
         return evaluation

@@ -9,7 +9,7 @@ import AtlasCore
 import UniformTypeIdentifiers
 
 struct StrategyGrid: View {
-    @StateObject private var viewModel = BacktestViewModel()
+    @StateObject private var viewModel = BacktestDashboardViewModel()
     @Environment(\.openWindow) private var openWindow
     @StateObject private var importSheetVM = CsvImportViewModel()
     

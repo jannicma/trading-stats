@@ -8,11 +8,6 @@ import Foundation
 import Charts
 import SwiftUI
 
-enum Mode: String, CaseIterable, Identifiable {
-    case backtest = "Backtest"
-    case liveTrade = "Live Trade"
-    var id: String { rawValue }
-}
 
 struct Metric: Identifiable, Hashable, Codable {
     let id: UUID

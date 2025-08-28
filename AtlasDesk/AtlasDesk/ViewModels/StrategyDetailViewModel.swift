@@ -9,7 +9,7 @@ import AtlasCore
 import AtlasSim
 
 final class StrategyDetailViewModel: ObservableObject {
-    var evaluation: StrategyEvaluations
+    @Published var evaluation: StrategyEvaluations
     @Published var results: [BacktestResult] = []
     @Published var selected: BacktestResult?
     
