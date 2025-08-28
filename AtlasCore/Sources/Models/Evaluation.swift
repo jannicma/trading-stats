@@ -5,8 +5,17 @@
 //  Created by Jannic Marcon on 23.08.2025.
 //
 
-public struct Evaluation: Codable, Sendable, Hashable{
-    public init(timeframe: String? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double) {
+import Foundation
+
+public struct EquityPoint: Codable, Sendable, Hashable, Identifiable {
+    public var id = UUID()
+    public let step: Int
+    public let equity: Double
+}
+
+
+public struct Evaluation: Codable, Sendable, Hashable, Identifiable {
+    public init(timeframe: String? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double, equityPoints: [EquityPoint] = []) {
         self.timeframe = timeframe
         self.symbol = symbol
         self.paramSet = paramSet
@@ -26,8 +35,9 @@ public struct Evaluation: Codable, Sendable, Hashable{
         self.recoveryFactor = recoveryFactor
         self.equityVariance = equityVariance
         self.returnSpread50 = returnSpread50
+        self.equityCurve = equityPoints
     }
-    
+    public var id = UUID()
     public var timeframe: String?
     public var symbol: String?
     public var paramSet: ParameterSet?
@@ -52,4 +62,6 @@ public struct Evaluation: Codable, Sendable, Hashable{
     public var recoveryFactor: Double         // net money profit / |maxDrawdown|
     public var equityVariance: Double         // variance of cumulative money equity
     public var returnSpread50: Double         // max(minus) min of money P&L for last 50 trades
+    
+    public var equityCurve: [EquityPoint]
 }

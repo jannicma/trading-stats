@@ -8,20 +8,6 @@ import SwiftUI
 import Charts
 import AtlasCore
 
-// MARK: - Models & ViewModel
-
-struct BacktestResult: Identifiable, Hashable, Codable {
-    var id: UUID = UUID()
-    let timeframe: String
-    let asset: String
-    let sharpe: Double
-    let drawdown: Double // 0.23 = 23%
-    let expectancy: Double
-    let winRate: Double  // 0.55 = 55%
-    let trades: Int
-}
-
-
 extension Comparable {
     func clamped(to range: ClosedRange<Self>) -> Self {
         return min(max(self, range.lowerBound), range.upperBound)
@@ -30,7 +16,7 @@ extension Comparable {
 
 struct StrategyDetail: View {
     @StateObject private var viewModel: StrategyDetailViewModel
-    @State private var selection: Set<BacktestResult.ID> = []
+    @State private var selection: Set<Evaluation.ID> = []
 
     init(evaluation: StrategyEvaluations) {
         _viewModel = StateObject(wrappedValue: StrategyDetailViewModel(evaluation: evaluation))
@@ -38,105 +24,113 @@ struct StrategyDetail: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack{
-                // Title of the selected Strategy
-                Text(viewModel.evaluation.strategyName)
-                    .font(.title2)
-                    .bold()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Text(String(viewModel.evaluation.evaluations.count))
-                                
-                Button {
-                    Task{
-                        await viewModel.runBacktest()
-                    }
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .imageScale(.large)
-                }
-                .keyboardShortcut("r", modifiers: [.command])
-                .accessibilityLabel("Run backtest")
-                .buttonStyle(.borderless)
-                .help("Run backtest")
-            }
-            // Top: Table of backtests
-            Table(viewModel.results, selection: $selection) {
-                TableColumn("Timeframe") { r in Text(r.timeframe) }
-                TableColumn("Asset") { r in Text(r.asset) }
-                TableColumn("Sharpe") { r in Text(format(r.sharpe)) }
-                TableColumn("DD") { r in Text(percent(r.drawdown)) }
-                TableColumn("Expectancy") { r in Text(format(r.expectancy)) }
-                TableColumn("Win %") { r in Text(percent(r.winRate)) }
-                TableColumn("Trades") { r in Text("\(r.trades)") }
-            }
-            .onChange(of: selection) { _, newValue in
-                if let id = newValue.first, let found = viewModel.results.first(where: { $0.id == id }) {
-                    viewModel.selected = found
-                } else {
-                    viewModel.selected = viewModel.results.first
-                }
-            }
-            .frame(minHeight: 220)
-
+            headerBar
+            resultsTable
             Divider()
-
-            // Bottom: Detail area with info box (left) and equity curve (right)
-            if let selected = viewModel.selected {
-                HStack(alignment: .top, spacing: 24) {
-                    // Info box
-                    VStack(alignment: .leading, spacing: 8) {
-                        infoRow(title: "Asset", value: selected.asset)
-                        infoRow(title: "Timeframe", value: selected.timeframe)
-                        infoRow(title: "Sharpe", value: format(selected.sharpe))
-                        infoRow(title: "Drawdown", value: percent(selected.drawdown))
-                        infoRow(title: "Expectancy", value: format(selected.expectancy))
-                        infoRow(title: "Win %", value: percent(selected.winRate))
-                        infoRow(title: "Trades", value: String(selected.trades))
-                    }
-                    .padding(14)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(.background)
-                            .shadow(radius: 1, y: 1)
-                    )
-
-                    // Equity chart box
-                    VStack(alignment: .leading) {
-                        Chart(viewModel.equity(for: selected)) { item in
-                            LineMark(
-                                x: .value("Step", item.step),
-                                y: .value("Equity", item.equity)
-                            )
-                        }
-                        .chartYAxisLabel("Equity")
-                        .frame(height: 240)
-                    }
-                    .padding(14)
-                    .frame(maxWidth: .infinity)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(.background)
-                            .shadow(radius: 1, y: 1)
-                    )
-                }
-            } else {
-                Text("Select a backtest above to see details")
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, minHeight: 200)
-            }
-
+            detailArea
             Spacer(minLength: 0)
         }
         .padding(20)
-        .onAppear {
-            if viewModel.selected == nil { viewModel.selected = viewModel.results.first }
-            if let sel = viewModel.selected?.id { selection = [sel] }
+    }
+
+    @ViewBuilder
+    private var headerBar: some View {
+        HStack {
+            // Title of the selected Strategy
+            Text(viewModel.evaluation.strategyName)
+                .font(.title2)
+                .bold()
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(String(viewModel.evaluation.evaluations.count))
+
+            Button {
+                Task {
+                    await viewModel.runBacktest()
+                }
+            } label: {
+                Image(systemName: "arrow.clockwise")
+                    .imageScale(.large)
+            }
+            .keyboardShortcut("r", modifiers: [.command])
+            .accessibilityLabel("Run backtest")
+            .buttonStyle(.borderless)
+            .help("Run backtest")
         }
     }
 
-    // MARK: - Helpers
+    @ViewBuilder
+    private var resultsTable: some View {
+        // Top: Table of backtests
+        Table(viewModel.evaluation.evaluations, selection: $selection) {
+            TableColumn("Trades") { (r: Evaluation) in
+                Text("\(r.trades)")
+            }
+            TableColumn("Sharpe") { (r: Evaluation) in
+                Text(String(format: "%.2f", r.sharpe))
+            }
+        }
+        .onChange(of: selection) { _, newValue in
+            if let id = newValue.first, let found = viewModel.evaluation.evaluations.first(where: { $0.id == id }) {
+                viewModel.selected = found
+            } else {
+                viewModel.selected = viewModel.evaluation.evaluations.first
+            }
+        }
+        .frame(minHeight: 220)
+    }
+
+    @ViewBuilder
+    private var detailArea: some View {
+        // Bottom: Detail area with info box (left) and equity curve (right)
+        if let selected = viewModel.selected {
+            backtestRunDetail(selected: selected)
+        } else {
+            Text("Select a backtest above to see details")
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, minHeight: 200)
+        }
+    }
+
+    // MARK: - Subviews
+    @ViewBuilder
+    private func backtestRunDetail(selected: Evaluation) -> some View {
+        HStack(alignment: .top, spacing: 24) {
+            // Info box
+            VStack(alignment: .leading, spacing: 8) {
+                infoRow(title: "Asset", value: String(selected.trades))
+                infoRow(title: "Timeframe", value: String(selected.sharpe))
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.background)
+                    .shadow(radius: 1, y: 1)
+            )
+
+            // Equity chart box
+            VStack(alignment: .leading) {
+                Chart(selected.equityCurve) { item in
+                    LineMark(
+                        x: .value("Step", item.step),
+                        y: .value("Equity", item.equity)
+                    )
+                }
+                .chartYAxisLabel("Equity")
+                .frame(height: 240)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(.background)
+                    .shadow(radius: 1, y: 1)
+            )
+        }
+    }
+
+    // MARK: - Row Helper
     @ViewBuilder
     private func infoRow(title: String, value: String) -> some View {
         HStack {

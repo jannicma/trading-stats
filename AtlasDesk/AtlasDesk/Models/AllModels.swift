@@ -15,8 +15,3 @@ struct Metric: Identifiable, Hashable, Codable {
     let value: Double
 }
 
-struct EquityPoint: Identifiable {
-    let id = UUID()
-    let step: Int
-    let equity: Double
-}
