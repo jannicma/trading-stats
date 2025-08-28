@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct TimeConverter {
+public struct TimeConverter {
     static func getYearAndMonth(from unixTimestamp: Int) -> (year: Int, month: Int)? {
         let interval = TimeInterval(unixTimestamp) / 1000.0
         let date = Date(timeIntervalSince1970: interval)
@@ -21,5 +21,9 @@ struct TimeConverter {
         } else {
             return nil
         }
+    }
+    
+    public static func addSeconds(_ seconds: Int, unixMillis: Int) -> Int {
+        return unixMillis + (1000 * seconds)
     }
 }

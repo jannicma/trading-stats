@@ -39,12 +39,25 @@ public struct ChartDataService {
     }
     
     
+    public func getLastTimestampOfChart(_ name: String, timeframe: Int = 1) async throws -> Int? {
+        let lastKline = try await DatabaseManager.shared.read { db in
+            try KlineDto
+                .filter { $0.symbol == name && $0.timeframe == timeframe }
+                .order(\.timestamp.desc)
+                .fetchOne(db)
+        }
+        
+        return lastKline?.timestamp
+    }
+    
+    
     public func importChart(_ chart: Chart) async -> Bool {
         let name = chart.name
         let timeframe = chart.timeframe
         
         let klines: [KlineDto] = chart.candles.map {
             KlineDto(
+                id: nil,
                 symbol: name,
                 timeframe: timeframe,
                 timestamp: $0.time,

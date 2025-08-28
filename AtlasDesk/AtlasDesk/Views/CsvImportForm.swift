@@ -56,13 +56,18 @@ struct CsvImportForm: View {
                 Button("Abbrechen") { dismiss() }
                 Button("OK") {
                     viewModel.confirmSelection()
-                    dismiss()
                 }
                 .keyboardShortcut(.defaultAction)
             }
         }
         .padding(20)
         .frame(minWidth: 480, minHeight: 360)
+        .alert(viewModel.lastImportSucceeded ? "Import successful" : "Import failed",
+               isPresented: $viewModel.showingResultAlert) {
+            Button("OK", role: .cancel) { dismiss() }
+        } message: {
+            Text(viewModel.lastImportSucceeded ? "The data was saved successfully." : "The import failed. Check timestamps, or error logs for more information.")
+        }
         .fileImporter(
             isPresented: $viewModel.showingFileImporter,
             allowedContentTypes: [.commaSeparatedText],

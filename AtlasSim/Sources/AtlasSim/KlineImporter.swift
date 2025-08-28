@@ -16,8 +16,21 @@ public struct KlineImporter {
     private let klineDataService: ChartDataService = .init()
     
     public func importChart(symbol: String, timeframe: Int, candles: [Candle]) async -> Bool {
-        let newChart = Chart(name: symbol, timeframe: timeframe, candles: candles)
-        return await klineDataService.importChart(newChart)
+        do {
+            let lastTimestamp = try await klineDataService.getLastTimestampOfChart(symbol, timeframe: timeframe)
+            let priorTimestampOfImport = TimeConverter.addSeconds(-timeframe * 60, unixMillis: candles.first!.time)
+            if lastTimestamp == nil || lastTimestamp == priorTimestampOfImport {
+                let newChart = Chart(name: symbol, timeframe: timeframe, candles: candles)
+                return await klineDataService.importChart(newChart)
+            }
+            else {
+                print("New Timestamps do not match with existing chart... quitting import...")
+            }
+        }
+        catch {
+            print(error)
+        }
+        return false
     }
     
     

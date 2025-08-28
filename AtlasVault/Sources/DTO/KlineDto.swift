@@ -9,7 +9,7 @@ import GRDB
 struct KlineDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
     static let databaseTableName = "kline"
     
-    let id: Int? = nil
+    let id: Int?
     let symbol: String
     let timeframe: Int
     let timestamp: Int
@@ -20,6 +20,7 @@ struct KlineDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
     let volume: Double
     
     enum Columns{
+        static let id = Column(CodingKeys.id)
         static let symbol = Column(CodingKeys.symbol)
         static let timeframe = Column(CodingKeys.timeframe)
         static let timestamp = Column(CodingKeys.timestamp)
@@ -29,4 +30,5 @@ struct KlineDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
         static let close = Column(CodingKeys.close)
         static let volume = Column(CodingKeys.volume)
     }
+
 }

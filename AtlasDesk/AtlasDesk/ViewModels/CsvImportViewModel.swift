@@ -7,10 +7,12 @@
 import SwiftUI
 import AtlasSim
 
-final class CsvImportViewModel: ObservableObject {
+@MainActor final class CsvImportViewModel: ObservableObject {
     @Published var assetName: String = ""
     @Published var selectedCSVURLs: [URL] = []
     @Published var showingFileImporter: Bool = false
+    @Published var showingResultAlert: Bool = false
+    @Published var lastImportSucceeded: Bool = false
     
     func confirmSelection() {
         let klineImporter = KlineImporter()
@@ -22,9 +24,12 @@ final class CsvImportViewModel: ObservableObject {
                     defer { accessibleURLs.forEach { $0.stopAccessingSecurityScopedResource() } }
 
                     let candles = try klineImporter.mergeAndFixCsv(urls: accessibleURLs)
-                    //TODO: give info to user for yes/no
                     let importSucceeded = await klineImporter.importChart(symbol: assetName, timeframe: 1, candles: candles)
+                    self.lastImportSucceeded = importSucceeded
+                    self.showingResultAlert = true
                 } catch {
+                    self.lastImportSucceeded = false
+                    self.showingResultAlert = true
                     print("error in confirmSelection(): \(error)")
                 }
             }
