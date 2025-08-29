@@ -63,8 +63,20 @@ struct StrategyDetail: View {
     private var resultsTable: some View {
         // Top: Table of backtests
         Table(viewModel.evaluation.evaluations, selection: $selection) {
+            TableColumn("Symbol") { (r: Evaluation) in
+                Text("\(r.symbol!)")
+            }
+            TableColumn("Timeframe") { (r: Evaluation) in
+                Text("\(r.timeframe!)")
+            }
             TableColumn("Trades") { (r: Evaluation) in
                 Text("\(r.trades)")
+            }
+            TableColumn("Expectancy") { (r: Evaluation) in
+                Text(String(format: "%.2f", r.expectancy))
+            }
+            TableColumn("R-Multiples") { (r: Evaluation) in
+                Text(String(format: "%.2f", r.averageRMultiples))
             }
             TableColumn("Sharpe") { (r: Evaluation) in
                 Text(String(format: "%.2f", r.sharpe))
@@ -96,10 +108,25 @@ struct StrategyDetail: View {
     @ViewBuilder
     private func backtestRunDetail(selected: Evaluation) -> some View {
         HStack(alignment: .top, spacing: 24) {
-            // Info box
             VStack(alignment: .leading, spacing: 8) {
-                infoRow(title: "Asset", value: String(selected.trades))
-                infoRow(title: "Timeframe", value: String(selected.sharpe))
+                infoRow(title: "Symbol", value: selected.symbol ?? "")
+                infoRow(title: "Timeframe", value: selected.timeframe ?? "")
+                infoRow(title: "Trades", value: String(selected.trades))
+                infoRow(title: "Wins", value: String(selected.wins))
+                infoRow(title: "Losses", value: String(selected.losses))
+                infoRow(title: "Win Rate", value: percent(selected.winRate))
+                infoRow(title: "Average R-Multiples", value: format(selected.averageRMultiples))
+                infoRow(title: "Expectancy", value: format(selected.expectancy))
+                infoRow(title: "Avg RRR", value: format(selected.avgRRR))
+                infoRow(title: "Sharpe", value: format(selected.sharpe))
+                infoRow(title: "Sortino", value: format(selected.sortino))
+                infoRow(title: "Max Drawdown", value: format(selected.maxDrawdown))
+                infoRow(title: "Calmar Ratio", value: format(selected.calmarRatio))
+                infoRow(title: "Profit Factor", value: format(selected.profitFactor))
+                infoRow(title: "Ulcer Index", value: format(selected.ulcerIndex))
+                infoRow(title: "Recovery Factor", value: format(selected.recoveryFactor))
+                infoRow(title: "Equity Variance", value: format(selected.equityVariance))
+                infoRow(title: "Param Set", value: String(describing: selected.paramSet)) //TODO: nicely display all params
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
