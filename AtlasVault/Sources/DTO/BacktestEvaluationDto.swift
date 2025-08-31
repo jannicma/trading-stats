@@ -8,15 +8,16 @@ import GRDB
 import Foundation
 import AtlasCore
 
-struct BacktestEvaluationDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
+struct BacktestEvaluationDto: Codable, Identifiable, FetchableRecord, MutablePersistableRecord{
     static let databaseTableName = "backtestEvaluation"
 
-    let id: Int
+    var id: Int64? = nil
     let strategyUuid: UUID
     let asset: String
     let timeframe: Int
     let parameters: ParameterSet?
     let trades: Int
+    let wins: Int
     let losses: Int
     let winRate: Double
     let averageRMultiples: Double
@@ -28,17 +29,19 @@ struct BacktestEvaluationDto: Codable, Identifiable, FetchableRecord, Persistabl
     let calmarRatio: Double
     let profitFactor: Double
     let ulcerIndex: Double
-    let revcoveryFactor: Double
+    let recoveryFactor: Double
     let equityVariance: Double
     let returnSpread50: Double
     
     
     enum Columns{
+        static let id = Column(CodingKeys.id)
         static let strategyUuid = Column(CodingKeys.strategyUuid)
         static let asset = Column(CodingKeys.asset)
         static let timeframe = Column(CodingKeys.timeframe)
         static let parameters = Column(CodingKeys.parameters)
         static let trades = Column(CodingKeys.trades)
+        static let wins = Column(CodingKeys.wins)
         static let losses = Column(CodingKeys.losses)
         static let winRate = Column(CodingKeys.winRate)
         static let averageRMultiples = Column(CodingKeys.averageRMultiples)
@@ -50,9 +53,12 @@ struct BacktestEvaluationDto: Codable, Identifiable, FetchableRecord, Persistabl
         static let calmarRatio = Column(CodingKeys.calmarRatio)
         static let profitFactor = Column(CodingKeys.profitFactor)
         static let ulcerIndex = Column(CodingKeys.ulcerIndex)
-        static let revcoveryFactor = Column(CodingKeys.revcoveryFactor)
+        static let recoveryFactor = Column(CodingKeys.recoveryFactor)
         static let equityVariance = Column(CodingKeys.equityVariance)
         static let returnSpread50 = Column(CodingKeys.returnSpread50)
     }
 
+    mutating func didInsert(_ inserted: InsertionSuccess) {
+        id = inserted.rowID
+    }
 }

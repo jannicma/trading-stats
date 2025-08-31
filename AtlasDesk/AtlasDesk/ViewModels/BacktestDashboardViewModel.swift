@@ -11,11 +11,18 @@ import AtlasSim
 
 final class BacktestDashboardViewModel: ObservableObject {
     @Published var strategies: [any Strategy] = []
-    private let backtestController: BacktestController
+    private var backtestController: BacktestController
     
     init() {
         backtestController = BacktestController()
-        strategies = backtestController.getAllStrategies()
+        
+        Task{
+            let strategies = await backtestController.loadAndGetAllStrategies()
+            await MainActor.run {
+                self.strategies = strategies
+            }
+
+        }
     }
     
     func getStrategyEvaluation(for stratIndex: Int) -> StrategyEvaluations {

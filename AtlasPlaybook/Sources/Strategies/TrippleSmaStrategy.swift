@@ -10,9 +10,11 @@ import AtlasCore
 import AtlasKit
 
 public struct TrippleEmaStrategy: Strategy {
-    public var id: UUID = UUID()
+    public init(id: UUID) {
+        self.id = id
+    }
     
-    public init() {}
+    public var id: UUID
     public var name = "Tripple SMA Strategy"
     
     public func getRequiredParameters() -> [ParameterRequirements] {

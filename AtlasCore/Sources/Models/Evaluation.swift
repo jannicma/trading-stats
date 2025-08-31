@@ -8,6 +8,10 @@
 import Foundation
 
 public struct EquityPoint: Codable, Sendable, Hashable, Identifiable {
+    public init(step: Int, equity: Double) {
+        self.step = step
+        self.equity = equity
+    }
     public var id = UUID()
     public let step: Int
     public let equity: Double
@@ -15,7 +19,7 @@ public struct EquityPoint: Codable, Sendable, Hashable, Identifiable {
 
 
 public struct Evaluation: Codable, Sendable, Hashable, Identifiable {
-    public init(timeframe: String? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double, equityPoints: [EquityPoint] = []) {
+    public init(timeframe: Int? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double, equityPoints: [EquityPoint] = []) {
         self.timeframe = timeframe
         self.symbol = symbol
         self.paramSet = paramSet
@@ -38,7 +42,7 @@ public struct Evaluation: Codable, Sendable, Hashable, Identifiable {
         self.equityCurve = equityPoints
     }
     public var id = UUID()
-    public var timeframe: String?
+    public var timeframe: Int?
     public var symbol: String?
     public var paramSet: ParameterSet?
     

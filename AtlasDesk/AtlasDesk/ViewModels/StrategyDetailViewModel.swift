@@ -12,11 +12,14 @@ final class StrategyDetailViewModel: ObservableObject {
     @Published var evaluation: StrategyEvaluations
     @Published var selected: Evaluation?
     
-    private let backtestController: BacktestController
+    private var backtestController: BacktestController
 
     init(evaluation: StrategyEvaluations) {
         self.evaluation = evaluation
         self.backtestController = BacktestController()
+        Task{
+            _ = await backtestController.loadAndGetAllStrategies()
+        }
         self.selected = nil
     }
     

@@ -9,10 +9,10 @@ import GRDB
 struct BacktestEquityDto: Codable, Identifiable, FetchableRecord, PersistableRecord{
     static let databaseTableName = "backtestEquity"
     
-    let id: Int
+    var id: Int? = nil
     let tradeNumber: Int
     let equity: Double
-    let evaluationId: Int
+    let evaluationId: Int64
     
     enum Columns{
         static let tradeNumber = Column(CodingKeys.tradeNumber)

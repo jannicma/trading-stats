@@ -13,14 +13,42 @@ import AtlasVault
 public struct BacktestController{
     public init() { }
     
-    private let allStrategies: [any Strategy] = [
-        StochRsiStrategy(),
-        TrippleEmaStrategy(),
+    private var allStrategies: [any Strategy] = []
+    private let allStrategyNames: [String] = [
+        "Tripple SMA Strategy",
+        "Stochastic/RSI Strategy"
     ]
     
-    public func getAllStrategies() -> [any Strategy] {
+    private func createStrategy(for name: String, uuid: UUID) -> any Strategy {
+        switch name {
+        case "Tripple SMA Strategy":
+            return TrippleEmaStrategy(id: uuid)
+        case "Stochastic/RSI Strategy":
+            return StochRsiStrategy(id: uuid)
+        default:
+            fatalError("Unsupported strategy name: \(name)")
+        }
+    }
+    
+    
+    public mutating func loadAndGetAllStrategies() async -> [any Strategy] {
+        let strategyDataService: StrategyDataService = .init()
+        var allStrategies: [any Strategy] = []
+        
+        do{
+            for name in allStrategyNames {
+                let uuid = try await strategyDataService.getOrCreateStrategyUuid(for: name)
+                let strat = createStrategy(for: name, uuid: uuid)
+                allStrategies.append(strat)
+            }
+        } catch {
+            print("fuuuk, something went wrong: \(error)")
+        }
+        
+        self.allStrategies = allStrategies
         return allStrategies
     }
+    
     
     public func runBacktest(strategyName: String) async -> StrategyEvaluations {
         let backtestingStrat: any Strategy = allStrategies.filter{ $0.name == strategyName }.first!
@@ -59,7 +87,7 @@ public struct BacktestController{
                         let trades = backtestingStrat.backtest(chart: chart, paramSet: setting)
                         var eval = Evaluator.evaluateTrades(simulatedTrades: trades)
                         eval.paramSet = setting
-                        eval.timeframe = String(chart.timeframe)  //TODO: change to Int
+                        eval.timeframe = chart.timeframe
                         eval.symbol = chart.name
                         
                         return eval
@@ -74,7 +102,6 @@ public struct BacktestController{
         }
         print()
         
-        //allEvaluations = allEvaluations.filter { $0.averageRMultiples > 0.15 && $0.maxDrawdown < 10_000 && $0.trades > 50}
         if allEvaluations.count < 10 {
             print("Not enough evaluations found, quitting...")
             return result
@@ -82,10 +109,10 @@ public struct BacktestController{
         
         
         allEvaluations.sort {$0.expectancy * Double($0.trades) > $1.expectancy * Double($1.trades)}
-        
-        JsonController.saveToJSON(allEvaluations, filePath: "/Users/jannicmarcon/Documents/Other/evaluations_1.json")
-        print()
         Evaluator.evaluateEvaluations(evaluations: allEvaluations)
+        
+        let evaluationDataService = EvaluationDataService()
+        _ = await evaluationDataService.saveEvaluations(allEvaluations, strategy: backtestingStrat.id as! UUID)
         
         result.evaluations = allEvaluations
         return result

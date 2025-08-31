@@ -110,7 +110,7 @@ struct StrategyDetail: View {
         HStack(alignment: .top, spacing: 24) {
             VStack(alignment: .leading, spacing: 8) {
                 infoRow(title: "Symbol", value: selected.symbol ?? "")
-                infoRow(title: "Timeframe", value: selected.timeframe ?? "")
+                infoRow(title: "Timeframe", value: String(selected.timeframe ?? 0))
                 infoRow(title: "Trades", value: String(selected.trades))
                 infoRow(title: "Wins", value: String(selected.wins))
                 infoRow(title: "Losses", value: String(selected.losses))

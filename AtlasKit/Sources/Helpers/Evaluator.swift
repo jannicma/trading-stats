@@ -156,7 +156,7 @@ public struct Evaluator {
         let tradesCount = simulatedTrades.count
         let wins = simulatedTrades.filter { $0.isLong ? $0.exitPrice! > $0.entryPrice : $0.exitPrice! < $0.entryPrice}.count
         let losses = simulatedTrades.filter { $0.isLong ? $0.exitPrice! <= $0.entryPrice : $0.exitPrice! >= $0.entryPrice}.count
-        let winRate = (Double(wins) / Double(tradesCount)) * 100
+        let winRate = (Double(wins) / max(Double(tradesCount), 1)) * 100
 
         assert(tradesCount == wins+losses, "trade wins and losses dont sum up correctly")
 
@@ -222,24 +222,29 @@ public struct Evaluator {
         let cagrVal = Self.cagr(equitySeries: equityDaily, calendar: calendar)
         let calmarRatio = mddPct > 0 ? cagrVal / mddPct : 0.0
         let recoveryFactor = mddMoney > 0 ? netMoney / mddMoney : 0.0
+        
+        let equityPoints = moneyReturns.enumerated().map { (index, value) in
+            EquityPoint(step: index, equity: value)
+        }
 
         let evaluation = Evaluation(
             trades: tradesCount,
             wins: wins,
             losses: losses,
-            winRate: winRate,
-            averageRMultiples: meanR,
-            expectancy: expectancyMoney,
-            avgRRR: averageRRR,
-            sharpe: sharpe,
-            sortino: sortino,
-            maxDrawdown: mddMoney,
-            calmarRatio: calmarRatio,
-            profitFactor: profitFactor,
-            ulcerIndex: ulcerIndex,
-            recoveryFactor: recoveryFactor,
-            equityVariance: equityVariance,
-            returnSpread50: returnSpread50
+            winRate: Double(round(1000 * winRate) / 1000),
+            averageRMultiples: Double(round(1000 * meanR) / 1000),
+            expectancy: Double(round(1000 * expectancyMoney) / 1000),
+            avgRRR: Double(round(1000 * averageRRR) / 1000),
+            sharpe: Double(round(1000 * sharpe) / 1000),
+            sortino: Double(round(1000 * sortino) / 1000),
+            maxDrawdown: Double(round(1000 * mddMoney) / 1000),
+            calmarRatio: Double(round(1000 * calmarRatio) / 1000),
+            profitFactor: Double(round(1000 * profitFactor) / 1000),
+            ulcerIndex: Double(round(1000 * ulcerIndex) / 1000),
+            recoveryFactor: Double(round(1000 * recoveryFactor) / 1000),
+            equityVariance: Double(round(1000 * equityVariance) / 1000),
+            returnSpread50: Double(round(1000 * returnSpread50) / 1000),
+            equityPoints: equityPoints
         )
 
         if printEval { Self.printEvaluation(evaluation)}
@@ -249,7 +254,7 @@ public struct Evaluator {
     
     private static func printEvaluation(_ evaluation: Evaluation) {
         print("Chart: \(evaluation.symbol ?? "No Symbol")")
-        print("Timeframe: \(evaluation.timeframe ?? "No Timeframe")")
+        print("Timeframe: \(evaluation.timeframe ?? 0)")
         print(evaluation.paramSet?.stringRepresentation ?? "no Parameter Set")
         print("Total Trades: \(evaluation.trades)")
         print("Wins: \(evaluation.wins)")
