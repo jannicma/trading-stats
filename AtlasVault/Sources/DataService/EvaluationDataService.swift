@@ -58,4 +58,30 @@ public struct EvaluationDataService {
         return true
         
     }
+    
+    
+    public func getAllEvaluations(for strategy: UUID) async throws -> [Evaluation] {
+        let evalDtos = try await DatabaseManager.shared.read { db in
+            try BacktestEvaluationDto
+                .filter{ $0.strategyUuid == strategy }
+                .fetchAll(db)
+        }
+        
+        let evaluations = evalDtos.map { $0.toEvaluation() }
+        
+        return evaluations
+    }
+    
+    
+    public func getEquityCurve(of backtestRunId: Int) async throws -> [EquityPoint] {
+        let backtestEquityDtos = try await DatabaseManager.shared.read { db in
+            try BacktestEquityDto
+                .filter{ $0.evaluationId == backtestRunId }
+                .fetchAll(db)
+        }
+        
+        let equityPoints = backtestEquityDtos.map { $0.toEquityPoint() }
+        
+        return equityPoints
+    }
 }

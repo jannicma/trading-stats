@@ -24,10 +24,23 @@ final class StrategyDetailViewModel: ObservableObject {
     }
     
     func runBacktest() async {
-        let simulatedEvaluations = await backtestController.runBacktest(strategyName: evaluation.strategyName)
-        
+        _ = await backtestController.runBacktest(strategyId: evaluation.strategyId!)
+        let newEvaluations = await backtestController.getEvaluations(for: evaluation.strategyId!)
         await MainActor.run {
-            self.evaluation = simulatedEvaluations
+            self.evaluation.evaluations = newEvaluations
+        }
+    }
+    
+    func changeSelectedResult() async {
+        guard let selectedRun = self.selected else {
+            return
+        }
+        
+        if selectedRun.equityCurve.isEmpty {
+            let equity = await backtestController.loadEquityCurve(of: selectedRun.id)
+            await MainActor.run {
+                self.selected?.equityCurve = equity
+            }
         }
     }
 }

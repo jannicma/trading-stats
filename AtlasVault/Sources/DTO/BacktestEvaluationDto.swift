@@ -61,4 +61,8 @@ struct BacktestEvaluationDto: Codable, Identifiable, FetchableRecord, MutablePer
     mutating func didInsert(_ inserted: InsertionSuccess) {
         id = inserted.rowID
     }
+        
+    public func toEvaluation() -> Evaluation {
+        Evaluation(id: Int(self.id!), timeframe: self.timeframe, symbol: self.asset, paramSet: self.parameters, trades: self.trades, wins: self.wins, losses: self.losses, winRate: self.winRate, averageRMultiples: self.averageRMultiples, expectancy: self.expectancy, avgRRR: self.avgRRR, sharpe: self.sharpe, sortino: self.sortino, maxDrawdown: self.maxDrawdown, calmarRatio: self.calmarRatio, profitFactor: self.profitFactor, ulcerIndex: self.ulcerIndex, recoveryFactor: self.recoveryFactor, equityVariance: self.equityVariance, returnSpread50: self.returnSpread50)
+    }
 }

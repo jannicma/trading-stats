@@ -19,7 +19,8 @@ public struct EquityPoint: Codable, Sendable, Hashable, Identifiable {
 
 
 public struct Evaluation: Codable, Sendable, Hashable, Identifiable {
-    public init(timeframe: Int? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double, equityPoints: [EquityPoint] = []) {
+    public init(id: Int = 0, timeframe: Int? = nil, symbol: String? = nil, paramSet: ParameterSet? = nil, trades: Int, wins: Int, losses: Int, winRate: Double, averageRMultiples: Double, expectancy: Double, avgRRR: Double, sharpe: Double, sortino: Double, maxDrawdown: Double, calmarRatio: Double, profitFactor: Double, ulcerIndex: Double, recoveryFactor: Double, equityVariance: Double, returnSpread50: Double, equityPoints: [EquityPoint] = []) {
+        self.id = id
         self.timeframe = timeframe
         self.symbol = symbol
         self.paramSet = paramSet
@@ -41,7 +42,8 @@ public struct Evaluation: Codable, Sendable, Hashable, Identifiable {
         self.returnSpread50 = returnSpread50
         self.equityCurve = equityPoints
     }
-    public var id = UUID()
+    
+    public var id: Int = 0
     public var timeframe: Int?
     public var symbol: String?
     public var paramSet: ParameterSet?

@@ -85,6 +85,9 @@ struct StrategyDetail: View {
         .onChange(of: selection) { _, newValue in
             if let id = newValue.first, let found = viewModel.evaluation.evaluations.first(where: { $0.id == id }) {
                 viewModel.selected = found
+                Task{
+                    await viewModel.changeSelectedResult()
+                }
             } else {
                 viewModel.selected = viewModel.evaluation.evaluations.first
             }
@@ -181,5 +184,5 @@ struct StrategyDetail: View {
 
 
 #Preview {
-    StrategyDetail(evaluation: StrategyEvaluations(strategyName: "Test", evaluations: []))
+    StrategyDetail(evaluation: StrategyEvaluations(strategyName: "Test", strategyId: nil, evaluations: []))
 }

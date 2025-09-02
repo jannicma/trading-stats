@@ -50,10 +50,23 @@ public struct BacktestController{
     }
     
     
-    public func runBacktest(strategyName: String) async -> StrategyEvaluations {
-        let backtestingStrat: any Strategy = allStrategies.filter{ $0.name == strategyName }.first!
+    public func getEvaluations(for strategy: UUID) async -> [Evaluation] {
+        let evalDataService = EvaluationDataService()
+        let evals = try? await evalDataService.getAllEvaluations(for: strategy)
+        return evals ?? []
+    }
+    
+    
+    public func loadEquityCurve(of backtestRun: Int) async -> [EquityPoint] {
+        let evaluationDataService = EvaluationDataService()
+        let curve = try? await evaluationDataService.getEquityCurve(of: backtestRun)
+        return curve ?? []
+    }
+    
+    
+    public func runBacktest(strategyId: UUID) async -> Int {
+        let backtestingStrat: any Strategy = allStrategies.filter{ $0.id as? UUID == strategyId }.first!
         print("Strategy backtest is running now...")
-        var result = StrategyEvaluations(strategyName: strategyName, evaluations: [])
         
         let parameterController: ParameterGenerator = ParameterGenerator()
         
@@ -104,7 +117,7 @@ public struct BacktestController{
         
         if allEvaluations.count < 10 {
             print("Not enough evaluations found, quitting...")
-            return result
+            return allEvaluations.count
         }
         
         
@@ -114,7 +127,6 @@ public struct BacktestController{
         let evaluationDataService = EvaluationDataService()
         _ = await evaluationDataService.saveEvaluations(allEvaluations, strategy: backtestingStrat.id as! UUID)
         
-        result.evaluations = allEvaluations
-        return result
+        return allEvaluations.count
     }
 }
