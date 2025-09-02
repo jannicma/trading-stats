@@ -19,16 +19,22 @@ final class StrategyDetailViewModel: ObservableObject {
         self.backtestController = BacktestController()
         Task{
             _ = await backtestController.loadAndGetAllStrategies()
+            await loadData()
         }
         self.selected = nil
     }
     
-    func runBacktest() async {
-        _ = await backtestController.runBacktest(strategyId: evaluation.strategyId!)
+    func loadData() async {
         let newEvaluations = await backtestController.getEvaluations(for: evaluation.strategyId!)
         await MainActor.run {
             self.evaluation.evaluations = newEvaluations
         }
+
+    }
+    
+    func runBacktest() async {
+        _ = await backtestController.runBacktest(strategyId: evaluation.strategyId!)
+        await loadData()
     }
     
     func changeSelectedResult() async {
@@ -38,6 +44,7 @@ final class StrategyDetailViewModel: ObservableObject {
         
         if selectedRun.equityCurve.isEmpty {
             let equity = await backtestController.loadEquityCurve(of: selectedRun.id)
+            assert(equity.count == selectedRun.trades, "Equity graph does not match number of trades")
             await MainActor.run {
                 self.selected?.equityCurve = equity
             }

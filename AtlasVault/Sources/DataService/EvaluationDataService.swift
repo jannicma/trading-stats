@@ -19,6 +19,10 @@ public struct EvaluationDataService {
         
         do {
             try await DatabaseManager.shared.write { db in
+                try BacktestEvaluationDto
+                    .filter{ $0.strategyUuid == strategy }
+                    .deleteAll(db)
+                
                 for idx in evaluationDtos.indices {
                     do{
                         try evaluationDtos[idx].insert(db)

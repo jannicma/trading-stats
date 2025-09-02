@@ -114,6 +114,11 @@ struct StrategyDetail: View {
             VStack(alignment: .leading, spacing: 8) {
                 infoRow(title: "Symbol", value: selected.symbol ?? "")
                 infoRow(title: "Timeframe", value: String(selected.timeframe ?? 0))
+                if let params = selected.paramSet?.parameters {
+                    ForEach(params, id: \.name) { param in
+                        infoRow(title: param.name, value: String(describing: param.value))
+                    }
+                }
                 infoRow(title: "Trades", value: String(selected.trades))
                 infoRow(title: "Wins", value: String(selected.wins))
                 infoRow(title: "Losses", value: String(selected.losses))
@@ -129,7 +134,6 @@ struct StrategyDetail: View {
                 infoRow(title: "Ulcer Index", value: format(selected.ulcerIndex))
                 infoRow(title: "Recovery Factor", value: format(selected.recoveryFactor))
                 infoRow(title: "Equity Variance", value: format(selected.equityVariance))
-                infoRow(title: "Param Set", value: String(describing: selected.paramSet)) //TODO: nicely display all params
             }
             .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -177,7 +181,7 @@ struct StrategyDetail: View {
     }
 
     private func percent(_ value: Double) -> String {
-        return String(format: "%.1f%%", value * 100)
+        return String(format: "%.1f%%", value)
     }
 }
 

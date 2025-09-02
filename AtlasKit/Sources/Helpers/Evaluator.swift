@@ -223,10 +223,14 @@ public struct Evaluator {
         let calmarRatio = mddPct > 0 ? cagrVal / mddPct : 0.0
         let recoveryFactor = mddMoney > 0 ? netMoney / mddMoney : 0.0
         
-        let equityPoints = moneyReturns.enumerated().map { (index, value) in
-            EquityPoint(step: index, equity: value)
+        var equityPoints: [EquityPoint] = []
+        var prevEquity = 0.0
+        for (index, moneyReturn) in moneyReturns.enumerated(){
+            prevEquity += moneyReturn
+            let point = EquityPoint(step: index, equity: prevEquity)
+            equityPoints.append(point)
         }
-
+        
         let evaluation = Evaluation(
             trades: tradesCount,
             wins: wins,
