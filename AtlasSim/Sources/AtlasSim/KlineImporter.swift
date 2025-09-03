@@ -76,7 +76,7 @@ public struct KlineImporter {
         let totalMovement = next.close - previous.close
         let avgMove = totalMovement / Double(count)
         let wickSize = abs(avgMove) / 4
-
+        
         for i in (start + 1)...end {
             let open = candles[i - 1].close
             if i != end {
@@ -86,15 +86,16 @@ public struct KlineImporter {
             candles[i].high = max(open, open + avgMove) + wickSize
             candles[i].low = min(open, open + avgMove) - wickSize
         }
-
+        
     }
     
     
     private func validateTimestamps(of candles: [Candle]) -> Bool {
-        let timeDiff = candles[0].time - candles[1].time
+        let timeDiff = candles[1].time - candles[0].time
         var lastTime = candles[0].time
         for candle in candles[1...] {
             if candle.time - lastTime != timeDiff {
+                print("there is a gap in this chart... exiting!")
                 return false
             }
             lastTime = candle.time
