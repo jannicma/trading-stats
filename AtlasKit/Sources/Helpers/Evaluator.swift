@@ -143,19 +143,21 @@ public struct Evaluator {
         let periodsPerYear: Double = 365.0
         let annualRiskFree: Double = 0.0
         let calendar = Calendar.current
+        
+        let simTrades = simulatedTrades.sorted { $0.timestamp < $1.timestamp }
 
         // --- Per-trade diagnostics kept as before ---
         var rMultiples: [Double] = []
-        rMultiples.reserveCapacity(simulatedTrades.count)
+        rMultiples.reserveCapacity(simTrades.count)
 
         var moneyReturns: [Double] = []
-        moneyReturns.reserveCapacity(simulatedTrades.count)
+        moneyReturns.reserveCapacity(simTrades.count)
 
         var rrRatios: [Double] = []
 
-        let tradesCount = simulatedTrades.count
-        let wins = simulatedTrades.filter { $0.isLong ? $0.exitPrice! > $0.entryPrice : $0.exitPrice! < $0.entryPrice}.count
-        let losses = simulatedTrades.filter { $0.isLong ? $0.exitPrice! <= $0.entryPrice : $0.exitPrice! >= $0.entryPrice}.count
+        let tradesCount = simTrades.count
+        let wins = simTrades.filter { $0.isLong ? $0.exitPrice! > $0.entryPrice : $0.exitPrice! < $0.entryPrice}.count
+        let losses = simTrades.filter { $0.isLong ? $0.exitPrice! <= $0.entryPrice : $0.exitPrice! >= $0.entryPrice}.count
         let winRate = (Double(wins) / max(Double(tradesCount), 1)) * 100
 
         assert(tradesCount == wins+losses, "trade wins and losses dont sum up correctly")
@@ -163,7 +165,9 @@ public struct Evaluator {
         var grossProfitMoney: Double = 0
         var grossLossMoney: Double = 0
 
-        for trade in simulatedTrades{
+        var equityPoints: [EquityPoint] = []
+
+        for (tradeNumber, trade) in simTrades.enumerated(){
             let slDiff = abs(trade.entryPrice - trade.slPrice)
             guard slDiff > 0, let exit = trade.exitPrice else { continue }
 
@@ -173,6 +177,10 @@ public struct Evaluator {
 
             let pnl = (trade.isLong ? (exit - trade.entryPrice) : (trade.entryPrice - exit)) * trade.volume
             moneyReturns.append(pnl)
+            
+            let lastEquity = equityPoints.last?.equity ?? 0.0
+            let newEquityPoint = EquityPoint(step: tradeNumber, equity: lastEquity + pnl)
+            equityPoints.append(newEquityPoint)
 
             if pnl > 0 { grossProfitMoney += pnl } else { grossLossMoney += abs(pnl) }
 
@@ -181,7 +189,7 @@ public struct Evaluator {
         }
 
         // --- Build daily equity curve (includes non-trade days) ---
-        let equityDaily: [DailyPoint] = Self.buildDailyEquity(trades: simulatedTrades, startEquity: startEquity, calendar: calendar)
+        let equityDaily: [DailyPoint] = Self.buildDailyEquity(trades: simTrades, startEquity: startEquity, calendar: calendar)
         let returnsDaily: [Double] = Self.dailyReturns(from: equityDaily)
 
         // --- Expectancy (money/trade) unchanged ---
@@ -222,14 +230,6 @@ public struct Evaluator {
         let cagrVal = Self.cagr(equitySeries: equityDaily, calendar: calendar)
         let calmarRatio = mddPct > 0 ? cagrVal / mddPct : 0.0
         let recoveryFactor = mddMoney > 0 ? netMoney / mddMoney : 0.0
-        
-        var equityPoints: [EquityPoint] = []
-        var prevEquity = 0.0
-        for (index, moneyReturn) in moneyReturns.enumerated(){
-            prevEquity += moneyReturn
-            let point = EquityPoint(step: index, equity: prevEquity)
-            equityPoints.append(point)
-        }
         
         let evaluation = Evaluation(
             trades: tradesCount,
