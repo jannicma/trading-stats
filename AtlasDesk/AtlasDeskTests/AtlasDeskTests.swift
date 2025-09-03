@@ -1,0 +1,17 @@
+//
+//  AtlasDeskTests.swift
+//  AtlasDeskTests
+//
+//  Created by Jannic Marcon on 22.08.2025.
+//
+
+import Testing
+@testable import AtlasDesk
+
+struct AtlasDeskTests {
+
+    @Test func example() async throws {
+        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    }
+
+}

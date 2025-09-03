@@ -1,0 +1,615 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D3784F6F2E58FC8900D0A635 /* AtlasCore in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F6E2E58FC8900D0A635 /* AtlasCore */; };
+		D3784F712E58FC8900D0A635 /* AtlasEngine in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F702E58FC8900D0A635 /* AtlasEngine */; };
+		D3784F732E58FC8900D0A635 /* AtlasKit in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F722E58FC8900D0A635 /* AtlasKit */; };
+		D3784F752E58FC8900D0A635 /* AtlasPlaybook in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F742E58FC8900D0A635 /* AtlasPlaybook */; };
+		D3784F772E58FC8900D0A635 /* AtlasSim in Frameworks */ = {isa = PBXBuildFile; productRef = D3784F762E58FC8900D0A635 /* AtlasSim */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D3784F252E58F67000D0A635 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D3784F0E2E58F66F00D0A635 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3784F152E58F66F00D0A635;
+			remoteInfo = AtlasDesk;
+		};
+		D3784F2F2E58F67000D0A635 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D3784F0E2E58F66F00D0A635 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D3784F152E58F66F00D0A635;
+			remoteInfo = AtlasDesk;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		D3784F162E58F66F00D0A635 /* AtlasDesk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AtlasDesk.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3784F242E58F67000D0A635 /* AtlasDeskTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AtlasDeskTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3784F2E2E58F67000D0A635 /* AtlasDeskUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AtlasDeskUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D3784F4E2E58F6A900D0A635 /* AtlasCore */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AtlasCore; path = ../AtlasCore; sourceTree = SOURCE_ROOT; };
+		D3784F4F2E58F6A900D0A635 /* AtlasEngine */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AtlasEngine; path = ../AtlasEngine; sourceTree = SOURCE_ROOT; };
+		D3784F502E58F6A900D0A635 /* AtlasKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AtlasKit; path = ../AtlasKit; sourceTree = SOURCE_ROOT; };
+		D3784F512E58F6A900D0A635 /* AtlasPlaybook */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AtlasPlaybook; path = ../AtlasPlaybook; sourceTree = SOURCE_ROOT; };
+		D3784F522E58F6A900D0A635 /* AtlasSim */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = AtlasSim; path = ../AtlasSim; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		D3784F182E58F66F00D0A635 /* AtlasDesk */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AtlasDesk;
+			sourceTree = "<group>";
+		};
+		D3784F272E58F67000D0A635 /* AtlasDeskTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AtlasDeskTests;
+			sourceTree = "<group>";
+		};
+		D3784F312E58F67000D0A635 /* AtlasDeskUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AtlasDeskUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D3784F132E58F66F00D0A635 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D3784F712E58FC8900D0A635 /* AtlasEngine in Frameworks */,
+				D3784F772E58FC8900D0A635 /* AtlasSim in Frameworks */,
+				D3784F732E58FC8900D0A635 /* AtlasKit in Frameworks */,
+				D3784F6F2E58FC8900D0A635 /* AtlasCore in Frameworks */,
+				D3784F752E58FC8900D0A635 /* AtlasPlaybook in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3784F212E58F67000D0A635 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3784F2B2E58F67000D0A635 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D3784F0D2E58F66F00D0A635 = {
+			isa = PBXGroup;
+			children = (
+				D3784F4E2E58F6A900D0A635 /* AtlasCore */,
+				D3784F4F2E58F6A900D0A635 /* AtlasEngine */,
+				D3784F502E58F6A900D0A635 /* AtlasKit */,
+				D3784F512E58F6A900D0A635 /* AtlasPlaybook */,
+				D3784F522E58F6A900D0A635 /* AtlasSim */,
+				D3784F182E58F66F00D0A635 /* AtlasDesk */,
+				D3784F272E58F67000D0A635 /* AtlasDeskTests */,
+				D3784F312E58F67000D0A635 /* AtlasDeskUITests */,
+				D3784F6D2E58FC8900D0A635 /* Frameworks */,
+				D3784F172E58F66F00D0A635 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D3784F172E58F66F00D0A635 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D3784F162E58F66F00D0A635 /* AtlasDesk.app */,
+				D3784F242E58F67000D0A635 /* AtlasDeskTests.xctest */,
+				D3784F2E2E58F67000D0A635 /* AtlasDeskUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D3784F6D2E58FC8900D0A635 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D3784F152E58F66F00D0A635 /* AtlasDesk */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3784F382E58F67000D0A635 /* Build configuration list for PBXNativeTarget "AtlasDesk" */;
+			buildPhases = (
+				D3784F122E58F66F00D0A635 /* Sources */,
+				D3784F132E58F66F00D0A635 /* Frameworks */,
+				D3784F142E58F66F00D0A635 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				D3784F182E58F66F00D0A635 /* AtlasDesk */,
+			);
+			name = AtlasDesk;
+			packageProductDependencies = (
+				D3784F6E2E58FC8900D0A635 /* AtlasCore */,
+				D3784F702E58FC8900D0A635 /* AtlasEngine */,
+				D3784F722E58FC8900D0A635 /* AtlasKit */,
+				D3784F742E58FC8900D0A635 /* AtlasPlaybook */,
+				D3784F762E58FC8900D0A635 /* AtlasSim */,
+			);
+			productName = AtlasDesk;
+			productReference = D3784F162E58F66F00D0A635 /* AtlasDesk.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D3784F232E58F67000D0A635 /* AtlasDeskTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3784F3B2E58F67000D0A635 /* Build configuration list for PBXNativeTarget "AtlasDeskTests" */;
+			buildPhases = (
+				D3784F202E58F67000D0A635 /* Sources */,
+				D3784F212E58F67000D0A635 /* Frameworks */,
+				D3784F222E58F67000D0A635 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D3784F262E58F67000D0A635 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D3784F272E58F67000D0A635 /* AtlasDeskTests */,
+			);
+			name = AtlasDeskTests;
+			packageProductDependencies = (
+			);
+			productName = AtlasDeskTests;
+			productReference = D3784F242E58F67000D0A635 /* AtlasDeskTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		D3784F2D2E58F67000D0A635 /* AtlasDeskUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D3784F3E2E58F67000D0A635 /* Build configuration list for PBXNativeTarget "AtlasDeskUITests" */;
+			buildPhases = (
+				D3784F2A2E58F67000D0A635 /* Sources */,
+				D3784F2B2E58F67000D0A635 /* Frameworks */,
+				D3784F2C2E58F67000D0A635 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D3784F302E58F67000D0A635 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				D3784F312E58F67000D0A635 /* AtlasDeskUITests */,
+			);
+			name = AtlasDeskUITests;
+			packageProductDependencies = (
+			);
+			productName = AtlasDeskUITests;
+			productReference = D3784F2E2E58F67000D0A635 /* AtlasDeskUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D3784F0E2E58F66F00D0A635 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					D3784F152E58F66F00D0A635 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					D3784F232E58F67000D0A635 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = D3784F152E58F66F00D0A635;
+					};
+					D3784F2D2E58F67000D0A635 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = D3784F152E58F66F00D0A635;
+					};
+				};
+			};
+			buildConfigurationList = D3784F112E58F66F00D0A635 /* Build configuration list for PBXProject "AtlasDesk" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D3784F0D2E58F66F00D0A635;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D3784F172E58F66F00D0A635 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D3784F152E58F66F00D0A635 /* AtlasDesk */,
+				D3784F232E58F67000D0A635 /* AtlasDeskTests */,
+				D3784F2D2E58F67000D0A635 /* AtlasDeskUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D3784F142E58F66F00D0A635 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3784F222E58F67000D0A635 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3784F2C2E58F67000D0A635 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D3784F122E58F66F00D0A635 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3784F202E58F67000D0A635 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D3784F2A2E58F67000D0A635 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D3784F262E58F67000D0A635 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D3784F152E58F66F00D0A635 /* AtlasDesk */;
+			targetProxy = D3784F252E58F67000D0A635 /* PBXContainerItemProxy */;
+		};
+		D3784F302E58F67000D0A635 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D3784F152E58F66F00D0A635 /* AtlasDesk */;
+			targetProxy = D3784F2F2E58F67000D0A635 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		D3784F362E58F67000D0A635 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D3784F372E58F67000D0A635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		D3784F392E58F67000D0A635 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AtlasDesk/AtlasDesk.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = name.jannic.AtlasDesk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D3784F3A2E58F67000D0A635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AtlasDesk/AtlasDesk.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = name.jannic.AtlasDesk;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D3784F3C2E58F67000D0A635 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = name.jannic.AtlasDeskTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AtlasDesk.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AtlasDesk";
+			};
+			name = Debug;
+		};
+		D3784F3D2E58F67000D0A635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = name.jannic.AtlasDeskTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AtlasDesk.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AtlasDesk";
+			};
+			name = Release;
+		};
+		D3784F3F2E58F67000D0A635 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = name.jannic.AtlasDeskUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = AtlasDesk;
+			};
+			name = Debug;
+		};
+		D3784F402E58F67000D0A635 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = JZ3AH8748N;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = name.jannic.AtlasDeskUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = AtlasDesk;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D3784F112E58F66F00D0A635 /* Build configuration list for PBXProject "AtlasDesk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3784F362E58F67000D0A635 /* Debug */,
+				D3784F372E58F67000D0A635 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3784F382E58F67000D0A635 /* Build configuration list for PBXNativeTarget "AtlasDesk" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3784F392E58F67000D0A635 /* Debug */,
+				D3784F3A2E58F67000D0A635 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3784F3B2E58F67000D0A635 /* Build configuration list for PBXNativeTarget "AtlasDeskTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3784F3C2E58F67000D0A635 /* Debug */,
+				D3784F3D2E58F67000D0A635 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D3784F3E2E58F67000D0A635 /* Build configuration list for PBXNativeTarget "AtlasDeskUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D3784F3F2E58F67000D0A635 /* Debug */,
+				D3784F402E58F67000D0A635 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D3784F6E2E58FC8900D0A635 /* AtlasCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasCore;
+		};
+		D3784F702E58FC8900D0A635 /* AtlasEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasEngine;
+		};
+		D3784F722E58FC8900D0A635 /* AtlasKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasKit;
+		};
+		D3784F742E58FC8900D0A635 /* AtlasPlaybook */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasPlaybook;
+		};
+		D3784F762E58FC8900D0A635 /* AtlasSim */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AtlasSim;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = D3784F0E2E58F66F00D0A635 /* Project object */;
+}
