@@ -17,6 +17,7 @@ extension Comparable {
 struct StrategyDetail: View {
     @StateObject private var viewModel: StrategyDetailViewModel
     @State private var selection: Set<Evaluation.ID> = []
+    @State private var showBacktestSheet: Bool = false
 
     init(evaluation: StrategyEvaluations) {
         _viewModel = StateObject(wrappedValue: StrategyDetailViewModel(evaluation: evaluation))
@@ -31,6 +32,9 @@ struct StrategyDetail: View {
             Spacer(minLength: 0)
         }
         .padding(20)
+        .sheet(isPresented: $showBacktestSheet) {
+            backtestStartSheet
+        }
     }
 
     @ViewBuilder
@@ -45,9 +49,7 @@ struct StrategyDetail: View {
             Text(String(viewModel.evaluation.evaluations.count))
 
             Button {
-                Task {
-                    await viewModel.runBacktest()
-                }
+                showBacktestSheet = true
             } label: {
                 Image(systemName: "arrow.clockwise")
                     .imageScale(.large)
@@ -105,6 +107,42 @@ struct StrategyDetail: View {
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, minHeight: 200)
         }
+    }
+
+    @ViewBuilder
+    private var backtestStartSheet: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Enter number")
+                .font(.headline)
+
+            HStack {
+                Text("Maker Fee:")
+                TextField("0.0000", value: $viewModel.makerFee, format: .number.precision(.fractionLength(3)))
+                    .textFieldStyle(.roundedBorder)
+            }
+            HStack {
+                Text("Taker Fee:")
+                TextField("0.0000", value: $viewModel.takerFee, format: .number.precision(.fractionLength(3)))
+                    .textFieldStyle(.roundedBorder)
+            }
+
+            HStack {
+                Spacer()
+                Button("Cancel") {
+                    showBacktestSheet = false
+                }
+                Button("OK") {
+                    showBacktestSheet = false
+                    Task {
+                        await viewModel.runBacktest()
+                    }
+                }
+                .keyboardShortcut(.defaultAction)
+            }
+            .padding(.top, 8)
+        }
+        .padding()
+        .frame(minWidth: 320)
     }
 
     // MARK: - Subviews

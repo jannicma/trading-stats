@@ -11,6 +11,8 @@ import AtlasSim
 final class StrategyDetailViewModel: ObservableObject {
     @Published var evaluation: StrategyEvaluations
     @Published var selected: Evaluation?
+    @Published var makerFee: Double = 0.0000
+    @Published var takerFee: Double = 0.0000
     
     private var backtestController: BacktestController
 
@@ -33,7 +35,9 @@ final class StrategyDetailViewModel: ObservableObject {
     }
     
     func runBacktest() async {
-        _ = await backtestController.runBacktest(strategyId: evaluation.strategyId!)
+        let fees: SimulatedFees = .init(makerFee: makerFee, takerFee: takerFee)
+        let settings: BacktestSettings = .init(fees: fees)
+        _ = await backtestController.runBacktest(strategyId: evaluation.strategyId!, backtestSettings: settings)
         await loadData()
     }
     

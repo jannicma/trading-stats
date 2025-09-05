@@ -18,13 +18,14 @@ public class TradeManager {
     public func enter(time: Int, open: Double, volume: Double,
                       sl: Double, tp: Double, atr: Double) -> UUID {
         let tradeId = UUID()
-        let trade = Trade(timestamp: time, entryPrice: open, volume: volume, tpPrice: tp, slPrice: sl, atrAtEntry: atr)
+        let trade = Trade(timestamp: time, entryPrice: open, volume: volume, tpPrice: tp, slPrice: sl, atrAtEntry: atr, entryMode: .Market)
         trades[tradeId] = trade
         return tradeId
     }
     
     public func exit(_ id: UUID, close: Double) -> Double {
         trades[id]!.exitPrice = close
+        trades[id]!.exitMode = .Limit
         var priceMove = close - trades[id]!.entryPrice
         priceMove = priceMove * (trades[id]!.isLong ? 1 : -1)
         let pnl = priceMove * trades[id]!.volume

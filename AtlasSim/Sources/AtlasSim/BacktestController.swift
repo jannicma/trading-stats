@@ -64,7 +64,7 @@ public struct BacktestController{
     }
     
     
-    public func runBacktest(strategyId: UUID) async -> Int {
+    public func runBacktest(strategyId: UUID, backtestSettings: BacktestSettings) async -> Int {
         let backtestingStrat: any Strategy = allStrategies.filter{ $0.id as? UUID == strategyId }.first!
         print("Strategy backtest is running now...")
         
@@ -75,7 +75,7 @@ public struct BacktestController{
         
         let chartController: ChartService = ChartService(indicatorsToCompute: requiredIndicators)
 
-        let allCharts = await chartController.loadAllCharts(timeframes: [1, 3, 5, 15, 30])
+        let allCharts = await chartController.loadAllCharts(timeframes: [3, 15, 30])   // [1, 3, 5, 15, 30]
         let settings = parameterController.generateParameters(requirements: requiredParameters)
         
         var parameterSets: [(chart: Chart, settings: ParameterSet)] = []
@@ -98,7 +98,7 @@ public struct BacktestController{
                 for (chart, setting) in batch {
                     group.addTask {
                         let trades = backtestingStrat.backtest(chart: chart, paramSet: setting)
-                        var eval = Evaluator.evaluateTrades(simulatedTrades: trades)
+                        var eval = Evaluator.evaluateTrades(simulatedTrades: trades, simFees: backtestSettings.fees)
                         eval.paramSet = setting
                         eval.timeframe = chart.timeframe
                         eval.symbol = chart.name

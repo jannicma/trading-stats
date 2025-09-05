@@ -137,7 +137,7 @@ public struct Evaluator {
     }
     
     
-    public static func evaluateTrades(simulatedTrades: [Trade], printEval: Bool = false) -> Evaluation {
+    public static func evaluateTrades(simulatedTrades: [Trade], simFees: SimulatedFees) -> Evaluation {
         // --- Inputs / constants ---
         let startEquity: Double = 100_000.0
         let periodsPerYear: Double = 365.0
@@ -175,7 +175,9 @@ public struct Evaluator {
             let r = trade.isLong ? (exit - trade.entryPrice) / slDiff : (trade.entryPrice - exit) / slDiff
             rMultiples.append(r)
 
-            let pnl = (trade.isLong ? (exit - trade.entryPrice) : (trade.entryPrice - exit)) * trade.volume
+            let rawTradePnl = (trade.isLong ? (exit - trade.entryPrice) : (trade.entryPrice - exit)) * trade.volume
+            let tradeFees = Self.calculateExpectedFees(for: trade, using: simFees)
+            let pnl = rawTradePnl - tradeFees
             moneyReturns.append(pnl)
             
             let lastEquity = equityPoints.last?.equity ?? 0.0
@@ -251,8 +253,31 @@ public struct Evaluator {
             equityPoints: equityPoints
         )
 
-        if printEval { Self.printEvaluation(evaluation)}
         return evaluation
+    }
+    
+    
+    private static func calculateExpectedFees(for trade: Trade, using feeStructure: SimulatedFees) -> Double {
+        var feeMoney: Double = 0
+        
+        let moneyAtEntry = trade.entryPrice * trade.volume
+        let moneyAtExit = trade.exitPrice! * trade.volume
+        
+        switch trade.entryMode {
+        case .Limit:
+            feeMoney += feeStructure.makerFee * moneyAtEntry
+        case .Market:
+            feeMoney += feeStructure.takerFee * moneyAtEntry
+        }
+        
+        switch trade.exitMode! {
+        case .Limit:
+            feeMoney += feeStructure.makerFee * moneyAtExit
+        case .Market:
+            feeMoney += feeStructure.takerFee * moneyAtExit
+        }
+        
+        return feeMoney
     }
     
     

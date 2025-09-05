@@ -8,10 +8,12 @@
 public struct Trade {
     public var timestamp: Int
     public var entryPrice: Double
+    public var entryMode: OrderMode
     public var volume: Double
     public var tpPrice: Double?
     public var slPrice: Double
     public var exitPrice: Double?
+    public var exitMode: OrderMode?
     public var atrAtEntry: Double
     
     public init(
@@ -21,7 +23,8 @@ public struct Trade {
         tpPrice: Double? = nil,
         slPrice: Double,
         exitPrice: Double? = nil,
-        atrAtEntry: Double
+        atrAtEntry: Double,
+        entryMode: OrderMode,
     ) {
         self.timestamp = timestamp
         self.entryPrice = entryPrice
@@ -30,6 +33,7 @@ public struct Trade {
         self.slPrice = slPrice
         self.exitPrice = exitPrice
         self.atrAtEntry = atrAtEntry
+        self.entryMode = entryMode
     }
 
     public var isLong: Bool { entryPrice > slPrice }
