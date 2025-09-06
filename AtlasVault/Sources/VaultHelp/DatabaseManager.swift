@@ -12,7 +12,7 @@ public actor DatabaseManager {
     private let dbPool: DatabasePool
 
     private init() throws {
-        let url = try DBPaths.databaseURL(appName: "TradeJournal")
+        let url = try Paths.databaseURL(appName: "TradeJournal")
         var config = Configuration()
         config.prepareDatabase { db in
             try db.execute(sql: "PRAGMA foreign_keys = ON;")

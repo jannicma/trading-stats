@@ -21,7 +21,8 @@ struct ChartDataHandler {
             charts = try await chartDataService.getAllCharts()
         }
         catch {
-            print("Error: \(error)")
+            let message = "Error fetching all charts: \(error)"
+            await Logger.shared.log(message)
         }
         return charts
     }

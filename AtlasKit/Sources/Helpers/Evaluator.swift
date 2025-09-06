@@ -186,7 +186,7 @@ public struct Evaluator {
 
             if pnl > 0 { grossProfitMoney += pnl } else { grossLossMoney += abs(pnl) }
 
-            let rr = 1.0 //abs(trade.tpPrice - trade.entryPrice) / slDiff
+            let rr = 0.0 //abs(trade.tpPrice - trade.entryPrice) / slDiff
             rrRatios.append(rr)
         }
 
