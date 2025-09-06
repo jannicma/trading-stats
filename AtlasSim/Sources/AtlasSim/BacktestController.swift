@@ -16,7 +16,8 @@ public struct BacktestController{
     private var allStrategies: [any Strategy] = []
     private let allStrategyNames: [String] = [
         "Tripple SMA Strategy",
-        "Stochastic/RSI Strategy"
+        "Stochastic/RSI Strategy",
+        "Candle Breakout Strategy"
     ]
     
     private func createStrategy(for name: String, uuid: UUID) -> any Strategy {
@@ -25,6 +26,8 @@ public struct BacktestController{
             return TrippleEmaStrategy(id: uuid)
         case "Stochastic/RSI Strategy":
             return StochRsiStrategy(id: uuid)
+        case "Candle Breakout Strategy":
+            return CandleBreakoutStrategy(id: uuid)
         default:
             fatalError("Unsupported strategy name: \(name)")
         }
