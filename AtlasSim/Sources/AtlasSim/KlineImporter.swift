@@ -28,7 +28,8 @@ public struct KlineImporter {
             }
         }
         catch {
-            print(error)
+            let message = "Error while importing chart: \(error.localizedDescription)"
+            await AtlasLogger.shared.log(message, level: .error)
         }
         return false
     }

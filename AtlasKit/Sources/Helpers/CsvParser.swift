@@ -33,7 +33,10 @@ public struct CsvParser {
                 )
             }
         } catch {
-            print(error)
+            let message = "Failed to read CSV file at \(url): \(error.localizedDescription)"
+            Task {
+                await AtlasLogger.shared.log(message, level: .error)
+            }
         }
 
         return candles

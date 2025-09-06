@@ -77,6 +77,8 @@ public struct ChartDataService {
             }
             return true
         } catch {
+            let message = "Error on chart import: \(error.localizedDescription)"
+            await AtlasLogger.shared.log(message, level: .error)
             return false
         }
     }

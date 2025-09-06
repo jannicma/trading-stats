@@ -42,7 +42,8 @@ public struct BacktestController{
                 allStrategies.append(strat)
             }
         } catch {
-            print("fuuuk, something went wrong: \(error)")
+            let message = "Failed to load strategy UUIDs: \(error.localizedDescription)"
+            await AtlasLogger.shared.log(message, level: .error)
         }
         
         self.allStrategies = allStrategies

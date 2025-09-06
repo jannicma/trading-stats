@@ -6,9 +6,10 @@
 //
 import Foundation
 import AtlasVault
+import AtlasCore
 
-public actor Logger {    
-    public static let shared = Logger()
+public actor AtlasLogger {    
+    public static let shared = AtlasLogger()
     private init () {
         do{
             fileWriter = try .init(forLogging: true)
@@ -20,7 +21,7 @@ public actor Logger {
     
     private let fileWriter: FileWriter
 
-    private var minimumLevel: LogLevel = .debug
+    private var minimumLevel: AtlasLogLevel = .debug
     private let dateFormatter: ISO8601DateFormatter = {
         let f = ISO8601DateFormatter()
         f.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -28,11 +29,11 @@ public actor Logger {
     }()
 
     // MARK: - Logging
-    func setMinimumLevel(_ level: LogLevel) {
+    func setMinimumLevel(_ level: AtlasLogLevel) {
         minimumLevel = level
     }
 
-    func log(_ message: String, level: LogLevel = .info) async {
+    public func log(_ message: String, level: AtlasLogLevel = .info) async {
         guard level >= minimumLevel else { return }
 
         let timestamp = dateFormatter.string(from: Date())

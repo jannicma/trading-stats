@@ -21,8 +21,8 @@ struct ChartDataHandler {
             charts = try await chartDataService.getAllCharts()
         }
         catch {
-            let message = "Error fetching all charts: \(error)"
-            await Logger.shared.log(message)
+            let message = "Error fetching all charts: \(error.localizedDescription)"
+            await AtlasLogger.shared.log(message, level: .error)
         }
         return charts
     }

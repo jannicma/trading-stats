@@ -6,12 +6,12 @@
 //
 
 
-public enum LogLevel: Int, Comparable {
+public enum AtlasLogLevel: Int, Comparable {
     case debug = 0
     case info = 1
     case error = 2
     
-    var label: String {
+    public var label: String {
         switch self {
         case .debug: return "DEBUG"
         case .info: return "INFO"
@@ -20,7 +20,7 @@ public enum LogLevel: Int, Comparable {
     }
     
     // Comparable conformance (so you can do level >= minLevel)
-    public static func < (lhs: LogLevel, rhs: LogLevel) -> Bool {
+    public static func < (lhs: AtlasLogLevel, rhs: AtlasLogLevel) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
 }
