@@ -20,11 +20,12 @@ public struct ChartService {
     private let indicatorsToCompute: [Indicator]
     
     public func loadAllCharts(timeframes: [Int]) async -> [Chart] {
-        var klineCharts: [Chart] = await chartDataHandler.getAllKlineCharts()
+        var baseOneMinCharts: [Chart] = await chartDataHandler.getAllKlineCharts()
+        var klineCharts: [Chart] = []
         let oneMinuteIndexes: [Int] = klineCharts.enumerated().map { $0.offset }
         
         for oneMinIndex in oneMinuteIndexes {
-            let newGeneratedTimeframeChart = generateTimeframeCharts(of: klineCharts[oneMinIndex], timeframes: timeframes)
+            let newGeneratedTimeframeChart = generateTimeframeCharts(of: baseOneMinCharts[oneMinIndex], timeframes: timeframes)
             klineCharts.append(contentsOf: newGeneratedTimeframeChart)
         }
         
