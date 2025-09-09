@@ -5,19 +5,24 @@
 //  Created by Jannic Marcon on 23.08.2025.
 //
 
-import Foundation
 import AtlasCore
+import Foundation
 
 public struct Evaluator {
-    
+
     // MARK: - Performance helpers (daily, percentage-based)
-    private struct DailyPoint { let date: Date; let equity: Double }
+    private struct DailyPoint {
+        let date: Date
+        let equity: Double
+    }
 
     private static func dailyRiskFreeRate(annualRf: Double, periodsPerYear: Double) -> Double {
         return pow(1.0 + annualRf, 1.0 / periodsPerYear) - 1.0
     }
 
-    private static func buildDailyEquity(trades: [Trade], startEquity: Double, calendar: Calendar) -> [DailyPoint] {
+    private static func buildDailyEquity(trades: [Trade], startEquity: Double, calendar: Calendar)
+        -> [DailyPoint]
+    {
         guard !trades.isEmpty else { return [] }
         var pnlByDay: [Date: Double] = [:]
         for t in trades {
@@ -30,7 +35,9 @@ public struct Evaluator {
             let day = calendar.startOfDay(for: tsDate)
             pnlByDay[day, default: 0.0] += pnl
         }
-        guard let firstDay = pnlByDay.keys.min(), let lastDay = pnlByDay.keys.max() else { return [] }
+        guard let firstDay = pnlByDay.keys.min(), let lastDay = pnlByDay.keys.max() else {
+            return []
+        }
         var out: [DailyPoint] = []
         let baselineDay = calendar.date(byAdding: .day, value: -1, to: firstDay)!
         out.append(DailyPoint(date: baselineDay, equity: startEquity))
@@ -50,7 +57,7 @@ public struct Evaluator {
         var r: [Double] = []
         r.reserveCapacity(equitySeries.count - 1)
         for i in 1..<equitySeries.count {
-            let e0 = equitySeries[i-1].equity
+            let e0 = equitySeries[i - 1].equity
             let e1 = equitySeries[i].equity
             guard e0 > 0 else { continue }
             r.append((e1 / e0) - 1.0)
@@ -58,7 +65,9 @@ public struct Evaluator {
         return r
     }
 
-    private static func sharpeFromDailyReturns(_ r: [Double], annualRf: Double, periodsPerYear: Double) -> Double {
+    private static func sharpeFromDailyReturns(
+        _ r: [Double], annualRf: Double, periodsPerYear: Double
+    ) -> Double {
         guard r.count > 1 else { return 0.0 }
         let rfDaily = Self.dailyRiskFreeRate(annualRf: annualRf, periodsPerYear: periodsPerYear)
         let excess = r.map { $0 - rfDaily }
@@ -68,7 +77,9 @@ public struct Evaluator {
         return sd > 0 ? mean / sd * sqrt(periodsPerYear) : 0.0
     }
 
-    private static func sortinoFromDailyReturns(_ r: [Double], marDaily: Double, periodsPerYear: Double) -> Double {
+    private static func sortinoFromDailyReturns(
+        _ r: [Double], marDaily: Double, periodsPerYear: Double
+    ) -> Double {
         guard r.count > 1 else { return 0.0 }
         let excess = r.map { $0 - marDaily }
         let meanExcess = excess.reduce(0.0, +) / Double(excess.count)
@@ -119,7 +130,9 @@ public struct Evaluator {
     }
 
     private static func cagr(equitySeries: [DailyPoint], calendar: Calendar) -> Double {
-        guard let first = equitySeries.first, let last = equitySeries.last, first.equity > 0 else { return 0.0 }
+        guard let first = equitySeries.first, let last = equitySeries.last, first.equity > 0 else {
+            return 0.0
+        }
         // If terminal equity is zero or negative, define CAGR as -100%
         if last.equity <= 0 { return -1.0 }
         let days = max(1, calendar.dateComponents([.day], from: first.date, to: last.date).day ?? 0)
@@ -127,23 +140,24 @@ public struct Evaluator {
         guard years > 0 else { return 0.0 }
         return pow(last.equity / first.equity, 1.0 / years) - 1.0
     }
-    
-    public static func evaluateEvaluations(evaluations: [Evaluation]){
-        for i in 0...7{
+
+    public static func evaluateEvaluations(evaluations: [Evaluation]) {
+        for i in 0...7 {
             print("Rank \(i+1): \(evaluations[i].symbol ?? "unknown")")
             Self.printEvaluation(evaluations[i])
             print("\n")
         }
     }
-    
-    
-    public static func evaluateTrades(simulatedTrades: [Trade], simFees: SimulatedFees) -> Evaluation {
+
+    public static func evaluateTrades(simulatedTrades: [Trade], simFees: SimulatedFees)
+        -> Evaluation
+    {
         // --- Inputs / constants ---
         let startEquity: Double = 100_000.0
         let periodsPerYear: Double = 365.0
         let annualRiskFree: Double = 0.0
         let calendar = Calendar.current
-        
+
         let simTrades = simulatedTrades.sorted { $0.timestamp < $1.timestamp }
 
         // --- Per-trade diagnostics kept as before ---
@@ -156,42 +170,51 @@ public struct Evaluator {
         var rrRatios: [Double] = []
 
         let tradesCount = simTrades.count
-        let wins = simTrades.filter { $0.isLong ? $0.exitPrice! > $0.entryPrice : $0.exitPrice! < $0.entryPrice}.count
-        let losses = simTrades.filter { $0.isLong ? $0.exitPrice! <= $0.entryPrice : $0.exitPrice! >= $0.entryPrice}.count
+        let wins = simTrades.filter {
+            $0.isLong ? $0.exitPrice! > $0.entryPrice : $0.exitPrice! < $0.entryPrice
+        }.count
+        let losses = simTrades.filter {
+            $0.isLong ? $0.exitPrice! <= $0.entryPrice : $0.exitPrice! >= $0.entryPrice
+        }.count
         let winRate = (Double(wins) / max(Double(tradesCount), 1)) * 100
 
-        assert(tradesCount == wins+losses, "trade wins and losses dont sum up correctly")
+        assert(tradesCount == wins + losses, "trade wins and losses dont sum up correctly")
 
         var grossProfitMoney: Double = 0
         var grossLossMoney: Double = 0
 
         var equityPoints: [EquityPoint] = []
 
-        for (tradeNumber, trade) in simTrades.enumerated(){
+        for (tradeNumber, trade) in simTrades.enumerated() {
             let slDiff = abs(trade.entryPrice - trade.slPrice)
             guard slDiff > 0, let exit = trade.exitPrice else { continue }
 
             // R-Multiple for this trade
-            let r = trade.isLong ? (exit - trade.entryPrice) / slDiff : (trade.entryPrice - exit) / slDiff
+            let r =
+                trade.isLong
+                ? (exit - trade.entryPrice) / slDiff : (trade.entryPrice - exit) / slDiff
             rMultiples.append(r)
 
-            let rawTradePnl = (trade.isLong ? (exit - trade.entryPrice) : (trade.entryPrice - exit)) * trade.volume
+            let rawTradePnl =
+                (trade.isLong ? (exit - trade.entryPrice) : (trade.entryPrice - exit))
+                * trade.volume
             let tradeFees = Self.calculateExpectedFees(for: trade, using: simFees)
             let pnl = rawTradePnl - tradeFees
             moneyReturns.append(pnl)
-            
+
             let lastEquity = equityPoints.last?.equity ?? 0.0
             let newEquityPoint = EquityPoint(step: tradeNumber, equity: lastEquity + pnl)
             equityPoints.append(newEquityPoint)
 
             if pnl > 0 { grossProfitMoney += pnl } else { grossLossMoney += abs(pnl) }
 
-            let rr = 0.0 //abs(trade.tpPrice - trade.entryPrice) / slDiff
+            let rr = 0.0  //abs(trade.tpPrice - trade.entryPrice) / slDiff
             rrRatios.append(rr)
         }
 
         // --- Build daily equity curve (includes non-trade days) ---
-        let equityDaily: [DailyPoint] = Self.buildDailyEquity(trades: simTrades, startEquity: startEquity, calendar: calendar)
+        let equityDaily: [DailyPoint] = Self.buildDailyEquity(
+            trades: simTrades, startEquity: startEquity, calendar: calendar)
         let returnsDaily: [Double] = Self.dailyReturns(from: equityDaily)
 
         // --- Expectancy (money/trade) unchanged ---
@@ -202,8 +225,10 @@ public struct Evaluator {
         let expectancyMoney = nM > 0 ? moneyReturns.reduce(0, +) / Double(nM) : 0.0
 
         // --- Risk-adjusted metrics on DAILY RETURNS ---
-        let sharpe = Self.sharpeFromDailyReturns(returnsDaily, annualRf: annualRiskFree, periodsPerYear: periodsPerYear)
-        let sortino = Self.sortinoFromDailyReturns(returnsDaily, marDaily: 0.0, periodsPerYear: periodsPerYear)
+        let sharpe = Self.sharpeFromDailyReturns(
+            returnsDaily, annualRf: annualRiskFree, periodsPerYear: periodsPerYear)
+        let sortino = Self.sortinoFromDailyReturns(
+            returnsDaily, marDaily: 0.0, periodsPerYear: periodsPerYear)
 
         // Profit factor unchanged (money-based)
         let profitFactor = grossLossMoney > 0 ? grossProfitMoney / grossLossMoney : 0.0
@@ -215,7 +240,9 @@ public struct Evaluator {
         var equityVariance: Double = 0.0
         if equityDaily.count > 1 {
             let meanEq = equityDaily.map { $0.equity }.reduce(0.0, +) / Double(equityDaily.count)
-            let varEq = equityDaily.reduce(0.0) { $0 + pow($1.equity - meanEq, 2) } / Double(equityDaily.count - 1)
+            let varEq =
+                equityDaily.reduce(0.0) { $0 + pow($1.equity - meanEq, 2) }
+                / Double(equityDaily.count - 1)
             equityVariance = varEq
         }
 
@@ -232,7 +259,7 @@ public struct Evaluator {
         let cagrVal = Self.cagr(equitySeries: equityDaily, calendar: calendar)
         let calmarRatio = mddPct > 0 ? cagrVal / mddPct : 0.0
         let recoveryFactor = mddMoney > 0 ? netMoney / mddMoney : 0.0
-        
+
         let evaluation = Evaluation(
             trades: tradesCount,
             wins: wins,
@@ -255,32 +282,32 @@ public struct Evaluator {
 
         return evaluation
     }
-    
-    
-    private static func calculateExpectedFees(for trade: Trade, using feeStructure: SimulatedFees) -> Double {
+
+    private static func calculateExpectedFees(for trade: Trade, using feeStructure: SimulatedFees)
+        -> Double
+    {
         var feeMoney: Double = 0
-        
+
         let moneyAtEntry = trade.entryPrice * trade.volume
         let moneyAtExit = trade.exitPrice! * trade.volume
-        
+
         switch trade.entryMode {
         case .Limit:
             feeMoney += feeStructure.makerFee * moneyAtEntry
         case .Market:
             feeMoney += feeStructure.takerFee * moneyAtEntry
         }
-        
+
         switch trade.exitMode! {
         case .Limit:
             feeMoney += feeStructure.makerFee * moneyAtExit
         case .Market:
             feeMoney += feeStructure.takerFee * moneyAtExit
         }
-        
+
         return feeMoney
     }
-    
-    
+
     private static func printEvaluation(_ evaluation: Evaluation) {
         print("Chart: \(evaluation.symbol ?? "No Symbol")")
         print("Timeframe: \(evaluation.timeframe ?? 0)")
