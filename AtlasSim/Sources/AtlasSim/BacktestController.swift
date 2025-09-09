@@ -94,26 +94,26 @@ public struct BacktestController {
         var allEvaluations: [Evaluation] = []
 
         // start test
-
-        for chart in charts {
-            let executor = BacktestExecutor()
-            for (i, _) in chart.enumerated() {
-                let knownChart = chart[max(0, i - 50)...i]
-                executor.updateLimits(kline: chart[i].kline)
-                let orders = executor.getOrders()
-                let positions = executor.getPositions()
-                let actions = strategy.onCandle(knownChart, orders: orders, positions: positions)
-
-                if let actions {
-                    executor.execute(actions: actions)
+        /*
+                for chart in charts {
+                    let executor = BacktestExecutor()
+                    for (i, _) in chart.enumerated() {
+                        let knownChart = chart[max(0, i - 50)...i]
+                        executor.updateLimits(kline: chart[i].kline)
+                        let orders = executor.getOrders()
+                        let positions = executor.getPositions()
+                        let actions = strategy.onCandle(knownChart, orders: orders, positions: positions)
+        
+                        if let actions {
+                            executor.execute(actions: actions)
+                        }
+                    }
+        
+                    let finishedTrades = executor.getAllClosedPositions()
+                    let evaluation = evaluator.evaluate(trades: finishedTrades)
+                    allEvaluatios.append(evaluation)
                 }
-            }
-
-            let finishedTrades = executor.getAllClosedPositions()
-            let evaluation = evaluator.evaluate(trades: finishedTrades)
-            allEvaluatios.append(evaluation)
-        }
-
+        */
         // end test
 
         for batch in batches {
