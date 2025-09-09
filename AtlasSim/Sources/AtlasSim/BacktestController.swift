@@ -104,7 +104,7 @@ public struct BacktestController {
                         let positions = executor.getPositions()
                         let actions = strategy.onCandle(knownChart, orders: orders, positions: positions)
         
-                        if let actions {
+                        if actions.count > 0 {
                             executor.execute(actions: actions)
                         }
                     }
