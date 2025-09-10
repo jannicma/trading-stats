@@ -23,7 +23,7 @@ public struct Candle: Codable, Sendable {
     public var volume: Double
     
     public func hasValidRange() -> Bool {
-        return high - low > 0 
+        return high - low > 0
     }
 }
 
@@ -41,4 +41,14 @@ public struct Chart: Sendable {
     public let timeframe: Int
     public let candles: [Candle]
     public var indicators: [String: [Double]]
+    
+    public subscript(range: Range<Int>) -> Chart {
+        let clampedRange = range.clamped(to: 0..<candles.count)
+        let slicedCandles = Array(candles[clampedRange])
+        var slicedIndicators: [String: [Double]] = [:]
+        for (key, values) in indicators {
+            slicedIndicators[key] = Array(values[clampedRange])
+        }
+        return Chart(name: name, timeframe: timeframe, candles: slicedCandles, indicators: slicedIndicators)
+    }
 }

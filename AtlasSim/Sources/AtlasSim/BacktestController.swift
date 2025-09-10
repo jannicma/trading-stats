@@ -95,7 +95,7 @@ public struct BacktestController {
             for _ in 0..<min(convurrencyCores, parameterSets.count) {
                 if let (_, job) = pendingRuns.next() {
                     group.addTask {
-                        return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: job.chart, paramSet: job.settings)
+                        return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: job.chart, paramSet: job.settings, backtestSettings: backtestSettings)
                     }
                 }
             }
@@ -104,7 +104,7 @@ public struct BacktestController {
                 allEvaluations.append(eval)
                 if let (_, nextJob) = pendingRuns.next() {
                     group.addTask {
-                        return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: nextJob.chart, paramSet: nextJob.settings)
+                        return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: nextJob.chart, paramSet: nextJob.settings, backtestSettings: backtestSettings)
                     }
                 }
             }
@@ -127,9 +127,20 @@ public struct BacktestController {
         return allEvaluations.count
     }
     
-    private static func makeBacktestRun(strategy: any Strategy, chart: Chart, paramSet: ParameterSet) async -> Evaluation {
-        //some stateless functions
-        var trades = strategy.backtest(chart: chart, paramSet: paramSet)
-        // ...
+    private static func makeBacktestRun(strategy: any Strategy, chart: Chart, paramSet: ParameterSet, backtestSettings: BacktestSettings) async -> Evaluation {
+        var executor = BacktestExecutor()
+        
+        for i in 0..<chart.candles.count {
+            let subChart = chart[i-50..<i+1]
+            let currCandle = chart.candles[i]
+            let openOrders = executor.getOpenOrders()
+            let openPositions = executor.getOpenPositions()
+            let actions = strategy.onCandle(subChart, orders: openOrders, positions: openPositions, paramSet: paramSet)
+            executor.submit(actions, marketPrice: currCandle.close, time: currCandle.time)
+        }
+        
+        let closedPositions = executor.getAllClosedPositions()
+        
+        Evaluator.evaluatePositions(closedPositions, fees: backtestSettings.fees)
     }
 }

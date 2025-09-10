@@ -1,9 +1,9 @@
 import AtlasCore
 import Foundation
 
-struct BacktestExecutor: Executor {
-    private var openOrders: [Order]
-    private var allPositions: [Position]
+internal struct BacktestExecutor: Executor {
+    private var openOrders: [Order] = []
+    private var allPositions: [Position] = []
     
     public mutating func submit(_ actions: [TradeAction], marketPrice: Double?, time: Int?){
         for action in actions {
