@@ -33,4 +33,8 @@ public struct Position {
         self.exitType = exitType
         self.exitReason = exitReason
     }
+    
+    public var isLong: Bool {
+        return side == .long
+    }
 }

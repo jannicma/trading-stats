@@ -20,16 +20,16 @@ public struct Evaluator {
         return pow(1.0 + annualRf, 1.0 / periodsPerYear) - 1.0
     }
 
-    private static func buildDailyEquity(trades: [Trade], startEquity: Double, calendar: Calendar)
+    private static func buildDailyEquity(trades: [Position], startEquity: Double, calendar: Calendar)
         -> [DailyPoint]
     {
         guard !trades.isEmpty else { return [] }
         var pnlByDay: [Date: Double] = [:]
         for t in trades {
             guard let exit = t.exitPrice else { continue }
-            let pnl = (t.isLong ? (exit - t.entryPrice) : (t.entryPrice - exit)) * t.volume
+            let pnl = (t.isLong ? (exit - t.entryPrice) : (t.entryPrice - exit)) * t.quantity
             // Convert Int unix timestamp (seconds or milliseconds) to Date
-            let rawTs = t.timestamp
+            let rawTs = t.entryTime
             let seconds = rawTs > 1_000_000_000_000 ? Double(rawTs) / 1000.0 : Double(rawTs)
             let tsDate = Date(timeIntervalSince1970: seconds)
             let day = calendar.startOfDay(for: tsDate)
@@ -149,7 +149,7 @@ public struct Evaluator {
         }
     }
 
-    public static func evaluateTrades(simulatedTrades: [Trade], simFees: SimulatedFees)
+    public static func evaluatePositions(_ positions: [Position], simFees: SimulatedFees)
         -> Evaluation
     {
         // --- Inputs / constants ---
@@ -158,22 +158,22 @@ public struct Evaluator {
         let annualRiskFree: Double = 0.0
         let calendar = Calendar.current
 
-        let simTrades = simulatedTrades.sorted { $0.timestamp < $1.timestamp }
+        let trades = positions.sorted { $0.entryTime < $1.entryTime }
 
         // --- Per-trade diagnostics kept as before ---
         var rMultiples: [Double] = []
-        rMultiples.reserveCapacity(simTrades.count)
+        rMultiples.reserveCapacity(trades.count)
 
         var moneyReturns: [Double] = []
-        moneyReturns.reserveCapacity(simTrades.count)
+        moneyReturns.reserveCapacity(trades.count)
 
         var rrRatios: [Double] = []
 
-        let tradesCount = simTrades.count
-        let wins = simTrades.filter {
+        let tradesCount = trades.count
+        let wins = trades.filter {
             $0.isLong ? $0.exitPrice! > $0.entryPrice : $0.exitPrice! < $0.entryPrice
         }.count
-        let losses = simTrades.filter {
+        let losses = trades.filter {
             $0.isLong ? $0.exitPrice! <= $0.entryPrice : $0.exitPrice! >= $0.entryPrice
         }.count
         let winRate = (Double(wins) / max(Double(tradesCount), 1)) * 100
@@ -185,19 +185,20 @@ public struct Evaluator {
 
         var equityPoints: [EquityPoint] = []
 
-        for (tradeNumber, trade) in simTrades.enumerated() {
-            let slDiff = abs(trade.entryPrice - trade.slPrice)
-            guard slDiff > 0, let exit = trade.exitPrice else { continue }
+        for (tradeNumber, trade) in trades.enumerated() {
+            let slDiff = abs(trade.entryPrice - (trade.sl ?? 0.0))
+            guard let exit = trade.exitPrice else { continue }
 
             // R-Multiple for this trade
-            let r =
-                trade.isLong
-                ? (exit - trade.entryPrice) / slDiff : (trade.entryPrice - exit) / slDiff
+            var r = 0.0
+            if slDiff > 0 {
+                r = trade.isLong ? (exit - trade.entryPrice) / slDiff : (trade.entryPrice - exit) / slDiff
+            }
             rMultiples.append(r)
 
             let rawTradePnl =
                 (trade.isLong ? (exit - trade.entryPrice) : (trade.entryPrice - exit))
-                * trade.volume
+                * trade.quantity
             let tradeFees = Self.calculateExpectedFees(for: trade, using: simFees)
             let pnl = rawTradePnl - tradeFees
             moneyReturns.append(pnl)
@@ -208,13 +209,16 @@ public struct Evaluator {
 
             if pnl > 0 { grossProfitMoney += pnl } else { grossLossMoney += abs(pnl) }
 
-            let rr = 0.0  //abs(trade.tpPrice - trade.entryPrice) / slDiff
+            var rr = 0.0
+            if let tp = trade.tp, slDiff > 0{
+                rr = abs(tp - trade.entryPrice) / slDiff
+            }
             rrRatios.append(rr)
         }
 
         // --- Build daily equity curve (includes non-trade days) ---
         let equityDaily: [DailyPoint] = Self.buildDailyEquity(
-            trades: simTrades, startEquity: startEquity, calendar: calendar)
+            trades: trades, startEquity: startEquity, calendar: calendar)
         let returnsDaily: [Double] = Self.dailyReturns(from: equityDaily)
 
         // --- Expectancy (money/trade) unchanged ---
@@ -283,25 +287,25 @@ public struct Evaluator {
         return evaluation
     }
 
-    private static func calculateExpectedFees(for trade: Trade, using feeStructure: SimulatedFees)
+    private static func calculateExpectedFees(for trade: Position, using feeStructure: SimulatedFees)
         -> Double
     {
         var feeMoney: Double = 0
 
-        let moneyAtEntry = trade.entryPrice * trade.volume
-        let moneyAtExit = trade.exitPrice! * trade.volume
+        let moneyAtEntry = trade.entryPrice * trade.quantity
+        let moneyAtExit = trade.exitPrice! * trade.quantity
 
-        switch trade.entryMode {
-        case .Limit:
+        switch trade.entryType {
+        case .maker:
             feeMoney += feeStructure.makerFee * moneyAtEntry
-        case .Market:
+        case .taker:
             feeMoney += feeStructure.takerFee * moneyAtEntry
         }
 
-        switch trade.exitMode! {
-        case .Limit:
+        switch trade.exitType! {
+        case .maker:
             feeMoney += feeStructure.makerFee * moneyAtExit
-        case .Market:
+        case .taker:
             feeMoney += feeStructure.takerFee * moneyAtExit
         }
 

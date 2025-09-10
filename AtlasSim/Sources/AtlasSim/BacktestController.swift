@@ -140,7 +140,10 @@ public struct BacktestController {
         }
         
         let closedPositions = executor.getAllClosedPositions()
-        
-        Evaluator.evaluatePositions(closedPositions, fees: backtestSettings.fees)
+        var eval = Evaluator.evaluatePositions(closedPositions, simFees: backtestSettings.fees)
+        eval.timeframe = chart.timeframe
+        eval.symbol = chart.name
+        eval.paramSet = paramSet
+        return eval
     }
 }
