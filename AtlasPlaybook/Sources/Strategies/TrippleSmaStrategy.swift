@@ -34,95 +34,45 @@ public struct TrippleEmaStrategy: Strategy {
     }
 
     
-    public func backtest(chart: Chart, paramSet: ParameterSet) -> [Trade] {
+    public func onCandle(_ chart: Chart, orders: [Order], positions: [Position], paramSet: ParameterSet) -> [TradeAction] {
         let tpMult = paramSet.parameters.filter{$0.name == "tpAtrMult"}.first!.value
         let slMult = paramSet.parameters.filter{$0.name == "slAtrMult"}.first!.value
-        let tradeManager = TradeManager()
-        
-        var trade: UUID?
+        var actions: [TradeAction] = []
 
         for i in 1..<chart.candles.count-1 {
             let currCandle = chart.candles[i]
             
-            if !isCorrectOrder(index: i-1, indicators: chart.indicators) && isCorrectOrder(index: i, indicators: chart.indicators)  && trade == nil {
+            if !isCorrectOrder(index: i-1, indicators: chart.indicators) && isCorrectOrder(index: i, indicators: chart.indicators)  && positions.count == 0 {
                 //this is the entry logic. All EMA/SMA crossed into the right order.
                 let atr = chart.indicators["ATR14"]![i]
-                trade = createTrade(with: tradeManager, candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult)
+                
+                let action = createTrade(candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult)
+                actions.append(action)
             }
-            
-            if trade != nil {
-                //exit check!
-                let isExit = checkForExit(tradeId: trade!, candle: currCandle, manager: tradeManager)
-                if isExit { trade = nil }
-            }
+            //Exits will be handled by TP and SL  //TODO: remove comment
         }
         
-        return tradeManager.finishBacktest()
+        return actions
     }
     
-    
-    private func checkForExit(tradeId: UUID, candle: Candle, manager: TradeManager) -> Bool {
-        let high = candle.high
-        let low = candle.low
-        let trade = manager.get(tradeId)
-        
-        guard let tpPrice = trade.tpPrice else {
-            print("TP Price not set!")
-            return false
-        }
-        
-        let isLong = trade.entryPrice > trade.slPrice
-        
-        var isExit = false
-        var closePrice = 0.0
-        
-        //calculate exit prices (when long, low below SL price, ...)
-        if isLong{
-            if low <= trade.slPrice{
-                closePrice = trade.slPrice
-                isExit = true
-            }
-            if high >= tpPrice{
-                closePrice = tpPrice
-                isExit = true
-            }
-        }
-        else{
-            if high >= trade.slPrice{
-                closePrice = trade.slPrice
-                isExit = true
-            }
-            if low <= tpPrice{
-                closePrice = tpPrice
-                isExit = true
-            }
-        }
-        
-        if isExit{
-            _ = manager.exit(tradeId, close: closePrice)
-        }
-        
-        return isExit
-    }
-    
-    
-    private func createTrade(with manager: TradeManager, candle: Candle, atr: Double, tpMult: Double, slMult: Double) -> UUID {
-        var trade: UUID
+    private func createTrade(candle: Candle, atr: Double, tpMult: Double, slMult: Double) -> TradeAction {
         assert(atr > 0)
         var entry, slPrice, tpPrice: Double
+        var side: Side
         entry = candle.close
 
         if isBull(candle) {
+            side = .long
             slPrice = entry - (slMult * atr)
             tpPrice = entry + (tpMult * atr)
         } else {
+            side = .short
             slPrice = entry + (slMult * atr)
             tpPrice = entry - (tpMult * atr)
         }
-        let volume = manager.computeVolume(slDistance: abs(entry - slPrice))
-        trade = manager.enter(time: candle.time, open: entry, volume: volume, sl: slPrice, tp: tpPrice, atr: atr)
-
-        return trade
+        let volume = OrderHelper.computeVolume(slDistance: abs(entry - slPrice), startBalance: 100_000, riskPerTradePercentage: 0.02)
+        let order = Order(id: UUID(), symbol: "", side: side, type: .market, quantity: volume, sl: slPrice, tp: tpPrice, entryType: .taker)
+        return TradeAction.open(order: order)
     }
     
     

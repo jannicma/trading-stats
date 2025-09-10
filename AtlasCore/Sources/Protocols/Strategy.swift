@@ -7,7 +7,6 @@
 
 public protocol Strategy: Sendable, Codable, Identifiable, Hashable {
     var name: String { get }
-    func backtest(chart: Chart, paramSet: ParameterSet) -> [Trade] //TODO: remove
     func getRequiredParameters() -> [ParameterRequirements]
     func getRequiredIndicators() -> [Indicator]
     
