@@ -86,60 +86,30 @@ public struct BacktestController {
                 parameterSets.append((chart, setting))
             }
         }
-
-        let batchSize = 50
-        let batches = parameterSets.chunked(into: batchSize)
-
-        var batchIndex = 0
+        
         var allEvaluations: [Evaluation] = []
-
-        // start test
-        /*
-                for chart in charts {
-                    let executor = BacktestExecutor()
-                    for (i, _) in chart.enumerated() {
-                        let knownChart = chart[max(0, i - 50)...i]
-                        executor.updateLimits(kline: chart[i].kline)
-                        let orders = executor.getOrders()
-                        let positions = executor.getPositions()
-                        let actions = strategy.onCandle(knownChart, orders: orders, positions: positions)
+        var pendingRuns = parameterSets.enumerated().makeIterator()
+        let convurrencyCores = OsHelpers.defaultConcurrencyCores()
         
-                        if actions.count > 0 {
-                            executor.execute(actions: actions)
-                        }
-                    }
-        
-                    let finishedTrades = executor.getAllClosedPositions()
-                    let evaluation = evaluator.evaluate(trades: finishedTrades)
-                    allEvaluatios.append(evaluation)
-                }
-        */
-        // end test
-
-        for batch in batches {
-            batchIndex += 1
-            await withTaskGroup(of: Evaluation.self) { group in
-                for (chart, setting) in batch {
+        await withTaskGroup(of: Evaluation.self) { group in
+            for _ in 0..<min(convurrencyCores, parameterSets.count) {
+                if let (_, job) = pendingRuns.next() {
                     group.addTask {
-                        let trades = backtestingStrat.backtest(chart: chart, paramSet: setting)
-                        var eval = Evaluator.evaluateTrades(
-                            simulatedTrades: trades, simFees: backtestSettings.fees)
-                        eval.paramSet = setting
-                        eval.timeframe = chart.timeframe
-                        eval.symbol = chart.name
-
-                        return eval
+                        return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: job.chart, paramSet: job.settings)
                     }
-                }
-
-                for await eval in group {
-                    allEvaluations.append(eval)
                 }
             }
-            print("batch \(batchIndex)/\(batches.count) done")
+            
+            while let eval = await group.next() {
+                allEvaluations.append(eval)
+                if let (_, nextJob) = pendingRuns.next() {
+                    group.addTask {
+                        return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: nextJob.chart, paramSet: nextJob.settings)
+                    }
+                }
+            }
         }
-        print()
-
+        
         if allEvaluations.count < 10 {
             print("Not enough evaluations found, quitting...")
             return allEvaluations.count
@@ -155,5 +125,11 @@ public struct BacktestController {
             allEvaluations, strategy: backtestingStrat.id as! UUID)
 
         return allEvaluations.count
+    }
+    
+    private static func makeBacktestRun(strategy: any Strategy, chart: Chart, paramSet: ParameterSet) async -> Evaluation {
+        //some stateless functions
+        var trades = strategy.backtest(chart: chart, paramSet: paramSet)
+        // ...
     }
 }

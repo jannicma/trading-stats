@@ -15,7 +15,7 @@ struct BacktestExecutor: Executor {
             case .modifyOrder(orderId: let id, update: let update):
                 submitHandleModifyOrder(orderId: id, update: update)
             case .close(positionId: let id):
-                submitHandleClosePosition(orderId: id, marketPrice: marketPrice!, time: time!)
+                submitHandleClosePosition(positionId: id, marketPrice: marketPrice!, time: time!)
             case .modifyPosition(positionId: let id, update: let update):
                 submitHandleModifyPosition(positionId: id, update: update)
             }
@@ -23,9 +23,13 @@ struct BacktestExecutor: Executor {
     }
     
     public mutating func simulatePositionUpdates(candle: Candle) {
+        var idsEntered: [UUID] = []
         for (idx, order) in openOrders.enumerated() {
-            simulateEntry(idx: idx, order: order, candle: candle)
+            if simulateEntry(idx: idx, order: order, candle: candle){
+                idsEntered.append(order.id)
+            }
         }
+        openOrders.removeAll(where: {idsEntered.contains($0.id)})
         
         for (idx, pos) in allPositions.filter({$0.open}).enumerated() {
             simulateExits(idx: idx, position: pos, candle: candle)
@@ -46,7 +50,7 @@ struct BacktestExecutor: Executor {
     
     private mutating func submitHandleOpen(order: Order, marketPrice: Double, time: Int){
         switch order.type {
-        case .limit(let price):
+        case .limit(_):
             openOrders.append(order)
         case .market:
             let newPosition = Position(id: UUID(), symbol: order.symbol, side: order.side, entryPrice: marketPrice, entryTime: time, entryType: .taker, sl: order.sl, tp: order.tp, quantity: order.quantity, open: true)
@@ -72,8 +76,8 @@ struct BacktestExecutor: Executor {
         }
     }
     
-    private mutating func submitHandleClosePosition(orderId: UUID, marketPrice: Double, time: Int){
-        if let idx = allPositions.firstIndex(where: {$0.id == orderId}) {
+    private mutating func submitHandleClosePosition(positionId: UUID, marketPrice: Double, time: Int){
+        if let idx = allPositions.firstIndex(where: {$0.id == positionId}) {
             allPositions[idx].exitPrice = marketPrice
             allPositions[idx].exitTime = time
             allPositions[idx].exitType = .taker
@@ -93,7 +97,7 @@ struct BacktestExecutor: Executor {
         }
     }
     
-    private mutating func simulateEntry(idx: Int, order: Order, candle: Candle){
+    private mutating func simulateEntry(idx: Int, order: Order, candle: Candle) -> Bool {
         switch order.type {
         case .market:
             assert(false, "Market order in orders")
@@ -110,9 +114,10 @@ struct BacktestExecutor: Executor {
             if isFilled {
                 let position = Position(id: UUID(), symbol: order.symbol, side: order.side, entryPrice: price, entryTime: candle.time, entryType: order.entryType, sl: order.sl, tp: order.tp, quantity: order.quantity, open: true)
                 allPositions.append(position)
-                openOrders.remove(at: idx)
+                return true
             }
         }
+        return false
     }
     
     private mutating func simulateExits(idx: Int, position: Position, candle: Candle) {
