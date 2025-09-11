@@ -9,10 +9,12 @@ public protocol Strategy: Sendable, Codable, Identifiable, Hashable {
     var name: String { get }
     func getRequiredParameters() -> [ParameterRequirements]
     func getRequiredIndicators() -> [Indicator]
-    
-    func onCandle(_ chart: Chart,
-                  orders: [Order],
-                  positions: [Position],
-                  paramSet: ParameterSet ) -> [TradeAction]
+
+    func onCandle(
+        _ chart: Chart,
+        orders: [Order],
+        positions: [Position],
+        paramSet: ParameterSet
+    ) -> [TradeAction]
 
 }
