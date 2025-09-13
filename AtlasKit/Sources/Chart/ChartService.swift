@@ -22,7 +22,7 @@ public struct ChartService {
     public func loadAllCharts(timeframes: [Int]) async -> [Chart] {
         var baseOneMinCharts: [Chart] = await chartDataHandler.getAllKlineCharts()
         var klineCharts: [Chart] = []
-        let oneMinuteIndexes: [Int] = klineCharts.enumerated().map { $0.offset }
+        let oneMinuteIndexes: [Int] = baseOneMinCharts.indices.map { $0 }
         
         for oneMinIndex in oneMinuteIndexes {
             let newGeneratedTimeframeChart = generateTimeframeCharts(of: baseOneMinCharts[oneMinIndex], timeframes: timeframes)

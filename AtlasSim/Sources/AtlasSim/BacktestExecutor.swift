@@ -3,7 +3,8 @@ import Foundation
 
 internal struct BacktestExecutor: Executor {
     private var openOrders: [Order] = []
-    private var allPositions: [Position] = []
+    private var closedPositions: [Position] = []
+    private var openPositions: [Position] = []
     
     public mutating func submit(_ actions: [TradeAction], marketPrice: Double?, time: Int?){
         for action in actions {
@@ -24,14 +25,14 @@ internal struct BacktestExecutor: Executor {
     
     public mutating func simulatePositionUpdates(candle: Candle) {
         var idsEntered: [UUID] = []
-        for (idx, order) in openOrders.enumerated() {
+        for (idx, order) in openOrders.enumerated().reversed() {
             if simulateEntry(idx: idx, order: order, candle: candle){
                 idsEntered.append(order.id)
             }
         }
         openOrders.removeAll(where: {idsEntered.contains($0.id)})
         
-        for (idx, pos) in allPositions.filter({$0.open}).enumerated() {
+        for (idx, pos) in openPositions.enumerated().reversed() {
             simulateExits(idx: idx, position: pos, candle: candle)
         }
     }
@@ -41,11 +42,11 @@ internal struct BacktestExecutor: Executor {
     }
     
     public func getOpenPositions() -> [Position] {
-        return allPositions.filter{$0.open}
+        return openPositions
     }
     
     public func getAllClosedPositions() -> [Position] {
-        return allPositions.filter{$0.open == false}
+        return closedPositions
     }
     
     private mutating func submitHandleOpen(order: Order, marketPrice: Double, time: Int){
@@ -54,7 +55,7 @@ internal struct BacktestExecutor: Executor {
             openOrders.append(order)
         case .market:
             let newPosition = Position(id: UUID(), symbol: order.symbol, side: order.side, entryPrice: marketPrice, entryTime: time, entryType: .taker, sl: order.sl, tp: order.tp, quantity: order.quantity, open: true)
-            allPositions.append(newPosition)
+            openPositions.append(newPosition)
         }
     }
     
@@ -76,22 +77,28 @@ internal struct BacktestExecutor: Executor {
         }
     }
     
-    private mutating func submitHandleClosePosition(positionId: UUID, marketPrice: Double, time: Int){
-        if let idx = allPositions.firstIndex(where: {$0.id == positionId}) {
-            allPositions[idx].exitPrice = marketPrice
-            allPositions[idx].exitTime = time
-            allPositions[idx].exitType = .taker
-            allPositions[idx].exitReason = .manual
-            allPositions[idx].open = false
+    private mutating func submitHandleClosePosition(positionId: UUID, marketPrice: Double, time: Int) {
+        if let idx = openPositions.firstIndex(where: {$0.id == positionId}) {
+            var position = openPositions.remove(at: idx)
+            position.exitPrice = marketPrice
+            position.exitTime = time
+            position.exitType = .taker
+            position.exitReason = .manual
+            position.open = false
+            closedPositions.append(position)
         } else {
             assert(false, "Position not found")
         }
     }
     
     private mutating func submitHandleModifyPosition(positionId: UUID, update: PositionUpdate){
-        if let idx = allPositions.firstIndex(where: {$0.id == positionId}) {
-            allPositions[idx].sl = update.newSL ?? allPositions[idx].sl
-            allPositions[idx].tp = update.newTP ?? allPositions[idx].tp
+        if let idx = openPositions.firstIndex(where: {$0.id == positionId}) {
+            if let newSL = update.newSL{
+                openPositions[idx].sl = newSL
+            }
+            if let newTP = update.newTP{
+                openPositions[idx].tp = newTP
+            }
         } else {
             assert(false , "Position not found")
         }
@@ -113,7 +120,7 @@ internal struct BacktestExecutor: Executor {
             
             if isFilled {
                 let position = Position(id: UUID(), symbol: order.symbol, side: order.side, entryPrice: price, entryTime: candle.time, entryType: order.entryType, sl: order.sl, tp: order.tp, quantity: order.quantity, open: true)
-                allPositions.append(position)
+                openPositions.append(position)
                 return true
             }
         }
@@ -145,11 +152,13 @@ internal struct BacktestExecutor: Executor {
         }
         
         if let exitPrice {
-            allPositions[idx].exitPrice = exitPrice
-            allPositions[idx].exitTime = candle.time
-            allPositions[idx].exitType = .taker
-            allPositions[idx].exitReason = exitReason
-            allPositions[idx].open = false
+            var closedPosition = openPositions.remove(at: idx)
+            closedPosition.exitPrice = exitPrice
+            closedPosition.exitTime = candle.time
+            closedPosition.exitType = .taker
+            closedPosition.exitReason = exitReason
+            closedPosition.open = false
+            closedPositions.append(closedPosition)
         }
     }
 }

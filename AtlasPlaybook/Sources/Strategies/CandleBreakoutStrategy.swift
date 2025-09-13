@@ -37,7 +37,7 @@ public struct CandleBreakoutStrategy: Strategy {
             .value
 
         var actions: [TradeAction] = []
-        let idx: Int = chart.candles.count - 1
+        let idx: Int = chart.candles.indices.last ?? 0
         let candle: Candle = chart.candles[idx]
 
         if idx < max(Int(entryLookback), Int(exitLookback)) { return [] }

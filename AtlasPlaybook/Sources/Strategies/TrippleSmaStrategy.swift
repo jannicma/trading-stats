@@ -38,24 +38,23 @@ public struct TrippleEmaStrategy: Strategy {
     ) -> [TradeAction] {
         let tpMult = paramSet.parameters.filter { $0.name == "tpAtrMult" }.first!.value
         let slMult = paramSet.parameters.filter { $0.name == "slAtrMult" }.first!.value
-        let lastIndex: Int = chart.candles.endIndex - 1
+        let lastIndex: Int = chart.candles.indices.last ?? 0
         let currCandle = chart.candles[lastIndex]
         var actions: [TradeAction] = []
 
         if !isCorrectOrder(index: lastIndex - 1, indicators: chart.indicators)
-            && isCorrectOrder(index: lastIndex, indicators: chart.indicators)
-            && positions.count == 0
+            && isCorrectOrder(index: lastIndex, indicators: chart.indicators) && positions.count == 0
         {
             //this is the entry logic. All EMA/SMA crossed into the right order.
             let atr = chart.indicators["ATR14"]![lastIndex]
-            let action = createTrade(candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult)
+            let action = createTrade(candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult, symbol: chart.name)
             actions.append(action)
         }
         //Exits will be handled by TP and SL  //TODO: remove comment
         return actions
     }
 
-    private func createTrade(candle: Candle, atr: Double, tpMult: Double, slMult: Double)
+    private func createTrade(candle: Candle, atr: Double, tpMult: Double, slMult: Double, symbol: String)
         -> TradeAction
     {
         assert(atr > 0)
@@ -77,7 +76,7 @@ public struct TrippleEmaStrategy: Strategy {
         let volume = OrderHelper.computeVolume(
             slDistance: abs(entry - slPrice), startBalance: 100_000, riskPerTradePercentage: 0.02)
         let order = Order(
-            id: UUID(), symbol: "", side: side, type: .market, quantity: volume, sl: slPrice,
+            id: UUID(), symbol: symbol, side: side, type: .market, quantity: volume, sl: slPrice,
             tp: tpPrice, entryType: .taker)
         return TradeAction.open(order: order)
     }

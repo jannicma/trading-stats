@@ -59,7 +59,7 @@ public struct StochRsiStrategy: Strategy {
         let shortCondition = TradeConditions(
             rsiThreashold: 100 - rsiThreasholdParam, rsiLimit: rsiLimitParam,
             stochThreashold: 100 - stochThreasholdParam)
-        let lastIndex = chart.candles.count - 1
+        let lastIndex = chart.candles.indices.last ?? 0
         var actions: [TradeAction] = []
 
         let close = chart.candles[lastIndex].close
@@ -73,7 +73,6 @@ public struct StochRsiStrategy: Strategy {
                 side: direction, rsi: rsiValue, stoch: stochValue, conditions: currentCondition)
         {
             let atr = chart.indicators[atrIndicator.name]![lastIndex]
-            let time = chart.candles[lastIndex].time
             let sl = close + ((2 * atr) * (direction == .long ? -1 : 1))
             let tp = close + ((30 * atr) * (direction == .long ? 1 : -1))
             let volume = OrderHelper.computeVolume(

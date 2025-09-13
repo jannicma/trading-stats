@@ -12,7 +12,7 @@ public enum OsHelpers {
         var n: Int32 = 0
         var size = MemoryLayout<Int32>.size
         if sysctlbyname("hw.perflevel0.physicalcpu", &n, &size, nil, 0) == 0, n > 0 {
-            return Int(n)
+            //return Int(n)
         }
         // Otherwise, use activeProcessorCount but leave one core free for OS/UI.
         return max(1, ProcessInfo.processInfo.activeProcessorCount - 1)

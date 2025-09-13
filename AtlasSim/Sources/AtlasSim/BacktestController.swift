@@ -89,10 +89,11 @@ public struct BacktestController {
         
         var allEvaluations: [Evaluation] = []
         var pendingRuns = parameterSets.enumerated().makeIterator()
-        let convurrencyCores = OsHelpers.defaultConcurrencyCores()
+        let concurrencyCores = OsHelpers.defaultConcurrencyCores()
+        var lastPercentagePrinted: Int? = nil
         
         await withTaskGroup(of: Evaluation.self) { group in
-            for _ in 0..<min(convurrencyCores, parameterSets.count) {
+            for _ in 0..<min(concurrencyCores, parameterSets.count) {
                 if let (_, job) = pendingRuns.next() {
                     group.addTask {
                         return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: job.chart, paramSet: job.settings, backtestSettings: backtestSettings)
@@ -102,6 +103,12 @@ public struct BacktestController {
             
             while let eval = await group.next() {
                 allEvaluations.append(eval)
+                let percentageFinished = 100 / parameterSets.count * allEvaluations.count
+                if percentageFinished % 5 == 0 && percentageFinished != lastPercentagePrinted{
+                    lastPercentagePrinted = percentageFinished
+                    print("\(percentageFinished)% finished")
+                }
+                
                 if let (_, nextJob) = pendingRuns.next() {
                     group.addTask {
                         return await BacktestController.makeBacktestRun(strategy: backtestingStrat, chart: nextJob.chart, paramSet: nextJob.settings, backtestSettings: backtestSettings)
@@ -129,10 +136,14 @@ public struct BacktestController {
     
     private static func makeBacktestRun(strategy: any Strategy, chart: Chart, paramSet: ParameterSet, backtestSettings: BacktestSettings) async -> Evaluation {
         var executor = BacktestExecutor()
+        let candleWindowSize: Int = 50
         
         for i in 0..<chart.candles.count {
-            let subChart = chart[i-50..<i+1]
+            if i < candleWindowSize { continue }
+            
+            let subChart = chart[i-candleWindowSize+1..<i+1]
             let currCandle = chart.candles[i]
+            executor.simulatePositionUpdates(candle: currCandle)
             let openOrders = executor.getOpenOrders()
             let openPositions = executor.getOpenPositions()
             let actions = strategy.onCandle(subChart, orders: openOrders, positions: openPositions, paramSet: paramSet)
