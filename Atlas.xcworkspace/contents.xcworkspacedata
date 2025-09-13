@@ -22,4 +22,7 @@
    <FileRef
       location = "group:AtlasVault">
    </FileRef>
+   <FileRef
+      location = "group:AtlasComms">
+   </FileRef>
 </Workspace>
