@@ -9,13 +9,22 @@ let package = Package(
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "AtlasComms",
-            targets: ["AtlasComms"]),
+            targets: ["AtlasComms"])
+    ],
+    dependencies: [
+        .package(path: "../AtlasCore"),
+        .package(path: "../AtlasKit"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "AtlasComms"),
+            name: "AtlasComms",
+            dependencies: [
+                "AtlasCore",
+                "AtlasKit",
+            ]
+        ),
         .testTarget(
             name: "AtlasCommsTests",
             dependencies: ["AtlasComms"]
