@@ -20,7 +20,7 @@ public struct ChartService {
     private let indicatorsToCompute: [Indicator]
     
     public func loadAllCharts(timeframes: [Int]) async -> [Chart] {
-        var baseOneMinCharts: [Chart] = await chartDataHandler.getAllKlineCharts()
+        let baseOneMinCharts: [Chart] = await chartDataHandler.getAllKlineCharts()
         var klineCharts: [Chart] = []
         let oneMinuteIndexes: [Int] = baseOneMinCharts.indices.map { $0 }
         
@@ -74,7 +74,14 @@ public struct ChartService {
     }
     
     
-    private func addIndicatorsToChart(_ chart: inout Chart) {
+    public func addIndicatorsToChart(_ chart: inout Chart) {
         chart.indicators = indicatorEngine.computeIndicators(for: chart.candles, requiredIndicators: indicatorsToCompute)
+    }
+    
+    public func updateLastIndicators(_ chart: inout Chart) {
+        for (indicator, numbers) in chart.indicators{
+            let newValues = indicatorEngine.updateLastIndicator(for: chart.candles, existing: numbers, indicator: indicator)
+            chart.indicators[indicator] = newValues
+        }
     }
 }

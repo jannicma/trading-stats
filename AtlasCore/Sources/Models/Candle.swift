@@ -29,7 +29,7 @@ public struct Candle: Codable, Sendable {
 
 
 public struct Chart: Sendable {
-    public init(name: String, timeframe: Int, candles: [Candle], indicators: [String : [Double]] = [:]) {
+    public init(name: String, timeframe: Int, candles: [Candle], indicators: [Indicator : [Double]] = [:]) {
         self.name = name
         self.timeframe = timeframe
         self.candles = candles
@@ -39,13 +39,13 @@ public struct Chart: Sendable {
     //use index to get indicator for each candle
     public let name: String
     public let timeframe: Int
-    public let candles: [Candle]
-    public var indicators: [String: [Double]]
+    public var candles: [Candle]
+    public var indicators: [Indicator: [Double]]
     
     public subscript(range: Range<Int>) -> Chart {
         let clampedRange = range.clamped(to: 0..<candles.count)
         let slicedCandles = Array(candles[clampedRange])
-        var slicedIndicators: [String: [Double]] = [:]
+        var slicedIndicators: [Indicator: [Double]] = [:]
         for (key, values) in indicators {
             slicedIndicators[key] = Array(values[clampedRange])
         }

@@ -63,16 +63,16 @@ public struct StochRsiStrategy: Strategy {
         var actions: [TradeAction] = []
 
         let close = chart.candles[lastIndex].close
-        let stochValue = chart.indicators[stochIndicaor.name]![lastIndex]
+        let stochValue = chart.indicators[stochIndicaor]![lastIndex]
         let direction = directionFrom(stoch: stochValue, threashold: stochThreasholdParam)
-        let rsiValue = chart.indicators[rsiIndicator.name]![lastIndex]
+        let rsiValue = chart.indicators[rsiIndicator]![lastIndex]
         let currentCondition = direction == .long ? longCondition : shortCondition
 
         if positions.count == 0 && direction != .none
             && checkEntryCondition(
                 side: direction, rsi: rsiValue, stoch: stochValue, conditions: currentCondition)
         {
-            let atr = chart.indicators[atrIndicator.name]![lastIndex]
+            let atr = chart.indicators[atrIndicator]![lastIndex]
             let sl = close + ((2 * atr) * (direction == .long ? -1 : 1))
             let tp = close + ((30 * atr) * (direction == .long ? 1 : -1))
             let volume = OrderHelper.computeVolume(

@@ -153,7 +153,7 @@ public struct ChartServiceOld: Sendable {
         return true
     }
 
-    private func computeIndicators(for chart: [Candle], using controller: IndicatorEngine) -> [String: [Double]] {
+    private func computeIndicators(for chart: [Candle], using controller: IndicatorEngine) -> [Indicator: [Double]] {
         return controller.computeIndicators(for: chart, requiredIndicators: indicatorsToCompute)
     }
 

@@ -46,7 +46,7 @@ public struct TrippleEmaStrategy: Strategy {
             && isCorrectOrder(index: lastIndex, indicators: chart.indicators) && positions.count == 0
         {
             //this is the entry logic. All EMA/SMA crossed into the right order.
-            let atr = chart.indicators["ATR14"]![lastIndex]
+            let atr = chart.indicators[Indicator.sma(period: 14)]![lastIndex]
             let action = createTrade(candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult, symbol: chart.name)
             actions.append(action)
         }
@@ -85,11 +85,11 @@ public struct TrippleEmaStrategy: Strategy {
         return candle.close > candle.open
     }
 
-    private func isCorrectOrder(index: Int, indicators: [String: [Double]]) -> Bool {
+    private func isCorrectOrder(index: Int, indicators: [Indicator: [Double]]) -> Bool {
         var correctOrder: Bool = false
-        let sma5 = indicators["SMA5"]![index]
-        let sma20 = indicators["SMA20"]![index]
-        let sma200 = indicators["SMA200"]![index]
+        let sma5 = indicators[Indicator.sma(period: 5)]![index]
+        let sma20 = indicators[Indicator.sma(period: 20)]![index]
+        let sma200 = indicators[Indicator.sma(period: 200)]![index]
 
         if sma5 > sma20 && sma20 > sma200 {
             correctOrder = true
