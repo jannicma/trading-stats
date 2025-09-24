@@ -1,4 +1,4 @@
-public enum Side {
+public enum Side: Sendable {
     case long
     case short
 }

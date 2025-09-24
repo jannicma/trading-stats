@@ -1,4 +1,4 @@
-public struct PositionUpdate {
+public struct PositionUpdate: Sendable {
     public let newSL: Double?
     public let newTP: Double?
 

@@ -6,7 +6,7 @@ import PackageDescription
 let package = Package(
     name: "AtlasEngine",
     platforms: [
-        .macOS(.v11)
+        .macOS(.v13)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
@@ -17,7 +17,8 @@ let package = Package(
     dependencies: [
         .package(path: "../AtlasCore"),
         .package(path: "../AtlasKit"),
-        .package(path: "../AtlasPlaybook")
+        .package(path: "../AtlasPlaybook"),
+        .package(path: "../AtlasComms")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -27,7 +28,8 @@ let package = Package(
             dependencies: [
                 "AtlasCore",
                 "AtlasKit",
-                "AtlasPlaybook"
+                "AtlasPlaybook",
+                "AtlasComms"
             ]
         ),
         .testTarget(

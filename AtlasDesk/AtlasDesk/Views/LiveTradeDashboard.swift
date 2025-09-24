@@ -6,7 +6,7 @@
 //
 import SwiftUI
 
-struct LiveTradePlaceholder: View {
+struct LiveTradeDashboard: View {
     var body: some View {
         VStack(spacing: 12) {
             Image(systemName: "chart.line.uptrend.xyaxis")

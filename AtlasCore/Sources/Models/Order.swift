@@ -1,7 +1,7 @@
 import Foundation
 
-public struct Order {
-    public let id: UUID
+public struct Order: Sendable {
+    public let id: UUID //TODO: Add origin (strategy) ID
     public let symbol: String
     public let side: Side
     public var type: OrderType

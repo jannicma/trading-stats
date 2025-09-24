@@ -17,7 +17,13 @@ public struct ChartService {
     
     private let chartDataHandler: ChartDataHandler
     private let indicatorEngine: IndicatorEngine
-    private let indicatorsToCompute: [Indicator]
+    private var indicatorsToCompute: [Indicator]
+    
+    public mutating func addRequiredIndicators(indicator: Indicator){
+        if !indicatorsToCompute.contains(indicator){
+            indicatorsToCompute.append(indicator)
+        }
+    }
     
     public func loadAllCharts(timeframes: [Int]) async -> [Chart] {
         let baseOneMinCharts: [Chart] = await chartDataHandler.getAllKlineCharts()

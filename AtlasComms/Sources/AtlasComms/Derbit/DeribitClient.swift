@@ -8,11 +8,15 @@ public actor DeribitClient: ExchangeClient {
     private var candleTask: Task<Void, Never>?
     private var chartIndicators: [Indicator] = []
     private var chartService: ChartService
-    
-    public init(requiredIndicators: [Indicator]){
-        chartService = ChartService(indicatorsToCompute: requiredIndicators)
+
+    public init() {
+        chartService = ChartService(indicatorsToCompute: [])
     }
     
+    public func addRequiredIndicator(_ indicator: Indicator) {
+        chartService.addRequiredIndicators(indicator: indicator)
+    }
+
     public func fetchChart(of chartName: String, timeframe: Int) -> Chart? {
         return charts.first { $0.name == chartName && $0.timeframe == timeframe }
     }
@@ -25,10 +29,10 @@ public actor DeribitClient: ExchangeClient {
             print("abc")
         }
     }
-    
+
     public func startChartRefresh(symbols: [String], timeframes: [Int]) async {
         await backloadCharts(symbols: symbols, timeframes: timeframes)
-        
+
         for symbol in symbols {
             for timeframe in timeframes {
                 await handleChartUpdate(symbol: symbol, tf: timeframe)
@@ -36,12 +40,11 @@ public actor DeribitClient: ExchangeClient {
         }
     }
 
-    
     private func handleChartUpdate(symbol: String, tf: Int) async {
         let chartStream = try? await pub.subscribeChart(symbol: symbol, resolution: tf)
         guard let stream = chartStream else { return }
         Task {
-            do{
+            do {
                 for try await kline in stream {
                     let chartName = kline.symbol
                     let timeframe = kline.resolution
@@ -53,16 +56,21 @@ public actor DeribitClient: ExchangeClient {
                         close: (kline.close as NSDecimalNumber).doubleValue,
                         volume: (kline.volume as NSDecimalNumber).doubleValue
                     )
-                    await self.updateChart(symbol: chartName, timeframe: timeframe, newCandle: candle)
+                    await self.updateChart(
+                        symbol: chartName, timeframe: timeframe, newCandle: candle)
                 }
-            }catch {
+            } catch {
                 print("aaa")
             }
         }
     }
-    
+
     private func updateChart(symbol: String, timeframe: Int, newCandle: Candle) async {
-        guard let chartIndex = charts.firstIndex(where: { $0.name == symbol && $0.timeframe == timeframe }) else {
+        guard
+            let chartIndex = charts.firstIndex(where: {
+                $0.name == symbol && $0.timeframe == timeframe
+            })
+        else {
             print("asijudhai")
             return
         }
@@ -93,6 +101,7 @@ public actor DeribitClient: ExchangeClient {
     }
 
     private func backloadCandles(symbol: String, timeframe: Int) async throws -> [Candle] {
-        return await DeribitPublicRest.getHistoricalChart(for: symbol, intervalMinutes: timeframe, limit: 1000)
+        return await DeribitPublicRest.getHistoricalChart(
+            for: symbol, intervalMinutes: timeframe, limit: 1000)
     }
 }

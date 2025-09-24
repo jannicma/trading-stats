@@ -1,4 +1,4 @@
-public struct OrderUpdate {
+public struct OrderUpdate: Sendable {
     public let newPrice: Double?
     public let newQuantity: Double?
     public let newSL: Double?

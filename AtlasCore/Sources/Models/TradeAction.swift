@@ -1,6 +1,6 @@
 import Foundation
 
-public enum TradeAction {
+public enum TradeAction: Sendable {
     case open(order: Order)
     case cancel(orderId: UUID)
     case modifyOrder(orderId: UUID, update: OrderUpdate)

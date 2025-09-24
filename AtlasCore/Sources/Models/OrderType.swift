@@ -1,4 +1,4 @@
-public enum OrderType {
+public enum OrderType: Sendable {
     case market
     case limit(price: Double)
     

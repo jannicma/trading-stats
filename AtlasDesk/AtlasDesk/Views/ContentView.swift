@@ -19,7 +19,7 @@ struct ContentView: View {
             case .backtest:
                 StrategyGrid()
             case .liveTrade:
-                LiveTradePlaceholder()
+                LiveTradeDashboard()
             }
         }
     }
