@@ -8,28 +8,8 @@
 //  multiple files (Model, Views, ViewModel). Each section below is labeled
 //  with a pseudo-filename to improve readability until we physically split it.
 //
-
+import AtlasCore
 import SwiftUI
-
-struct StrategyModel: Identifiable, Hashable {
-    let id: UUID
-    var name: String
-    var profit: Double // running P&L in account currency
-    var startedAt: Date
-    var symbol: String
-    var colorA: Color
-    var colorB: Color
-
-    init(id: UUID = UUID(), name: String, profit: Double, startedAt: Date, symbol: String, colorA: Color, colorB: Color) {
-        self.id = id
-        self.name = name
-        self.profit = profit
-        self.startedAt = startedAt
-        self.symbol = symbol
-        self.colorA = colorA
-        self.colorB = colorB
-    }
-}
 
 struct LiveTradeDashboard: View {
     @State private var showingAddSheet = false

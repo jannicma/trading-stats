@@ -5,9 +5,10 @@
 //  Created by Jannic Marcon on 25.09.2025.
 //
 import SwiftUI
+import AtlasCore
 
 struct LiveStrategyGrid: View {
-    init(strategies: [StrategyModel], onTap: @escaping (StrategyModel) -> Void, onOpenLog: @escaping (StrategyModel) -> Void, onPause: @escaping (StrategyModel) -> Void, onStop: @escaping (StrategyModel) -> Void) {
+    init(strategies: [LiveStrategy], onTap: @escaping (LiveStrategy) -> Void, onOpenLog: @escaping (LiveStrategy) -> Void, onPause: @escaping (LiveStrategy) -> Void, onStop: @escaping (LiveStrategy) -> Void) {
         self.strategies = strategies
         self.onTap = onTap
         self.onOpenLog = onOpenLog
@@ -15,11 +16,11 @@ struct LiveStrategyGrid: View {
         self.onStop = onStop
     }
     
-    let strategies: [StrategyModel]
-    var onTap: (StrategyModel) -> Void
-    var onOpenLog: (StrategyModel) -> Void
-    var onPause: (StrategyModel) -> Void
-    var onStop: (StrategyModel) -> Void
+    let strategies: [LiveStrategy]
+    var onTap: (LiveStrategy) -> Void
+    var onOpenLog: (LiveStrategy) -> Void
+    var onPause: (LiveStrategy) -> Void
+    var onStop: (LiveStrategy) -> Void
 
     private var columns: [GridItem] = [
         GridItem(.adaptive(minimum: 240, maximum: 320), spacing: 12, alignment: .top)

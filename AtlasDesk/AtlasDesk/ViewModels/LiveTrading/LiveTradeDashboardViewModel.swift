@@ -6,27 +6,12 @@
 //
 import Foundation
 import SwiftUI
+import AtlasCore
 
 final class LiveTradeDashboardViewModel: ObservableObject {
-    @Published var strategies: [StrategyModel] = []
+    @Published var strategies: [LiveStrategy] = []
 
     init() { seedMock() }
-
-    // Quick-add used earlier; keeping for convenience
-    func addStrategy() {
-        let colors: [(Color, Color)] = [(.blue, .purple), (.pink, .orange), (.green, .teal), (.mint, .cyan), (.indigo, .blue), (.yellow, .orange)]
-        let pick = colors.randomElement() ?? (.blue, .purple)
-        let new = StrategyModel(
-            name: randomName(),
-            profit: Double.random(in: -500...2500).rounded(.toNearestOrAwayFromZero),
-            startedAt: .now.addingTimeInterval(-Double.random(in: 300...60*60*36)),
-            symbol: randomSymbol(),
-            colorA: pick.0,
-            colorB: pick.1
-        )
-        strategies.insert(new, at: 0)
-        print("[VM] Add strategy tapped -> created: \(new.name) \(new.symbol) id=\(new.id)")
-    }
 
     func addStrategy(template: StrategyTemplate, symbol: String?, colorA: Color?, colorB: Color?) {
         let name = template.rawValue
@@ -46,7 +31,7 @@ final class LiveTradeDashboardViewModel: ObservableObject {
         let cA = colorA ?? defaults.0
         let cB = colorB ?? defaults.1
 
-        let new = StrategyModel(
+        let new = LiveStrategy(
             name: name,
             profit: Double.random(in: -200...1200),
             startedAt: .now.addingTimeInterval(-Double.random(in: 120...60*60*12)),
@@ -59,23 +44,19 @@ final class LiveTradeDashboardViewModel: ObservableObject {
     }
 
     // Tile & menu actions
-    func tapStrategy(_ strategy: StrategyModel) { print("[VM] Tile tapped -> \(strategy.name) id=\(strategy.id)") }
-    func openLog(for strategy: StrategyModel) { print("[VM] Open Console Log for: \(strategy.name) id=\(strategy.id)") }
-    func pause(_ strategy: StrategyModel) { print("[VM] Pause requested for: \(strategy.name)") }
-    func stop(_ strategy: StrategyModel) { print("[VM] Stop requested for: \(strategy.name)") }
+    func tapStrategy(_ strategy: LiveStrategy) { print("[VM] Tile tapped -> \(strategy.name) id=\(strategy.id)") }
+    func openLog(for strategy: LiveStrategy) { print("[VM] Open Console Log for: \(strategy.name) id=\(strategy.id)") }
+    func pause(_ strategy: LiveStrategy) { print("[VM] Pause requested for: \(strategy.name)") }
+    func stop(_ strategy: LiveStrategy) { print("[VM] Stop requested for: \(strategy.name)") }
 
     // Mock
     private func seedMock() {
         strategies = [
-            StrategyModel(name: "Mean Reversion", profit: 1234.56, startedAt: .now.addingTimeInterval(TimeInterval(-60*60*7 - 60*22)), symbol: "BTC-PERP", colorA: .blue, colorB: .purple),
-            StrategyModel(name: "Breakout", profit: -245.12, startedAt: .now.addingTimeInterval(TimeInterval(-60*60*2 - 60*5)), symbol: "ETH-PERP", colorA: .pink, colorB: .orange),
-            StrategyModel(name: "Grid Bot", profit: 89.40, startedAt: .now.addingTimeInterval(TimeInterval(-60*60*30)), symbol: "SOL-PERP", colorA: .green, colorB: .teal),
-            StrategyModel(name: "Arb Scout", profit: 512.03, startedAt: .now.addingTimeInterval(TimeInterval(-60*12)), symbol: "BNB-PERP", colorA: .mint, colorB: .cyan)
+            LiveStrategy(name: "Mean Reversion", profit: 1234.56, startedAt: .now.addingTimeInterval(TimeInterval(-60*60*7 - 60*22)), symbol: "BTC-PERP", colorA: .blue, colorB: .purple),
+            LiveStrategy(name: "Breakout", profit: -245.12, startedAt: .now.addingTimeInterval(TimeInterval(-60*60*2 - 60*5)), symbol: "ETH-PERP", colorA: .pink, colorB: .orange),
+            LiveStrategy(name: "Grid Bot", profit: 89.40, startedAt: .now.addingTimeInterval(TimeInterval(-60*60*30)), symbol: "SOL-PERP", colorA: .green, colorB: .teal),
+            LiveStrategy(name: "Arb Scout", profit: 512.03, startedAt: .now.addingTimeInterval(TimeInterval(-60*12)), symbol: "BNB-PERP", colorA: .mint, colorB: .cyan)
         ]
-    }
-
-    private func randomName() -> String {
-        ["Momentum", "Breakout", "Mean Reversion", "Grid Bot", "Scalper", "Arb Scout", "Carry", "Vol Hunter"].randomElement()!
     }
 
     private func randomSymbol() -> String {

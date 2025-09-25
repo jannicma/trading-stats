@@ -5,6 +5,7 @@
 //  Created by Jannic Marcon on 25.09.2025.
 //
 import SwiftUI
+import AtlasCore
 
 enum StrategyTemplate: String, CaseIterable, Identifiable {
     case momentum = "Momentum"
@@ -80,7 +81,7 @@ struct AddStrategySheet: View {
             }
 
             Section("Preview") {
-                StrategyTile(strategy: StrategyModel(name: template.rawValue,
+                StrategyTile(strategy: LiveStrategy(name: template.rawValue,
                                                      profit: 0,
                                                      startedAt: .now,
                                                      symbol: template.needsSymbol ? symbol : "BTC-PERP",

@@ -5,10 +5,11 @@
 //  Created by Jannic Marcon on 25.09.2025.
 //
 import SwiftUI
+import AtlasCore
 
 struct StrategyTile: View {
-    let strategy: StrategyModel
-    let onTap: (StrategyModel) -> Void
+    let strategy: LiveStrategy
+    let onTap: (LiveStrategy) -> Void
 
     private var profitColor: Color { strategy.profit >= 0 ? .green : .red }
 
