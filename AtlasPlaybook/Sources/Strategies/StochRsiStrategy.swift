@@ -10,12 +10,12 @@ import AtlasKit
 import Foundation
 
 public struct StochRsiStrategy: Strategy {
+    public static let name = "Stochastic/RSI Strategy"
+    public var id: UUID = UUID()
+    
     public init(id: UUID) {
         self.id = id
     }
-
-    public var id: UUID
-    public var name = "Stochastic/RSI Strategy"
 
     public func getRequiredParameters() -> [ParameterRequirements] {
         return [

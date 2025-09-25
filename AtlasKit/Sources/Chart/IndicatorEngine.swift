@@ -168,7 +168,7 @@ struct IndicatorEngine {
     }
     
     private func updateRelativeStrengthIndex(on candles: [Candle], length: Int, existing: [Double]) -> Double {
-        var values = computeRelativeStrengthIndex(on: candles, length: length)
+        let values = computeRelativeStrengthIndex(on: candles, length: length)
         return values.last ?? 0.0
     }
     

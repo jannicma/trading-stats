@@ -26,9 +26,9 @@ final class BacktestDashboardViewModel: ObservableObject {
     }
     
     func getStrategyEvaluation(for stratIndex: Int) -> StrategyEvaluations {
-        let name = strategies[stratIndex].name
+        let name = type(of: strategies[stratIndex]).name
         let id = strategies[stratIndex].id
-        let evaluation = StrategyEvaluations(strategyName: name, strategyId: id as? UUID, evaluations: [])
+        let evaluation = StrategyEvaluations(strategyName: name, strategyId: id, evaluations: [])
         return evaluation
     }
 }

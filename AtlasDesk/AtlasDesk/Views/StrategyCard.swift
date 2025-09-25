@@ -15,24 +15,13 @@ struct StrategyCard: View {
             ZStack {
                 RoundedRectangle(cornerRadius: 18)
                     .fill(.blue.opacity(0.15))
-                Text(strategy.name)
+                Text(type(of: strategy).name)
                     .font(.headline)
                     .padding(.vertical, 26)
             }
             .frame(height: 110)
             
             HStack(spacing: 12) {
-            /*    ForEach(strategy.metrics) { m in
-                    VStack {
-                        Text(m.label.uppercased())
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Text(format(m.value))
-                            .font(.subheadline)
-                            .monospacedDigit()
-                    }
-                    .frame(maxWidth: .infinity)
-                }   */
             }
         }
         .padding(14)

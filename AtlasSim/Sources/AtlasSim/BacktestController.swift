@@ -14,33 +14,15 @@ public struct BacktestController {
     public init() {}
 
     private var allStrategies: [any Strategy] = []
-    private let allStrategyNames: [String] = [
-        "Tripple SMA Strategy",
-        "Stochastic/RSI Strategy",
-        "Candle Breakout Strategy",
-    ]
-
-    private func createStrategy(for name: String, uuid: UUID) -> any Strategy {
-        switch name {
-        case "Tripple SMA Strategy":
-            return TrippleEmaStrategy(id: uuid)
-        case "Stochastic/RSI Strategy":
-            return StochRsiStrategy(id: uuid)
-        case "Candle Breakout Strategy":
-            return CandleBreakoutStrategy(id: uuid)
-        default:
-            fatalError("Unsupported strategy name: \(name)")
-        }
-    }
 
     public mutating func loadAndGetAllStrategies() async -> [any Strategy] {
         let strategyDataService: StrategyDataService = .init()
         var allStrategies: [any Strategy] = []
 
         do {
-            for name in allStrategyNames {
-                let uuid = try await strategyDataService.getOrCreateStrategyUuid(for: name)
-                let strat = createStrategy(for: name, uuid: uuid)
+            for name in StrategyTypes.allCases {
+                let uuid = try await strategyDataService.getOrCreateStrategyUuid(for: name.type.name)
+                let strat = name.make(id: uuid)
                 allStrategies.append(strat)
             }
         } catch {
@@ -65,7 +47,7 @@ public struct BacktestController {
     }
 
     public func runBacktest(strategyId: UUID, backtestSettings: BacktestSettings) async -> Int {
-        let backtestingStrat: any Strategy = allStrategies.filter { $0.id as? UUID == strategyId }
+        let backtestingStrat: any Strategy = allStrategies.filter { $0.id == strategyId }
             .first!
         print("Strategy backtest is running now...")
 
@@ -129,7 +111,7 @@ public struct BacktestController {
 
         let evaluationDataService = EvaluationDataService()
         _ = await evaluationDataService.saveEvaluations(
-            allEvaluations, strategy: backtestingStrat.id as! UUID)
+            allEvaluations, strategy: backtestingStrat.id)
 
         return allEvaluations.count
     }

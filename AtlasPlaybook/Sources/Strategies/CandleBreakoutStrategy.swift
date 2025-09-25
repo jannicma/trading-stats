@@ -10,8 +10,9 @@ import AtlasKit
 import Foundation
 
 public struct CandleBreakoutStrategy: Strategy {
-    public var name: String = "Candle Breakout Strategy"
+    public static let name = "Breakout Strategy"
     public var id: UUID
+    
     public init(id: UUID) {
         self.id = id
     }
