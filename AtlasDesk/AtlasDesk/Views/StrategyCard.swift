@@ -20,9 +20,6 @@ struct StrategyCard: View {
                     .padding(.vertical, 26)
             }
             .frame(height: 110)
-            
-            HStack(spacing: 12) {
-            }
         }
         .padding(14)
         .background(

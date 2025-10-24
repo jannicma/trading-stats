@@ -17,13 +17,7 @@ struct LiveTradeDashboard: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            LiveStrategyGrid(
-                strategies: vm.strategies,
-                onTap: vm.tapStrategy,
-                onOpenLog: vm.openLog,
-                onPause: vm.pause,
-                onStop: vm.stop
-            )
+            tiles
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(.background)
@@ -37,6 +31,23 @@ struct LiveTradeDashboard: View {
             AddStrategySheet(vm: vm)
         }
     }
+    
+    private var tiles: some View {
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 16) {
+                ForEach(vm.strategies, id: \.self) { strategy in
+                    StrategyTile(strategy: strategy)
+                }
+            }
+            .padding(20)
+        }
+    }
+    
+    private let columns = [
+        GridItem(.adaptive(minimum: 150), spacing: 16)
+    ]
+
+
 }
 
 // ================================================================

@@ -7,10 +7,12 @@
 import AtlasCore
 import Foundation
 
-public enum StrategyTypes: CaseIterable {
+public enum StrategyType: CaseIterable, Identifiable {
     case candleBreakoutStrategy
     case stochRsiStrategy
     case trippleSmaStrategy
+    
+    public var id: String { self.type.name }
     
     public var type: any Strategy.Type {
         switch self{
@@ -18,6 +20,10 @@ public enum StrategyTypes: CaseIterable {
         case .stochRsiStrategy: return StochRsiStrategy.self
         case .trippleSmaStrategy: return TrippleSmaStrategy.self
         }
+    }
+    
+    public var name: String {
+        type.name
     }
     
     public func make(id: UUID) -> any Strategy {

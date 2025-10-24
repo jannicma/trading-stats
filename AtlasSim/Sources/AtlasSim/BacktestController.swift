@@ -20,7 +20,7 @@ public struct BacktestController {
         var allStrategies: [any Strategy] = []
 
         do {
-            for name in StrategyTypes.allCases {
+            for name in StrategyType.allCases {
                 let uuid = try await strategyDataService.getOrCreateStrategyUuid(for: name.type.name)
                 let strat = name.make(id: uuid)
                 allStrategies.append(strat)
