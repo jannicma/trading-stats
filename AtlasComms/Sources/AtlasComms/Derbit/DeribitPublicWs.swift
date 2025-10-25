@@ -107,11 +107,13 @@ public actor DeribitPublicWs {
             guard let self else { return }
             do {
                 while !Task.isCancelled {
-                    guard let socket = await self.socket else { break }
+                    print("in pump loop")
+                    guard let socket = await self.socket else { print("no socket"); break }
                     let msg = try await socket.receive()
                     await self.updateLastMessageTime()
                     switch msg {
                     case .string(let text):
+                        if text.contains("pong") { print("pong") }
                         await self.handle(text: text)
                     case .data(let data):
                         if let text = String(data: data, encoding: .utf8) {
@@ -146,6 +148,7 @@ public actor DeribitPublicWs {
 
                 do {
                     try await socket.send(.string(#"{"jsonrpc":"2.0","method":"public/ping"}"#))
+                    print("ping")
                 } catch {
                     // exit? i dont know
                 }

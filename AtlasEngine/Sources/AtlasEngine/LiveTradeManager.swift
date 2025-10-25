@@ -62,8 +62,12 @@ public actor LiveTradeManager {
     
     public func initDeribitClient() {
         self.client = DeribitClient() //TODO: add API secret
-        
         self.tradeExecutor = LiveTradeExecutor(client: self.client!)
+        
+        //TODO: remove
+        Task{
+            await client?.startChartRefresh(symbols: ["BTC-PERPETUAL"], timeframes: [1])
+        }
     }
     
     private func initClient() async {

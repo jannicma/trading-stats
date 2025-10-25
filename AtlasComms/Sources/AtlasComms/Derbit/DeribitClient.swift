@@ -12,7 +12,9 @@ public actor DeribitClient: ExchangeClient {
 
     public init() {
         chartService = ChartService(indicatorsToCompute: [])
-        Task { await self.initWebSockets() }
+        Task {
+            await self.initWebSockets()
+        }
     }
     
     public func addRequiredIndicator(_ indicator: Indicator) {
@@ -49,6 +51,7 @@ public actor DeribitClient: ExchangeClient {
                 for try await kline in stream {
                     let chartName = kline.symbol
                     let timeframe = kline.resolution
+                    print("New Data on \(chartName) at \(kline.time) with resolution \(timeframe)")
                     let candle = Candle(
                         time: kline.time,
                         open: (kline.open as NSDecimalNumber).doubleValue,
@@ -79,8 +82,10 @@ public actor DeribitClient: ExchangeClient {
         let lastCandleTime = charts[chartIndex].candles[lastCandleIndex].time
         if lastCandleTime == newCandle.time {
             charts[chartIndex].candles[lastCandleIndex] = newCandle
+            print("Update chart with index: \(lastCandleIndex)")
         } else {
             charts[chartIndex].candles.append(newCandle)
+            print("Add Candle to chart with index: \(lastCandleIndex + 1)")
         }
         chartService.updateLastIndicators(&charts[chartIndex])
     }
