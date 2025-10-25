@@ -8,9 +8,11 @@ public actor DeribitClient: ExchangeClient {
     private var candleTask: Task<Void, Never>?
     private var chartIndicators: [Indicator] = []
     private var chartService: ChartService
+    private let baseUrl: URL = URL(string: "wss://www.deribit.com/ws/api/v2")!
 
     public init() {
         chartService = ChartService(indicatorsToCompute: [])
+        Task { await self.initWebSockets() }
     }
     
     public func addRequiredIndicator(_ indicator: Indicator) {
@@ -22,9 +24,8 @@ public actor DeribitClient: ExchangeClient {
     }
 
     public func initWebSockets() async {
-        let url = URL(string: "")!
         do {
-            try await pub.connect(url: url)
+            try await pub.connect(url: baseUrl)
         } catch {
             print("abc")
         }

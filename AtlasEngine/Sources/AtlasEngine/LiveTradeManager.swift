@@ -60,12 +60,14 @@ public actor LiveTradeManager {
         return .milliseconds(Int(interval * 1000))
     }
     
-    public func initDeribitClient() async {
+    public func initDeribitClient() {
         self.client = DeribitClient() //TODO: add API secret
+        
         self.tradeExecutor = LiveTradeExecutor(client: self.client!)
     }
     
     private func initClient() async {
+        initDeribitClient()
         startMinuteTimer()
     }
     
