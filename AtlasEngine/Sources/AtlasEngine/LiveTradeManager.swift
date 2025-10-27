@@ -21,8 +21,11 @@ public actor LiveTradeManager {
         }
     }
     
+    //TODO: refactor structs
     private var liveStrategies: [UUID: any Strategy] = [:]
     private var liveParams: [UUID: ParameterSet] = [:]
+    private var liveSymbol: [UUID: String] = [:]
+    private var liveTimeframe: [UUID: Int] = [:]
     
     private var client: ExchangeClient?
     private var tradeExecutor: LiveTradeExecutor?
@@ -63,11 +66,6 @@ public actor LiveTradeManager {
     public func initDeribitClient() {
         self.client = DeribitClient() //TODO: add API secret
         self.tradeExecutor = LiveTradeExecutor(client: self.client!)
-        
-        //TODO: remove
-        Task{
-            await client?.startChartRefresh(symbols: ["BTC-PERPETUAL"], timeframes: [1])
-        }
     }
     
     private func initClient() async {
@@ -75,13 +73,23 @@ public actor LiveTradeManager {
         startMinuteTimer()
     }
     
-    public func addStrategy(_ strat: StrategyType, params: ParameterSet) -> LiveStrategyOverview {
+    public func addStrategy(_ strat: StrategyType, params: ParameterSet, symbol: String, timeframe: Int) -> LiveStrategyOverview {
         let id = UUID()
         let strategy = strat.make(id: id)
         liveStrategies[id] = strategy
         liveParams[id] = params
+        liveSymbol[id] = symbol
+        liveTimeframe[id] = timeframe
         
-        let overview = LiveStrategyOverview(id: id, name: strat.name, parameters: params, pnl: 0.0)
+        Task{
+            for indicator in strategy.getRequiredIndicators() {
+                await client?.addRequiredIndicator(indicator)
+            }
+            await client?.startChartRefresh(symbols: [symbol], timeframes: [timeframe])
+        }
+
+        
+        let overview = LiveStrategyOverview(id: id, name: strat.name, parameters: params, symbol: symbol, timeframe: timeframe, pnl: 0.0)
         return overview
     }
     
@@ -89,7 +97,7 @@ public actor LiveTradeManager {
         var strategies: [LiveStrategyOverview] = []
         for key in liveStrategies.keys {
             let stratName = type(of: liveStrategies[key]!).name
-            let strat = LiveStrategyOverview(id: key, name: stratName, parameters: liveParams[key]!, pnl: 0.0)
+            let strat = LiveStrategyOverview(id: key, name: stratName, parameters: liveParams[key]!, symbol: liveSymbol[key]!, timeframe: liveTimeframe[key]!, pnl: 0.0)
             strategies.append(strat)
         }
         return strategies
@@ -102,13 +110,21 @@ public actor LiveTradeManager {
             return
         }
         
-        let oneMinChart = await client.fetchChart(of: "BTC-PERPETUAL", timeframe: 1)!
+        var charts: [UUID: Chart] = [:]
+        for (id, _) in liveStrategies {
+            let tf = liveTimeframe[id]!
+            let symbol = liveSymbol[id]!
+            let chart = await client.fetchChart(of: symbol, timeframe: tf)!
+            charts[id] = chart
+        }
+        
+        //TODO: add ID to executor to get data for one strategy
         let orders: [Order] = tradeExecutor.getOpenOrders()
         let positions: [Position] = tradeExecutor.getOpenPositions()
         
         for id in liveStrategies.keys {
             Task{
-                await strategyLoop(id, chart: oneMinChart, orders: orders, positions: positions)
+                await strategyLoop(id, chart: charts[id]!, orders: orders, positions: positions)
             }
         }
     }

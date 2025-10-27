@@ -18,7 +18,11 @@ public actor DeribitClient: ExchangeClient {
     }
     
     public func addRequiredIndicator(_ indicator: Indicator) {
+        //TODO: only add to charts where needed, when needed
         chartService.addRequiredIndicators(indicator: indicator)
+        for idx in charts.indices {
+            chartService.addIndicatorsToChart(&charts[idx])
+        }
     }
 
     public func fetchChart(of chartName: String, timeframe: Int) -> Chart? {
@@ -82,10 +86,11 @@ public actor DeribitClient: ExchangeClient {
         let lastCandleTime = charts[chartIndex].candles[lastCandleIndex].time
         if lastCandleTime == newCandle.time {
             charts[chartIndex].candles[lastCandleIndex] = newCandle
-            print("Update chart with index: \(lastCandleIndex)")
         } else {
+            if charts[chartIndex].candles.count > 1500 {
+                _ = charts[chartIndex].candles.removeFirst()
+            }
             charts[chartIndex].candles.append(newCandle)
-            print("Add Candle to chart with index: \(lastCandleIndex + 1)")
         }
         chartService.updateLastIndicators(&charts[chartIndex])
     }

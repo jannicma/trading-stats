@@ -15,12 +15,18 @@ final class LiveTradeDashboardViewModel: ObservableObject, @unchecked Sendable {
     private let tradeManager: LiveTradeManager = LiveTradeManager.shared
 
     init() {  }
-    
 
-    func addStrategy(template: StrategyType, symbol: String) async {
-        let newStrategy: LiveStrategyOverview = await tradeManager.addStrategy(template, params: ParameterSet(parameters: []))
-        DispatchQueue.main.async { 
+    func addStrategy(strategy: StrategyType, params: ParameterSet, symbol: String, timeframe: Int) async {
+        let newStrategy: LiveStrategyOverview = await tradeManager.addStrategy(strategy, params: params, symbol: symbol, timeframe: timeframe)
+        DispatchQueue.main.async {
             self.strategies.append(newStrategy)
         }
+    }
+
+    func getStrategyParameterDefaults(stratType: StrategyType) -> ParameterSet {
+        let strategy = stratType.make(id: UUID())
+        let paramRequirements = strategy.getRequiredParameters()
+        let params = paramRequirements.map { Parameter(name: $0.name, value: 0.0) }
+        return ParameterSet(parameters: params)
     }
 }

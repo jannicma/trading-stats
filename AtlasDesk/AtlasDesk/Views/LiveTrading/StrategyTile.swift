@@ -57,6 +57,8 @@ private extension LiveStrategyOverview {
             id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
             name: "Sample Strategy",
             parameters: ParameterSet(parameters: []),
+            symbol: "BTC-JANNICMA",
+            timeframe: 1,
             pnl: 1234.56
         )
     }
