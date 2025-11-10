@@ -16,7 +16,7 @@ public actor DeribitClient: ExchangeClient {
             await self.initWebSockets()
         }
     }
-    
+
     public func addRequiredIndicator(_ indicator: Indicator) {
         //TODO: only add to charts where needed, when needed
         chartService.addRequiredIndicators(indicator: indicator)
@@ -55,7 +55,6 @@ public actor DeribitClient: ExchangeClient {
                 for try await kline in stream {
                     let chartName = kline.symbol
                     let timeframe = kline.resolution
-                    print("New Data on \(chartName) at \(kline.time) with resolution \(timeframe)")
                     let candle = Candle(
                         time: kline.time,
                         open: (kline.open as NSDecimalNumber).doubleValue,
@@ -85,12 +84,22 @@ public actor DeribitClient: ExchangeClient {
         let lastCandleIndex = charts[chartIndex].candles.count - 1
         let lastCandleTime = charts[chartIndex].candles[lastCandleIndex].time
         if lastCandleTime == newCandle.time {
-            charts[chartIndex].candles[lastCandleIndex] = newCandle
+            charts[chartIndex].candles[lastCandleIndex].high = newCandle.high
+            charts[chartIndex].candles[lastCandleIndex].low = newCandle.low
+            charts[chartIndex].candles[lastCandleIndex].close = newCandle.close
+            charts[chartIndex].candles[lastCandleIndex].volume = newCandle.volume
+
         } else {
             if charts[chartIndex].candles.count > 1500 {
                 _ = charts[chartIndex].candles.removeFirst()
+                for key in charts[chartIndex].indicators.keys {
+                    _ = charts[chartIndex].indicators[key]?.removeFirst()
+                }
             }
-            charts[chartIndex].candles.append(newCandle)
+            let lastCandle = charts[chartIndex].candles.last!
+            let lastClose = lastCandle.close
+            var candle = newCandle
+            candle.open = lastClose
         }
         chartService.updateLastIndicators(&charts[chartIndex])
     }
