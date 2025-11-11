@@ -100,6 +100,7 @@ public actor DeribitClient: ExchangeClient {
             let lastClose = lastCandle.close
             var candle = newCandle
             candle.open = lastClose
+            charts[chartIndex].candles.append(candle)
         }
         chartService.updateLastIndicators(&charts[chartIndex])
     }
