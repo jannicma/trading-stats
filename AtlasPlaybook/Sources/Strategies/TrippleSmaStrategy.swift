@@ -12,7 +12,7 @@ import Foundation
 public struct TrippleSmaStrategy: Strategy {
     static public let name = "Tripple SMA Strategy"
     public var id: UUID = UUID()
-    
+
     public init(id: UUID) {
         self.id = id
     }
@@ -46,18 +46,22 @@ public struct TrippleSmaStrategy: Strategy {
         var actions: [TradeAction] = []
 
         if !isCorrectOrder(index: lastIndex - 1, indicators: chart.indicators)
-            && isCorrectOrder(index: lastIndex, indicators: chart.indicators) && positions.count == 0
+            && isCorrectOrder(index: lastIndex, indicators: chart.indicators)
+            && positions.count == 0
         {
             //this is the entry logic. All EMA/SMA crossed into the right order.
             let atr = chart.indicators[Indicator.atr(length: 14)]![lastIndex]
-            let action = createTrade(candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult, symbol: chart.name)
+            let action = createTrade(
+                candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult, symbol: chart.name)
             actions.append(action)
         }
 
         return actions
     }
 
-    private func createTrade(candle: Candle, atr: Double, tpMult: Double, slMult: Double, symbol: String)
+    private func createTrade(
+        candle: Candle, atr: Double, tpMult: Double, slMult: Double, symbol: String
+    )
         -> TradeAction
     {
         assert(atr > 0)

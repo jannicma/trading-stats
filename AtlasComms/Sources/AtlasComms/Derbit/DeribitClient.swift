@@ -67,7 +67,7 @@ public actor DeribitClient: ExchangeClient {
                         symbol: chartName, timeframe: timeframe, newCandle: candle)
                 }
             } catch {
-                print("aaa")
+                print("aaa... error: \(error)")
             }
         }
     }

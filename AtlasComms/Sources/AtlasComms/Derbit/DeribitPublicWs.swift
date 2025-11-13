@@ -1,5 +1,5 @@
-import Foundation
 import AtlasCore
+import Foundation
 
 public actor DeribitPublicWs {
     private var session: URLSession?
@@ -13,7 +13,8 @@ public actor DeribitPublicWs {
     private let heartbeatInterval: TimeInterval = 15
     private let idleTimeout: TimeInterval = 60
 
-    private var continuations: [CandleKey: AsyncThrowingStream<TransferKline, Error>.Continuation] = [:]
+    private var continuations: [CandleKey: AsyncThrowingStream<TransferKline, Error>.Continuation] =
+        [:]
     private var refCount: [CandleKey: Int] = [:]
     private var channelToKey: [String: CandleKey] = [:]
 
@@ -84,6 +85,7 @@ public actor DeribitPublicWs {
     }
 
     public func dissconnect() async {
+        print("dissconnect web socket")
         pingTask?.cancel()
         pingTask = nil
         pumpTask?.cancel()
@@ -107,7 +109,10 @@ public actor DeribitPublicWs {
             guard let self else { return }
             do {
                 while !Task.isCancelled {
-                    guard let socket = await self.socket else { print("no socket"); break }
+                    guard let socket = await self.socket else {
+                        print("no socket")
+                        break
+                    }
                     let msg = try await socket.receive()
                     await self.updateLastMessageTime()
                     switch msg {

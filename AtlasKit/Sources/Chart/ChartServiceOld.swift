@@ -6,10 +6,9 @@
 //
 // TODO: Maybe reconsider file location
 
-
-import Foundation
 import AtlasCore
 import AtlasVault
+import Foundation
 
 public struct ChartServiceOld: Sendable {
     public init(indicatorsToCompute: [Indicator]) {
@@ -21,34 +20,38 @@ public struct ChartServiceOld: Sendable {
     // MARK: - Public API
 
     public func loadTestCharts() async -> [Chart] {
-        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key == "test"  }
+        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key == "test" }
         let indicatorEngine = IndicatorEngine()
         let (name, files) = allChartPaths.first!
-        
+
         let allCharts = generateMultiTimeframeCharts(from: files, name: name)
 
         var allIndicatorCharts: [Chart] = []
         for (chartName, chartCandles) in allCharts {
             var indicators = computeIndicators(for: chartCandles, using: indicatorEngine)
             let dropCount = indicators.map { $0.value.filter { $0 == 0.0 }.count }.max() ?? 0
-            
+
             for (key, value) in indicators {
                 indicators[key] = Array(value.dropFirst(dropCount))
             }
             let trimmedCandles = Array(chartCandles.dropFirst(dropCount))
             assert(trimmedCandles.count == indicators.first!.value.count)
-            
-            allIndicatorCharts.append(Chart(name: chartName, timeframe: 1, candles: trimmedCandles, indicators: indicators))
+
+            allIndicatorCharts.append(
+                Chart(
+                    name: chartName, timeframe: 1, candles: trimmedCandles, indicators: indicators))
         }
-        
+
         return allIndicatorCharts
     }
 
     public func loadAllCharts(initChartsForTesting: [String: [Candle]] = [:]) async -> [Chart] {
-        let allChartPaths = CsvController.loadAllChartFileURLs().filter { $0.key != "bak" && $0.key != "tmp" && $0.key != "test" && $0.key != "indicatorTesting"  }
+        let allChartPaths = CsvController.loadAllChartFileURLs().filter {
+            $0.key != "bak" && $0.key != "tmp" && $0.key != "test" && $0.key != "indicatorTesting"
+        }
         var allRawCharts: [String: [Candle]] = initChartsForTesting
         let indicatorController = IndicatorEngine()
-        
+
         if allRawCharts.isEmpty {
             await withTaskGroup(of: [String: [Candle]].self) { group in
                 for (name, files) in allChartPaths {
@@ -56,7 +59,7 @@ public struct ChartServiceOld: Sendable {
                         generateMultiTimeframeCharts(from: files, name: name)
                     }
                 }
-                
+
                 for await result in group {
                     allRawCharts.merge(result, uniquingKeysWith: { $1 })
                 }
@@ -68,15 +71,17 @@ public struct ChartServiceOld: Sendable {
             for (name, candles) in allRawCharts {
                 group.addTask {
                     var indicators = computeIndicators(for: candles, using: indicatorController)
-                    let dropCount = indicators.map { $0.value.filter { $0 == 0.0 }.count }.max() ?? 0
+                    let dropCount =
+                        indicators.map { $0.value.filter { $0 == 0.0 }.count }.max() ?? 0
 
                     for (key, value) in indicators {
                         indicators[key] = Array(value.dropFirst(dropCount))
                     }
                     let trimmedCandles = Array(candles.dropFirst(dropCount))
                     assert(trimmedCandles.count == indicators.first!.value.count)
-                    
-                    return Chart(name: name, timeframe: 1, candles: trimmedCandles, indicators: indicators)
+
+                    return Chart(
+                        name: name, timeframe: 1, candles: trimmedCandles, indicators: indicators)
                 }
             }
 
@@ -119,7 +124,7 @@ public struct ChartServiceOld: Sendable {
                     do {
                         try saveChartGroupedByMonth(candles, named: name)
                     } catch {
-                        print("there was an error")
+                        print("there was an error: \(error)")
                     }
                 } else {
                     print("maaan, it did not fix it... \(name)")
@@ -153,11 +158,14 @@ public struct ChartServiceOld: Sendable {
         return true
     }
 
-    private func computeIndicators(for chart: [Candle], using controller: IndicatorEngine) -> [Indicator: [Double]] {
+    private func computeIndicators(for chart: [Candle], using controller: IndicatorEngine)
+        -> [Indicator: [Double]]
+    {
         return controller.computeIndicators(for: chart, requiredIndicators: indicatorsToCompute)
     }
 
-    private func generateMultiTimeframeCharts(from files: [URL], name: String) -> [String: [Candle]] {
+    private func generateMultiTimeframeCharts(from files: [URL], name: String) -> [String: [Candle]]
+    {
         var candles: [Candle] = []
         for url in files {
             let part = CsvController.loadCandles(from: url)
@@ -177,13 +185,14 @@ public struct ChartServiceOld: Sendable {
             for candle in candles {
                 buffer.append(candle)
                 if buffer.count == groupSize {
-                    grouped.append(Candle(
-                        time: buffer.first!.time,
-                        open: buffer.first!.open,
-                        high: buffer.map(\.high).max()!,
-                        low: buffer.map(\.low).min()!,
-                        close: buffer.last!.close
-                    ))
+                    grouped.append(
+                        Candle(
+                            time: buffer.first!.time,
+                            open: buffer.first!.open,
+                            high: buffer.map(\.high).max()!,
+                            low: buffer.map(\.low).min()!,
+                            close: buffer.last!.close
+                        ))
                     buffer.removeAll()
                 }
             }
@@ -222,7 +231,8 @@ public struct ChartServiceOld: Sendable {
         }
     }
 
-    private func interpolateInvalidCandles(in candles: inout [Candle], from start: Int, to end: Int) {
+    private func interpolateInvalidCandles(in candles: inout [Candle], from start: Int, to end: Int)
+    {
         let previous = candles[start]
         let next = candles[end]
         let count = end - start
