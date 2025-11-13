@@ -53,7 +53,7 @@ public struct TrippleSmaStrategy: Strategy {
             let action = createTrade(candle: currCandle, atr: atr, tpMult: tpMult, slMult: slMult, symbol: chart.name)
             actions.append(action)
         }
-        //Exits will be handled by TP and SL  //TODO: remove comment
+
         return actions
     }
 
