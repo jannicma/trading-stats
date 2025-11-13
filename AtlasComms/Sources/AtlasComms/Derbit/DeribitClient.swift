@@ -123,6 +123,6 @@ public actor DeribitClient: ExchangeClient {
 
     private func backloadCandles(symbol: String, timeframe: Int) async throws -> [Candle] {
         return await DeribitPublicRest.getHistoricalChart(
-            for: symbol, intervalMinutes: timeframe, limit: 1000)
+            for: symbol, intervalMinutes: timeframe, limit: 10000)
     }
 }
